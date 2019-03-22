@@ -1,8 +1,8 @@
 {
-  "name": "project",
+  "name": "RollRace",
   "version": "0.1.0",
   "private": true,
-  "description": "Describe your project",
+  "description": "RollRace is an online, multiplayer, sidescrolling racing game that pits friends and foes alike in a race to the death (and against time).",
   "engines": {
     "node": "10.15.x"
   },
@@ -17,8 +17,12 @@
   ],
   "keywords": [],
   "contributors": [
-    "Student1 <student1@middlebury.edu>",
-    "Student2 <student2@middlebury.edu>"
+    "Kibet Gad <glotiolo@middlebury.edu>",
+    "Kai DeLorenzo <kjdelorenzo@middlebury.edu>",
+    "Elijah Peake <epeake@middlebury.edu>",
+    "Anthony Turcios <aturcios@middlebury.edu>",
+    "Bryan Diaz <bddiaz@middlebury.edu>",
+    "Joshua Ravishankar <jravishankar@middlebury.edu>"
   ],
   "license": "Apache-2.0",
   "devDependencies": {
