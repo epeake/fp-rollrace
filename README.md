@@ -80,7 +80,7 @@ and added an `"extends"` entry to `.eslintrc.json`.
 
 The skeleton is setup for CI with Travis-CI. Travis will build the client and test and lint both the client and the server.
 
-https://travis-ci.com/csci312a-s19/fp-rollrace.svg?token=Hyy79yxXoEwF3R53oyHK&branch=master
+[![Build Status](https://travis-ci.com/csci312a-s19/fp-rollrace.svg?token=Hyy79yxXoEwF3R53oyHK&branch=master)](https://travis-ci.com/csci312a-s19/fp-rollrace)
 
 ## Deploying to Heroku
 
