@@ -1,3 +1,10 @@
+[![Build Status](https://travis-ci.com/csci312a-s19/fp-rollrace.svg?token=Hyy79yxXoEwF3R53oyHK&branch=master)](https://travis-ci.com/csci312a-s19/fp-rollrace)
+
+# Roll Race
+Have you ever been sitting in lecture, bored out of your mind? Well sit no further!
+Now introducing RollRace, an online, multiplayer racing game that soothes your
+itch for a good time.
+
 # Project Skeleton Top-level
 
 This repository combines the client and server into a single repository that can be co-developed, tested and ultimately deployed to Heroku or basin.cs.middlebury.edu.
@@ -76,6 +83,8 @@ and added an `"extends"` entry to `.eslintrc.json`.
 The skeleton is setup for CI with Travis-CI. Travis will build the client and test and lint both the client and the server.
 
 ## Deploying to Heroku
+
+Link to Heroku App: https://aqueous-bayou-41404.herokuapp.com/
 
 Your application can be deployed to [Heroku](heroku.com) using the approach demonstrated in this [repository](https://github.com/mars/heroku-cra-node). The key additions to the top-level `package.json` file to enable Heroku deployment:
 
