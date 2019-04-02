@@ -9,7 +9,6 @@ const jump = {
 const JUMP_HEIGHT = 120;
 const JUMP_INCREMENT = 3;
 const UPDATE_TIMEOUT = 1;
-let resizeId;
 
 class GameCharacter extends Component {
   constructor(props) {
@@ -41,6 +40,7 @@ class GameCharacter extends Component {
 
   // https://alvarotrigo.com/blog/firing-resize-event-only-once-when-resizing-is-finished/
   handleWindowResize() {
+    let resizeId;
     clearTimeout(resizeId);
     resizeId = setTimeout(() => {
       this.setState({
@@ -54,6 +54,7 @@ class GameCharacter extends Component {
   componentDidUpdate() {
     // don't bother checking conditionals if still stopped
     if (this.state.jumpState !== jump.STOP) {
+      // going up
       if (
         this.state.yStart - this.state.y < JUMP_HEIGHT &&
         this.state.jumpState === jump.UP
@@ -61,7 +62,10 @@ class GameCharacter extends Component {
         setTimeout(() => {
           this.setState({ y: this.state.y - JUMP_INCREMENT });
         }, UPDATE_TIMEOUT);
-      } else if (
+      }
+
+      // we've hit the top
+      else if (
         this.state.yStart - this.state.y >= JUMP_HEIGHT &&
         this.state.jumpState === jump.UP
       ) {
@@ -69,14 +73,20 @@ class GameCharacter extends Component {
           jumpState: jump.DOWN,
           y: this.state.y + JUMP_INCREMENT
         });
-      } else if (
+      }
+
+      // coming down
+      else if (
         this.state.yStart - this.state.y > 0 &&
         this.state.jumpState === jump.DOWN
       ) {
         setTimeout(() => {
           this.setState({ y: this.state.y + JUMP_INCREMENT });
         }, UPDATE_TIMEOUT);
-      } else if (
+      }
+
+      // we've hit the bottom
+      else if (
         this.state.yStart - this.state.y === 0 &&
         this.state.jumpState === jump.DOWN
       ) {
