@@ -9,6 +9,7 @@ const jump = {
 const JUMP_HEIGHT = 120;
 const JUMP_INCREMENT = 3;
 const UPDATE_TIMEOUT = 1;
+let resizeId;
 
 class GameCharacter extends Component {
   constructor(props) {
@@ -17,15 +18,18 @@ class GameCharacter extends Component {
       x: 400,
       y: 400,
       yStart: 400,
-      jumpState: jump.STOP
+      jumpState: jump.STOP,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
     };
 
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleWindowResize = this.handleWindowResize.bind(this);
   }
 
   // Allows the character to jump when spacebar is pressed
   handleKeyPress(event) {
-    if (event.keyCode === 87 && this.state.jumpState === jump.STOP) {
+    if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
       // so they can't jump mid jump
       this.setState({
         yStart: this.state.y,
@@ -33,8 +37,20 @@ class GameCharacter extends Component {
         y: this.state.y - 3
       });
     }
-  } // Handle animation
+  }
 
+  // https://alvarotrigo.com/blog/firing-resize-event-only-once-when-resizing-is-finished/
+  handleWindowResize() {
+    clearTimeout(resizeId);
+    resizeId = setTimeout(() => {
+      this.setState({
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight
+      });
+    }, 500); // wait until finished resizing until fired
+  }
+
+  // Handle animation
   componentDidUpdate() {
     // don't bother checking conditionals if still stopped
     if (this.state.jumpState !== jump.STOP) {
@@ -73,8 +89,15 @@ class GameCharacter extends Component {
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
+    window.addEventListener('resize', () => this.handleWindowResize());
+
     return (
-      <svg viewBox={`0 0 1000 1000`} preserveAspectRatio={'xMidYMid meet'}>
+      <svg
+        viewBox={'0 0 500 1000'}
+        preserveAspectRatio={'xMinYMin meet'}
+        height={window.innerHeight}
+        width={window.innerWidth}
+      >
                 
         <circle
           cx={this.state.x}
