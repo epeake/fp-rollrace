@@ -36,6 +36,8 @@ class GameCharacter extends Component {
         jumpState: jump.UP,
         y: this.state.y - 3
       });
+    } else {
+      void 0; // do nothing
     }
   }
 
