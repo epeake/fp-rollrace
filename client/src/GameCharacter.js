@@ -7,13 +7,14 @@ const jump = {
   DOWN: 2
 };
 const JUMP_HEIGHT = 120;
-const JUMP_INCREMENT = 3;
-const UPDATE_TIMEOUT = 1;
+const JUMP_TIME = 500;
+const UPDATE_TIMEOUT = 0.01;
 
 class GameCharacter extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      jumpStartTime: undefined,
       x: 400,
       y: 400,
       yStart: 400,
@@ -34,7 +35,7 @@ class GameCharacter extends Component {
       this.setState({
         yStart: this.state.y,
         jumpState: jump.UP,
-        y: this.state.y - 3
+        jumpStartTime: new Date().getTime()
       });
     } else {
       void 0; // do nothing
@@ -55,45 +56,30 @@ class GameCharacter extends Component {
 
   // Handle animation
   componentDidUpdate() {
-    // don't bother checking conditionals if still stopped
+    // don't begin a jump if no jump was initialized
     if (this.state.jumpState !== jump.STOP) {
-      // going up
-      if (
-        this.state.yStart - this.state.y < JUMP_HEIGHT &&
-        this.state.jumpState === jump.UP
-      ) {
+      // mid jump
+      const currentTime = new Date().getTime();
+      if (currentTime - this.state.jumpStartTime < JUMP_TIME) {
         setTimeout(() => {
-          this.setState({ y: this.state.y - JUMP_INCREMENT });
+          this.setState({
+            y:
+              this.state.yStart -
+              Math.abs(
+                Math.abs(
+                  ((currentTime - this.state.jumpStartTime) / JUMP_TIME) *
+                    2 *
+                    JUMP_HEIGHT -
+                    JUMP_HEIGHT
+                ) - JUMP_HEIGHT
+              )
+          });
         }, UPDATE_TIMEOUT);
       }
 
-      // we've hit the top
-      else if (
-        this.state.yStart - this.state.y >= JUMP_HEIGHT &&
-        this.state.jumpState === jump.UP
-      ) {
-        this.setState({
-          jumpState: jump.DOWN,
-          y: this.state.y + JUMP_INCREMENT
-        });
-      }
-
-      // coming down
-      else if (
-        this.state.yStart - this.state.y > 0 &&
-        this.state.jumpState === jump.DOWN
-      ) {
-        setTimeout(() => {
-          this.setState({ y: this.state.y + JUMP_INCREMENT });
-        }, UPDATE_TIMEOUT);
-      }
-
-      // we've hit the bottom
-      else if (
-        this.state.yStart - this.state.y === 0 &&
-        this.state.jumpState === jump.DOWN
-      ) {
-        this.setState({ jumpState: jump.STOP });
+      // stop jump when jump should be over and return the sprite to the original prejump location
+      else {
+        this.setState({ jumpState: jump.STOP, y: this.state.yStart });
       }
     }
   }
