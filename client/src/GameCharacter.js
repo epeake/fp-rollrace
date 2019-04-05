@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Map from './Map.js';
 
 // Jump state enum for clarity
 const jump = {
@@ -14,7 +15,7 @@ class GameCharacter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      x: 400,
+      x: 60,
       y: 400,
       yStart: 400,
       jumpState: jump.STOP,
@@ -100,11 +101,10 @@ class GameCharacter extends Component {
           });
         }, UPDATE_TIMEOUT); // timeout controls animation speed
       } else {
-
-      /*
-       * stop jump when jump should be over and return the sprite to the
-       * original prejump location
-       */
+        /*
+         * stop jump when jump should be over and return the sprite to the
+         * original prejump location
+         */
         this.setState({ jumpState: jump.STOP, y: this.state.yStart });
       }
     }
@@ -135,6 +135,7 @@ class GameCharacter extends Component {
           strokeWidth={1}
           fill={'green'}
         />
+        <Map />
               
       </svg>
     );
