@@ -10,8 +10,11 @@ __author__ = "Elijah Peake <epeake@middlebury.edu>"
 
 
 if __name__ == "__main__":
-    print("Input path string\n")
+    print("Input file path\n")
     original_path = input()
+    with open(original_path, 'r') as file:
+        original_path = file.read().replace('\n', '')
+        
     f = open("path_output.txt", "w")
 
     numbers = set(["-", "1","2","3","4","5","6","7","8","9","0"])
@@ -22,7 +25,7 @@ if __name__ == "__main__":
     path_split = [num for num in path.split(" ")
                  if len(num) > 0 and num[0] in numbers]
 
-    path_replacements = {old: str(round(eval(old))) for old in path_split}
+    path_replacements = {old: str(round(eval(old) * 60)) for old in path_split}
 
     path = original_path
     for key in path_replacements:
