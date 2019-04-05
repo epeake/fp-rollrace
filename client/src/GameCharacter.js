@@ -23,13 +23,33 @@ class GameCharacter extends Component {
       windowHeight: window.innerHeight
     };
 
+    this.temporaryState = {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    };
+
+    this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
   }
 
+  // Prevent functions from event handlers from being repeatedly called
+  debounce(func, delay, ...args) {
+    let timeout;
+
+    return () => {
+      let fireLater = () => {
+        func(...args);
+      };
+
+      clearTimeout(timeout);
+      timeout = setTimeout(fireLater, delay);
+    };
+  }
+
   // Allows the character to jump when spacebar is pressed
   handleKeyPress(event) {
-    // TODO: promise so excecutes when hits bottom (queue a single spacebar so maybe clear promisess)
+    // TODO: promise so excecutes when hits bottom?
     if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
       // so they can't jump mid jump
       this.setState({
@@ -42,16 +62,12 @@ class GameCharacter extends Component {
     }
   }
 
-  // https://alvarotrigo.com/blog/firing-resize-event-only-once-when-resizing-is-finished/
+  // Resets our current window dimentions
   handleWindowResize() {
-    let resizeId;
-    clearTimeout(resizeId);
-    resizeId = setTimeout(() => {
-      this.setState({
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight
-      });
-    }, 500); // wait until finished resizing until fired
+    Object.assign(this.temporaryState, {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
   }
 
   // Handle animation
@@ -88,7 +104,10 @@ class GameCharacter extends Component {
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
-    window.addEventListener('resize', () => this.handleWindowResize());
+    window.addEventListener(
+      'resize',
+      this.debounce(this.handleWindowResize, 500)
+    );
 
     return (
       <svg
