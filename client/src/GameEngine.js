@@ -61,7 +61,6 @@ class GameEngine extends Component {
 
   // Allows the character to jump when spacebar is pressed
   handleKeyPress(event) {
-    // TODO: promise so excecutes when hits bottom?
     if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
       // so they can't jump mid jump
       this.jumpStartTime = new Date().getTime();
