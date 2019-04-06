@@ -10,7 +10,7 @@ const jump = {
 const JUMP_HEIGHT = 120;
 const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
-const SCROLL_SPEED = 2;
+const SCROLL_SPEED = 1 / 5;
 
 class GameEngine extends Component {
   constructor(props) {
@@ -25,6 +25,7 @@ class GameEngine extends Component {
       windowHeight: window.innerHeight
     };
 
+    this.gameStartTime = null;
     this.jumpStartTime = null;
 
     /*
@@ -59,10 +60,15 @@ class GameEngine extends Component {
     };
   }
 
-  // Allows the character to jump when spacebar is pressed
+  /*
+   * Allows the character to jump when spacebar is pressed and prevents the
+   * character from jumping mid-jump
+   */
   handleKeyPress(event) {
     if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
-      // so they can't jump mid jump
+      if (!this.gameStartTime) {
+        this.gameStartTime = new Date().getTime();
+      }
       this.jumpStartTime = new Date().getTime();
       this.setState({
         yStart: this.state.y,
@@ -96,7 +102,8 @@ class GameEngine extends Component {
         clearTimeout(this.mapTimeout);
         this.mapTimeout = setTimeout(() => {
           this.setState({
-            mapTranslation: this.state.mapTranslation - SCROLL_SPEED,
+            mapTranslation:
+              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED,
             y:
               this.state.yStart -
               Math.abs(
@@ -120,9 +127,10 @@ class GameEngine extends Component {
       clearTimeout(this.mapTimeout);
       this.mapTimeout = setTimeout(() => {
         this.setState({
-          mapTranslation: this.state.mapTranslation - SCROLL_SPEED
+          mapTranslation:
+            (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
         });
-      }, UPDATE_TIMEOUT); // react starts firing a lot more of these after a few jumps?...
+      }, UPDATE_TIMEOUT);
     }
   }
 
@@ -153,6 +161,19 @@ class GameEngine extends Component {
           width={80}
           fill={'orange'}
         />
+        <g>
+          <rect
+            rx={15}
+            ry={15}
+            x={15}
+            y={15}
+            height={50}
+            width={50}
+            fill={'red'}
+          />
+          <rect x={28} y={28} height={25} width={10} fill={'black'} />
+          <rect x={43} y={28} height={25} width={10} fill={'black'} />
+        </g>
               
       </svg>
     );
