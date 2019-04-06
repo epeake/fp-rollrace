@@ -47,7 +47,7 @@ class GameCharacter extends Component {
    */
   debounce(func, delay, ...args) {
     return () => {
-      let fireLater = () => {
+      const fireLater = () => {
         func(...args);
       };
 
@@ -123,8 +123,8 @@ class GameCharacter extends Component {
       <svg
         viewBox={'0 0 500 1000'}
         preserveAspectRatio={'xMinYMin meet'}
-        height={window.innerHeight}
-        width={window.innerWidth}
+        height={this.state.windowHeight}
+        width={this.state.windowWidth}
       >
                 
         <circle

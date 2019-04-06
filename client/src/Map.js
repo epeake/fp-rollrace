@@ -10,7 +10,7 @@ const MapPath = styled.path`
   stroke-opacity: 1;
 `;
 
-export default function Map(props) {
+export default function Map() {
   return (
     <g>
       <MapPath
@@ -123,8 +123,8 @@ export default function Map(props) {
 
       <MapPath
         d={
-          'm 2540, 380\
-          h 111\
+          'm 2340, 100\
+          h 511\
           v -111\
           h 159\
           v 175\
