@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Map from './Map.js';
+import PauseMenu from './PauseMenu.js';
 
 // Jump state enum for clarity
 const jump = {
@@ -16,13 +17,14 @@ class GameEngine extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      paused: false,
       x: 60,
       y: 360,
       mapTranslation: 0,
       yStart: 400,
       jumpState: jump.STOP,
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowWidth: window.outerWidth,
+      windowHeight: window.outerHeight
     };
 
     this.gameStartTime = null;
@@ -82,55 +84,64 @@ class GameEngine extends Component {
   // Resets our current window dimentions
   handleWindowResize() {
     this.setState({
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowWidth: window.outerWidth,
+      windowHeight: window.outerHeight
     });
   }
 
   // Handle animation
   componentDidUpdate() {
-    // don't begin a jump if no jump was initialized
-    if (this.state.jumpState !== jump.STOP) {
-      // mid jump
-      const currentTime = new Date().getTime();
-      if (currentTime - this.jumpStartTime < JUMP_TIME) {
-        /*
-         * Need to clear timeout or the calls start to stack up and too many
-         * fire one after another, changing the scroll speed and causing
-         * extra computation.
-         */
+    // don't update if game has not started
+    if (this.gameStartTime) {
+      // don't begin a jump if no jump was initialized
+      if (this.state.jumpState !== jump.STOP) {
+        const currentTime = new Date().getTime();
+
+        // mid jump case
+        if (currentTime - this.jumpStartTime < JUMP_TIME) {
+          /*
+           * Need to clear timeout or the calls start to stack up and too many
+           * fire one after another, changing the scroll speed and causing
+           * extra computation.
+           */
+          clearTimeout(this.mapTimeout);
+          this.mapTimeout = setTimeout(() => {
+            this.setState({
+              mapTranslation:
+                (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED,
+              y:
+                this.state.yStart -
+                Math.abs(
+                  Math.abs(
+                    ((currentTime - this.jumpStartTime) / JUMP_TIME) *
+                      2 *
+                      JUMP_HEIGHT -
+                      JUMP_HEIGHT
+                  ) - JUMP_HEIGHT
+                )
+            });
+          }, UPDATE_TIMEOUT); // prevent max depth calls
+        } else {
+          /*
+           * stop jump when jump should be over and return the sprite to the
+           * original prejump location
+           */
+          this.setState({
+            jumpState: jump.STOP,
+            y: this.state.yStart,
+            mapTranslation:
+              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
+          });
+        }
+      } else {
         clearTimeout(this.mapTimeout);
         this.mapTimeout = setTimeout(() => {
           this.setState({
             mapTranslation:
-              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED,
-            y:
-              this.state.yStart -
-              Math.abs(
-                Math.abs(
-                  ((currentTime - this.jumpStartTime) / JUMP_TIME) *
-                    2 *
-                    JUMP_HEIGHT -
-                    JUMP_HEIGHT
-                ) - JUMP_HEIGHT
-              )
+              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
           });
-        }, UPDATE_TIMEOUT); // prevent max depth calls
-      } else {
-        /*
-         * stop jump when jump should be over and return the sprite to the
-         * original prejump location
-         */
-        this.setState({ jumpState: jump.STOP, y: this.state.yStart });
+        }, UPDATE_TIMEOUT);
       }
-    } else {
-      clearTimeout(this.mapTimeout);
-      this.mapTimeout = setTimeout(() => {
-        this.setState({
-          mapTranslation:
-            (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
-        });
-      }, UPDATE_TIMEOUT);
     }
   }
 
@@ -161,7 +172,11 @@ class GameEngine extends Component {
           width={80}
           fill={'orange'}
         />
-        <g>
+        <g
+          onClick={() => {
+            if (this.gameStartTime) this.setState({ paused: true });
+          }}
+        >
           <rect
             rx={15}
             ry={15}
@@ -169,11 +184,35 @@ class GameEngine extends Component {
             y={15}
             height={50}
             width={50}
-            fill={'red'}
+            fill={'pink'}
           />
-          <rect x={28} y={28} height={25} width={10} fill={'black'} />
-          <rect x={43} y={28} height={25} width={10} fill={'black'} />
+          <rect
+            rx={5}
+            ry={5}
+            x={28}
+            y={28}
+            height={25}
+            width={10}
+            fill={'black'}
+          />
+          <rect
+            rx={5}
+            ry={5}
+            x={43}
+            y={28}
+            height={25}
+            width={10}
+            fill={'black'}
+          />
         </g>
+        {this.state.paused ? (
+          <PauseMenu
+            windowWidth={this.state.windowWidth}
+            windowHeight={this.state.windowHeight}
+          />
+        ) : (
+          <></>
+        )}
               
       </svg>
     );
