@@ -10,9 +10,9 @@ const MapPath = styled.path`
   stroke-opacity: 1;
 `;
 
-export default function Map() {
+export default function Map(props) {
   return (
-    <g>
+    <g transform={`translate(${props.translation} 0)`}>
       <MapPath
         d={
           'm 0, 442\

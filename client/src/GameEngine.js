@@ -10,13 +10,15 @@ const jump = {
 const JUMP_HEIGHT = 120;
 const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
+const SCROLL_SPEED = 2;
 
-class GameCharacter extends Component {
+class GameEngine extends Component {
   constructor(props) {
     super(props);
     this.state = {
       x: 60,
-      y: 400,
+      y: 360,
+      mapTranslation: 0,
       yStart: 400,
       jumpState: jump.STOP,
       windowWidth: window.innerWidth,
@@ -30,6 +32,7 @@ class GameCharacter extends Component {
      * timeout is not in the constructor...
      */
     this.timeout = null;
+    this.mapTimeout = null;
 
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -86,8 +89,15 @@ class GameCharacter extends Component {
       // mid jump
       const currentTime = new Date().getTime();
       if (currentTime - this.jumpStartTime < JUMP_TIME) {
-        setTimeout(() => {
+        /*
+         * Need to clear timeout or the calls start to stack up and too many
+         * fire one after another, changing the scroll speed and causing
+         * extra computation.
+         */
+        clearTimeout(this.mapTimeout);
+        this.mapTimeout = setTimeout(() => {
           this.setState({
+            mapTranslation: this.state.mapTranslation - SCROLL_SPEED,
             y:
               this.state.yStart -
               Math.abs(
@@ -99,7 +109,7 @@ class GameCharacter extends Component {
                 ) - JUMP_HEIGHT
               )
           });
-        }, UPDATE_TIMEOUT); // timeout controls animation speed
+        }, UPDATE_TIMEOUT); // prevent max depth calls
       } else {
         /*
          * stop jump when jump should be over and return the sprite to the
@@ -107,6 +117,13 @@ class GameCharacter extends Component {
          */
         this.setState({ jumpState: jump.STOP, y: this.state.yStart });
       }
+    } else {
+      clearTimeout(this.mapTimeout);
+      this.mapTimeout = setTimeout(() => {
+        this.setState({
+          mapTranslation: this.state.mapTranslation - SCROLL_SPEED
+        });
+      }, UPDATE_TIMEOUT); // react starts firing a lot more of these after a few jumps?...
     }
   }
 
@@ -127,19 +144,20 @@ class GameCharacter extends Component {
         width={this.state.windowWidth}
       >
                 
-        <circle
-          cx={this.state.x}
-          cy={this.state.y}
-          r={40}
-          stroke={'black'}
-          strokeWidth={1}
-          fill={'green'}
+        <Map translation={this.state.mapTranslation} />
+        <rect
+          rx={15}
+          ry={15}
+          x={this.state.x}
+          y={this.state.y}
+          height={80}
+          width={80}
+          fill={'orange'}
         />
-        <Map />
               
       </svg>
     );
   }
 }
 
-export default GameCharacter;
+export default GameEngine;
