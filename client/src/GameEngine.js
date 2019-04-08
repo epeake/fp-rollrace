@@ -9,7 +9,7 @@ const jump = {
   UP: 1,
   DOWN: 2
 };
-const JUMP_HEIGHT = 120;
+const JUMP_HEIGHT = 150;
 const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
 const SCROLL_SPEED = 1 / 5;
@@ -33,10 +33,6 @@ class GameEngine extends Component {
     this.gameStartTime = null;
     this.jumpStartTime = null;
 
-    /*
-     * I don't know why, but the event gets messed up after rerendering if
-     * timeout is not in the constructor...
-     */
     this.timeout = null;
     this.mapTimeout = null;
 
@@ -111,7 +107,10 @@ class GameEngine extends Component {
           this.mapTimeout = setTimeout(() => {
             this.setState({
               mapTranslation:
-                (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED,
+                (this.gameStartTime -
+                  new Date().getTime() +
+                  this.state.pauseOffset) *
+                SCROLL_SPEED,
               y:
                 this.state.yStart -
                 Math.abs(
@@ -133,7 +132,10 @@ class GameEngine extends Component {
             jumpState: jump.STOP,
             y: this.state.yStart,
             mapTranslation:
-              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
+              (this.gameStartTime -
+                new Date().getTime() +
+                this.state.pauseOffset) *
+              SCROLL_SPEED
           });
         }
       } else {
@@ -141,7 +143,10 @@ class GameEngine extends Component {
         this.mapTimeout = setTimeout(() => {
           this.setState({
             mapTranslation:
-              (this.gameStartTime - new Date().getTime()) * SCROLL_SPEED
+              (this.gameStartTime -
+                new Date().getTime() +
+                this.state.pauseOffset) *
+              SCROLL_SPEED
           });
         }, UPDATE_TIMEOUT);
       }
@@ -165,7 +170,7 @@ class GameEngine extends Component {
         width={this.state.windowWidth}
       >
                 
-        <Map translation={this.state.mapTranslation + this.state.pauseOffset} />
+        <Map translation={this.state.mapTranslation} />
         <rect
           rx={15}
           ry={15}
@@ -178,6 +183,7 @@ class GameEngine extends Component {
         <g
           onClick={() => {
             if (this.gameStartTime) {
+              console.log('paused');
               this.setState({
                 paused: true,
                 pauseOffsetStart: new Date().getTime()
@@ -222,8 +228,8 @@ class GameEngine extends Component {
                 paused: false,
                 pauseOffset:
                   this.state.pauseOffset +
-                  (new Date().getTime() - this.state.pauseOffsetStart) *
-                    SCROLL_SPEED
+                  new Date().getTime() -
+                  this.state.pauseOffsetStart
               });
             }}
           />
