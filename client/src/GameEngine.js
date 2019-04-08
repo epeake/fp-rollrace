@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 
+// for client socket
+import io from 'socket.io-client';
+
 // Jump state enum for clarity
 const jump = {
   STOP: 0,
@@ -18,14 +21,23 @@ class GameEngine extends Component {
     super(props);
     this.state = {
       paused: false,
-      x: 60,
+      // NOTE: for testing using random starting locations (was 60 before)
+      // using starting x positions from 50 - 200 in x direction
+      x: Math.random() * 200 + 50,
       y: 360,
       mapTranslation: 0,
       yStart: 400,
       jumpState: jump.STOP,
       windowWidth: window.outerWidth,
-      windowHeight: window.outerHeight
+      windowHeight: window.outerHeight,
+      players: undefined
     };
+
+    /*
+     each game will have a socket to connect back to the server
+    */
+    this.socket = io.connect('http://localhost:3001');
+    // store the other players as a member for THIS player
 
     this.gameStartTime = null;
     this.jumpStartTime = null;
@@ -40,6 +52,42 @@ class GameEngine extends Component {
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
+  }
+
+  componentDidMount() {
+    /* 
+      create a player with its coordinates
+      to be sent to the server 
+    */
+    const player = {
+      x: this.state.x,
+      y: this.state.y
+    };
+
+    this.socket.on('connect', () => {
+      /*
+        Pass the player and a call back that will give back
+        the a list of players.
+
+        Each player contains the (x, y) coordinates of THAT player
+        the list will include THIS player
+
+        The call back is used in order to make sure that the players
+        are set after the emit call
+      */
+      this.socket.emit('NEW_PLAYER', player, (data, f) => {
+        this.setState({ players: data });
+        // update everyone else
+      });
+
+      /*
+        this will occur when another player has joined
+        the game (not when THIS player has joined)
+      */
+      this.socket.on('PLAYER', data => {
+        this.setState({ players: data });
+      });
+    });
   }
 
   /*
@@ -154,6 +202,37 @@ class GameEngine extends Component {
       this.debounce(this.handleWindowResize, 500)
     );
 
+    // now we need to account for other players that should be rendered
+    let boxes = undefined;
+    if (this.state.players) {
+      boxes = this.state.players.map(player => {
+        return (
+          <rect
+            rx={15}
+            ry={15}
+            x={player.x}
+            y={player.y}
+            height={80}
+            width={80}
+            fill={`rgb(${Math.random() * 255}, ${Math.random() *
+              255}, ${Math.random() * 255})`}
+          />
+        );
+      });
+    } else {
+      boxes = (
+        <rect
+          rx={15}
+          ry={15}
+          x={this.state.x}
+          y={this.state.y}
+          height={80}
+          width={80}
+          fill={`rgb(${Math.random() * 255}, ${Math.random() *
+            255}, ${Math.random() * 255})`}
+        />
+      );
+    }
     return (
       <svg
         viewBox={'0 0 500 1000'}
@@ -163,15 +242,7 @@ class GameEngine extends Component {
       >
                 
         <Map translation={this.state.mapTranslation} />
-        <rect
-          rx={15}
-          ry={15}
-          x={this.state.x}
-          y={this.state.y}
-          height={80}
-          width={80}
-          fill={'orange'}
-        />
+        {boxes}
         <g
           onClick={() => {
             if (this.gameStartTime) this.setState({ paused: true });
