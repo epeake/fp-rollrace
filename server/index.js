@@ -30,7 +30,6 @@ io.on('connection', socket => {
 			player
 		*/
     const arr = Array.from(players.values());
-    console.log(arr);
     fn(arr);
     // tell all other sockets about the player that just joined
     io.emit('PLAYER', arr);
@@ -40,6 +39,6 @@ io.on('connection', socket => {
     // eliminate the player from the container of players
     players.delete(socket.id);
     // broadcast the updated list to the rest of the players
-    io.emit('BROADCAST', { players: players });
+    io.emit('BROADCAST', players);
   });
 });

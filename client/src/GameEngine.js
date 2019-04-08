@@ -75,7 +75,7 @@ class GameEngine extends Component {
         The call back is used in order to make sure that the players
         are set after the emit call
       */
-      this.socket.emit('NEW_PLAYER', player, (data, f) => {
+      this.socket.emit('NEW_PLAYER', player, data => {
         this.setState({ players: data });
         // update everyone else
       });
