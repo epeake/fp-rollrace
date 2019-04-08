@@ -1,3 +1,4 @@
+// button and space at same time
 import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
@@ -21,6 +22,8 @@ class GameEngine extends Component {
       x: 60,
       y: 360,
       mapTranslation: 0,
+      pauseOffsetStart: 0,
+      pauseOffset: 0,
       yStart: 400,
       jumpState: jump.STOP,
       windowWidth: window.outerWidth,
@@ -92,7 +95,7 @@ class GameEngine extends Component {
   // Handle animation
   componentDidUpdate() {
     // don't update if game has not started
-    if (this.gameStartTime) {
+    if (this.gameStartTime && !this.state.paused) {
       // don't begin a jump if no jump was initialized
       if (this.state.jumpState !== jump.STOP) {
         const currentTime = new Date().getTime();
@@ -162,7 +165,7 @@ class GameEngine extends Component {
         width={this.state.windowWidth}
       >
                 
-        <Map translation={this.state.mapTranslation} />
+        <Map translation={this.state.mapTranslation + this.state.pauseOffset} />
         <rect
           rx={15}
           ry={15}
@@ -174,7 +177,12 @@ class GameEngine extends Component {
         />
         <g
           onClick={() => {
-            if (this.gameStartTime) this.setState({ paused: true });
+            if (this.gameStartTime) {
+              this.setState({
+                paused: true,
+                pauseOffsetStart: new Date().getTime()
+              });
+            }
           }}
         >
           <rect
@@ -209,6 +217,15 @@ class GameEngine extends Component {
           <PauseMenu
             windowWidth={this.state.windowWidth}
             windowHeight={this.state.windowHeight}
+            resume={() => {
+              this.setState({
+                paused: false,
+                pauseOffset:
+                  this.state.pauseOffset +
+                  (new Date().getTime() - this.state.pauseOffsetStart) *
+                    SCROLL_SPEED
+              });
+            }}
           />
         ) : (
           <></>
