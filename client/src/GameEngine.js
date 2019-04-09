@@ -2,6 +2,11 @@
 import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
+import styled from 'styled-components';
+
+const SVGLayer = styled.svg`
+  position: absolute;
+`;
 
 // Jump state enum for clarity
 const jump = {
@@ -26,8 +31,8 @@ class GameEngine extends Component {
       pauseOffset: 0,
       yStart: 400,
       jumpState: jump.STOP,
-      windowWidth: window.outerWidth,
-      windowHeight: window.outerHeight
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
     };
 
     this.gameStartTime = null;
@@ -83,8 +88,8 @@ class GameEngine extends Component {
   // Resets our current window dimentions
   handleWindowResize() {
     this.setState({
-      windowWidth: window.outerWidth,
-      windowHeight: window.outerHeight
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
     });
   }
 
@@ -107,9 +112,7 @@ class GameEngine extends Component {
           this.mapTimeout = setTimeout(() => {
             this.setState({
               mapTranslation:
-                (this.gameStartTime -
-                  new Date().getTime() +
-                  this.state.pauseOffset) *
+                (this.gameStartTime - currentTime + this.state.pauseOffset) *
                 SCROLL_SPEED,
               y:
                 this.state.yStart -
@@ -132,9 +135,7 @@ class GameEngine extends Component {
             jumpState: jump.STOP,
             y: this.state.yStart,
             mapTranslation:
-              (this.gameStartTime -
-                new Date().getTime() +
-                this.state.pauseOffset) *
+              (this.gameStartTime - currentTime + this.state.pauseOffset) *
               SCROLL_SPEED
           });
         }
@@ -163,81 +164,87 @@ class GameEngine extends Component {
     );
 
     return (
-      <svg
-        viewBox={'0 0 500 1000'}
-        preserveAspectRatio={'xMinYMin meet'}
-        height={this.state.windowHeight}
-        width={this.state.windowWidth}
-      >
-                
-        <Map translation={this.state.mapTranslation} />
-        <rect
-          rx={15}
-          ry={15}
-          x={this.state.x}
-          y={this.state.y}
-          height={80}
-          width={80}
-          fill={'orange'}
-        />
-        <g
-          onClick={() => {
-            if (this.gameStartTime) {
-              console.log('paused');
-              this.setState({
-                paused: true,
-                pauseOffsetStart: new Date().getTime()
-              });
-            }
-          }}
+      <>
+        <SVGLayer
+          viewBox={'0 0 1000 2000'}
+          preserveAspectRatio={'xMaxYMin slice'}
+          height={this.state.windowHeight}
+          width={this.state.windowWidth}
         >
+                  
+          <Map translation={this.state.mapTranslation} />
           <rect
             rx={15}
             ry={15}
-            x={15}
-            y={15}
-            height={50}
-            width={50}
-            fill={'pink'}
+            x={this.state.x}
+            y={this.state.y}
+            height={80}
+            width={80}
+            fill={'orange'}
           />
-          <rect
-            rx={5}
-            ry={5}
-            x={28}
-            y={28}
-            height={25}
-            width={10}
-            fill={'black'}
-          />
-          <rect
-            rx={5}
-            ry={5}
-            x={43}
-            y={28}
-            height={25}
-            width={10}
-            fill={'black'}
-          />
-        </g>
-        {this.state.paused ? (
-          <PauseMenu
-            windowWidth={this.state.windowWidth}
-            windowHeight={this.state.windowHeight}
-            resume={() => {
-              this.setState({
-                paused: false,
-                pauseOffset:
-                  this.state.pauseOffset +
-                  new Date().getTime() -
-                  this.state.pauseOffsetStart
-              });
+          <g
+            onClick={() => {
+              if (this.gameStartTime) {
+                console.log('paused');
+                this.setState({
+                  paused: true,
+                  pauseOffsetStart: new Date().getTime()
+                });
+              }
             }}
-          />
+          >
+            <rect
+              rx={15}
+              ry={15}
+              x={15}
+              y={15}
+              height={50}
+              width={50}
+              fill={'pink'}
+            />
+            <rect
+              rx={5}
+              ry={5}
+              x={28}
+              y={28}
+              height={25}
+              width={10}
+              fill={'black'}
+            />
+            <rect
+              rx={5}
+              ry={5}
+              x={43}
+              y={28}
+              height={25}
+              width={10}
+              fill={'black'}
+            />
+          </g>
+        </SVGLayer>
+        {this.state.paused ? (
+          <SVGLayer
+            viewBox={'0 0 2000 1000'}
+            preserveAspectRatio={'xMinYMin meet'}
+          >
+            <PauseMenu
+              windowHeight={this.state.windowHeight}
+              windowWidth={this.state.windowWidth}
+              resume={() => {
+                this.setState({
+                  paused: false,
+                  pauseOffset:
+                    this.state.pauseOffset +
+                    new Date().getTime() -
+                    this.state.pauseOffsetStart
+                });
+              }}
+            />
+          </SVGLayer>
         ) : (
           <></>
         )}
-              
-      </svg>
+      </>
     );
   }
 }
