@@ -19,38 +19,41 @@ const JUMP_HEIGHT = 150;
 const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
 const SCROLL_SPEED = 1 / 5;
+const INITIAL_STATE = {
+  paused: false,
+  x: 60,
+  y: 360,
+  jumpStartTime: null,
+  gameStartTime: null,
+  mapTranslation: 0,
+  pauseOffsetStart: 0,
+  pauseOffset: 0,
+  yStart: 400,
+  jumpState: jump.STOP,
+  windowWidth: window.innerWidth,
+  windowHeight: window.innerHeight,
+  players: undefined
+};
 
 class GameEngine extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      paused: false,
-      x: 60,
-      y: 360,
-      jumpStartTime: null,
-      gameStartTime: null,
-      mapTranslation: 0,
-      pauseOffsetStart: 0,
-      pauseOffset: 0,
-      yStart: 400,
-      jumpState: jump.STOP,
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-      players: undefined
-    };
+    this.state = INITIAL_STATE;
 
     /*
-     each game will have a socket to connect back to the server
-    */
+     * each game will have a socket to connect back to the server
+     * store the other players as a member for THIS player
+     */
     this.socket = io.connect('http://localhost:3001');
-    // store the other players as a member for THIS player
-
     this.timeout = null;
     this.mapTimeout = null;
 
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
+    this.restartGame = this.restartGame.bind(this);
+    this.resumeGame = this.resumeGame.bind(this);
+    this.pauseGame = this.pauseGame.bind(this);
   }
 
   componentDidMount() {
@@ -139,7 +142,45 @@ class GameEngine extends Component {
     });
   }
 
-  // Handle animation
+  // Restarts our game  TODO: NEED TO GET THIS TO WORK WITH SOCKETS
+  restartGame() {
+    this.timeout = null;
+    this.mapTimeout = null;
+    this.setState(INITIAL_STATE);
+  }
+
+  // Resumes our after being paused
+  resumeGame() {
+    this.setState({
+      paused: false,
+      pauseOffset:
+        this.state.pauseOffset +
+        new Date().getTime() -
+        this.state.pauseOffsetStart,
+      jumpStartTime:
+        this.state.jumpStartTime +
+        new Date().getTime() -
+        this.state.pauseOffsetStart
+    });
+  }
+
+  // Pauses our game
+  pauseGame() {
+    if (this.state.gameStartTime) {
+      this.setState({
+        paused: true,
+        pauseOffsetStart: new Date().getTime()
+      });
+    } else {
+      void 0; // don't pause if we haven't started
+    }
+  }
+
+  /*
+   * TODO: CLEAN UP ONCE WE MERGE WITH KAI
+   *
+   * Handle animation
+   */
   componentDidUpdate() {
     // don't update if game has not started
     if (this.state.gameStartTime && !this.state.paused) {
@@ -244,6 +285,7 @@ class GameEngine extends Component {
         />
       );
     }
+
     return (
       <>
         <SVGLayer
@@ -264,17 +306,7 @@ class GameEngine extends Component {
             width={80}
             fill={'orange'}
           />
-          <g
-            onClick={() => {
-              if (this.state.gameStartTime) {
-                console.log('paused');
-                this.setState({
-                  paused: true,
-                  pauseOffsetStart: new Date().getTime()
-                });
-              }
-            }}
-          >
+          <g onClick={() => this.pauseGame()}>
             <rect
               rx={15}
               ry={15}
@@ -312,19 +344,8 @@ class GameEngine extends Component {
             <PauseMenu
               windowHeight={this.state.windowHeight}
               windowWidth={this.state.windowWidth}
-              resume={() => {
-                this.setState({
-                  paused: false,
-                  pauseOffset:
-                    this.state.pauseOffset +
-                    new Date().getTime() -
-                    this.state.pauseOffsetStart,
-                  jumpStartTime:
-                    this.state.jumpStartTime +
-                    new Date().getTime() -
-                    this.state.pauseOffsetStart
-                });
-              }}
+              resume={() => this.resumeGame()}
+              restart={() => this.restartGame()}
             />
           </SVGLayer>
         ) : (

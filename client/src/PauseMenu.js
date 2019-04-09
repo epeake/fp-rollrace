@@ -2,11 +2,11 @@ import React from 'react';
 
 const MENU_HEIGHT = 700;
 const MENU_WIDTH = 550;
-const BUTTON_OFFSET = 80;
 const BUTTON_HEIGHT = 50;
 const BUTTON_WIDTH = 300;
 
 export default function Map(props) {
+  // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
   return (
     <g>
       <rect
@@ -32,12 +32,24 @@ export default function Map(props) {
         rx={30}
         ry={30}
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + BUTTON_OFFSET}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 80}
         height={BUTTON_HEIGHT}
         width={BUTTON_WIDTH}
         fill={'black'}
         opacity={1}
         onClick={() => props.resume()}
+      />
+
+      <rect
+        rx={30}
+        ry={30}
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 160}
+        height={BUTTON_HEIGHT}
+        width={BUTTON_WIDTH}
+        fill={'red'}
+        opacity={1}
+        onClick={() => props.restart()}
       />
     </g>
   );
