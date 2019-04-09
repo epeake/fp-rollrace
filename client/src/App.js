@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import GameCharacter from './GameCharacter.js';
+import ProgressBar from './ProgressBar.js';
 
 /* eslint-disable react/prefer-stateless-function */
+
 class App extends Component {
   render() {
-    return <GameCharacter />;
+    return (
+      <div>
+        <ProgressBar />
+        <GameCharacter />
+      </div>
+    );
   }
 }
 
