@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import styled from 'styled-components';
+// for client socket
+import io from 'socket.io-client';
 
 const SVGLayer = styled.svg`
   position: absolute;
 `;
-
-// for client socket
-import io from 'socket.io-client';
 
 // Jump state enum for clarity
 const jump = {
@@ -26,9 +25,7 @@ class GameEngine extends Component {
     super(props);
     this.state = {
       paused: false,
-      // NOTE: for testing using random starting locations (was 60 before)
-      // using starting x positions from 50 - 200 in x direction
-      x: Math.random() * 200 + 50,
+      x: 60,
       y: 360,
       jumpStartTime: null,
       gameStartTime: null,
@@ -38,8 +35,7 @@ class GameEngine extends Component {
       yStart: 400,
       jumpState: jump.STOP,
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
-    };
+      windowHeight: window.innerHeight,
       players: undefined
     };
 
@@ -58,9 +54,9 @@ class GameEngine extends Component {
   }
 
   componentDidMount() {
-    /* 
+    /*
       create a player with its coordinates
-      to be sent to the server 
+      to be sent to the server
     */
     const player = {
       x: this.state.x,
