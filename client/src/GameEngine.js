@@ -1,4 +1,3 @@
-// button and space at same time
 import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
