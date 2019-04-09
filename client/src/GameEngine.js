@@ -205,7 +205,7 @@ class GameEngine extends Component {
               y={15}
               height={50}
               width={50}
-              fill={'pink'}
+              fill={'black'}
             />
             <rect
               rx={5}
@@ -214,7 +214,7 @@ class GameEngine extends Component {
               y={28}
               height={25}
               width={10}
-              fill={'black'}
+              fill={'white'}
             />
             <rect
               rx={5}
@@ -223,7 +223,7 @@ class GameEngine extends Component {
               y={28}
               height={25}
               width={10}
-              fill={'black'}
+              fill={'white'}
             />
           </g>
         </SVGLayer>
