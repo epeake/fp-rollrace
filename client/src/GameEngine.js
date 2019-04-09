@@ -56,42 +56,6 @@ class GameEngine extends Component {
     this.pauseGame = this.pauseGame.bind(this);
   }
 
-  componentDidMount() {
-    /*
-      create a player with its coordinates
-      to be sent to the server
-    */
-    const player = {
-      x: this.state.x,
-      y: this.state.y
-    };
-
-    this.socket.on('connect', () => {
-      /*
-        Pass the player and a call back that will give back
-        the a list of players.
-
-        Each player contains the (x, y) coordinates of THAT player
-        the list will include THIS player
-
-        The call back is used in order to make sure that the players
-        are set after the emit call
-      */
-      this.socket.emit('NEW_PLAYER', player, data => {
-        this.setState({ players: data });
-        // update everyone else
-      });
-
-      /*
-        this will occur when another player has joined
-        the game (not when THIS player has joined)
-      */
-      this.socket.on('PLAYER', data => {
-        this.setState({ players: data });
-      });
-    });
-  }
-
   /*
    * Prevent functions from event handlers from being repeatedly called.
    * This is essential for on window resize, which could potentially be called
@@ -174,6 +138,42 @@ class GameEngine extends Component {
     } else {
       void 0; // don't pause if we haven't started
     }
+  }
+
+  componentDidMount() {
+    /*
+      create a player with its coordinates
+      to be sent to the server
+    */
+    const player = {
+      x: this.state.x,
+      y: this.state.y
+    };
+
+    this.socket.on('connect', () => {
+      /*
+        Pass the player and a call back that will give back
+        the a list of players.
+
+        Each player contains the (x, y) coordinates of THAT player
+        the list will include THIS player
+
+        The call back is used in order to make sure that the players
+        are set after the emit call
+      */
+      this.socket.emit('NEW_PLAYER', player, data => {
+        this.setState({ players: data });
+        // update everyone else
+      });
+
+      /*
+        this will occur when another player has joined
+        the game (not when THIS player has joined)
+      */
+      this.socket.on('PLAYER', data => {
+        this.setState({ players: data });
+      });
+    });
   }
 
   /*
