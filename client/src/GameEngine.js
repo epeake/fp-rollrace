@@ -25,6 +25,8 @@ class GameEngine extends Component {
       paused: false,
       x: 60,
       y: 360,
+      jumpStartTime: null,
+      gameStartTime: null,
       mapTranslation: 0,
       pauseOffsetStart: 0,
       pauseOffset: 0,
@@ -33,9 +35,6 @@ class GameEngine extends Component {
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     };
-
-    this.gameStartTime = null;
-    this.jumpStartTime = null;
 
     this.timeout = null;
     this.mapTimeout = null;
@@ -71,11 +70,14 @@ class GameEngine extends Component {
    */
   handleKeyPress(event) {
     if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
-      if (!this.gameStartTime) {
-        this.gameStartTime = new Date().getTime();
+      if (!this.state.gameStartTime) {
+        this.setState({
+          gameStartTime: new Date().getTime()
+        });
       }
-      this.jumpStartTime = new Date().getTime();
+
       this.setState({
+        jumpStartTime: new Date().getTime(),
         yStart: this.state.y,
         jumpState: jump.UP
       });
@@ -95,13 +97,13 @@ class GameEngine extends Component {
   // Handle animation
   componentDidUpdate() {
     // don't update if game has not started
-    if (this.gameStartTime && !this.state.paused) {
+    if (this.state.gameStartTime && !this.state.paused) {
       // don't begin a jump if no jump was initialized
       if (this.state.jumpState !== jump.STOP) {
         const currentTime = new Date().getTime();
 
         // mid jump case
-        if (currentTime - this.jumpStartTime < JUMP_TIME) {
+        if (currentTime - this.state.jumpStartTime < JUMP_TIME) {
           /*
            * Need to clear timeout or the calls start to stack up and too many
            * fire one after another, changing the scroll speed and causing
@@ -111,13 +113,15 @@ class GameEngine extends Component {
           this.mapTimeout = setTimeout(() => {
             this.setState({
               mapTranslation:
-                (this.gameStartTime - currentTime + this.state.pauseOffset) *
+                (this.state.gameStartTime -
+                  currentTime +
+                  this.state.pauseOffset) *
                 SCROLL_SPEED,
               y:
                 this.state.yStart -
                 Math.abs(
                   Math.abs(
-                    ((currentTime - this.jumpStartTime) / JUMP_TIME) *
+                    ((currentTime - this.state.jumpStartTime) / JUMP_TIME) *
                       2 *
                       JUMP_HEIGHT -
                       JUMP_HEIGHT
@@ -134,7 +138,9 @@ class GameEngine extends Component {
             jumpState: jump.STOP,
             y: this.state.yStart,
             mapTranslation:
-              (this.gameStartTime - currentTime + this.state.pauseOffset) *
+              (this.state.gameStartTime -
+                currentTime +
+                this.state.pauseOffset) *
               SCROLL_SPEED
           });
         }
@@ -143,7 +149,7 @@ class GameEngine extends Component {
         this.mapTimeout = setTimeout(() => {
           this.setState({
             mapTranslation:
-              (this.gameStartTime -
+              (this.state.gameStartTime -
                 new Date().getTime() +
                 this.state.pauseOffset) *
               SCROLL_SPEED
@@ -183,7 +189,7 @@ class GameEngine extends Component {
           />
           <g
             onClick={() => {
-              if (this.gameStartTime) {
+              if (this.state.gameStartTime) {
                 console.log('paused');
                 this.setState({
                   paused: true,
@@ -234,6 +240,10 @@ class GameEngine extends Component {
                   paused: false,
                   pauseOffset:
                     this.state.pauseOffset +
+                    new Date().getTime() -
+                    this.state.pauseOffsetStart,
+                  jumpStartTime:
+                    this.state.jumpStartTime +
                     new Date().getTime() -
                     this.state.pauseOffsetStart
                 });
