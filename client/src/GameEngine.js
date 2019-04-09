@@ -106,7 +106,7 @@ class GameEngine extends Component {
     });
   }
 
-  // Restarts our game  TODO: NEED TO GET THIS TO WORK WITH SOCKETS
+  // Restarts our game
   restartGame() {
     this.timeout = null;
     this.mapTimeout = null;
