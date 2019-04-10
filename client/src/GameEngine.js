@@ -53,11 +53,12 @@ class GameEngine extends Component {
 
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleJumpKey = this.handleJumpKey.bind(this);
+    this.handleChangeJumpKey = this.handleChangeJumpKey.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
-    this.changeJumpKey = this.changeJumpKey.bind(this);
   }
 
   /*
@@ -80,26 +81,39 @@ class GameEngine extends Component {
     };
   }
 
+  // Initiates jump
+  handleJumpKey() {
+    if (!this.state.gameStartTime) {
+      this.setState({
+        gameStartTime: new Date().getTime()
+      });
+    }
+
+    this.setState({
+      jumpStartTime: new Date().getTime(),
+      yStart: this.state.y,
+      jumpState: jump.UP
+    });
+  }
+
+  // Changes our current jump key
+  handleChangeJumpKey(event) {
+    this.setState({ jumpKey: event.keyCode, changingKey: false });
+  }
+
   /*
    * Allows the character to jump when spacebar is pressed and prevents the
    * character from jumping mid-jump
    */
   handleKeyPress(event) {
-    if (
+    if (this.state.changingKey) {
+      this.handleChangeJumpKey(event);
+    } else if (
       event.keyCode === this.state.jumpKey &&
-      this.state.jumpState === jump.STOP
+      this.state.jumpState === jump.STOP &&
+      !this.state.paused
     ) {
-      if (!this.state.gameStartTime) {
-        this.setState({
-          gameStartTime: new Date().getTime()
-        });
-      }
-
-      this.setState({
-        jumpStartTime: new Date().getTime(),
-        yStart: this.state.y,
-        jumpState: jump.UP
-      });
+      this.handleJumpKey();
     } else {
       void 0; // do nothing
     }
@@ -117,7 +131,16 @@ class GameEngine extends Component {
   restartGame() {
     this.timeout = null;
     this.mapTimeout = null;
-    this.setState(INITIAL_STATE);
+
+    /*
+     * make sure window is correct size
+     * (person may have changes window while playing so can't really make a default for it)
+     */
+    const restartState = Object.assign({}, INITIAL_STATE, {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
+    this.setState(restartState);
   }
 
   // Resumes our after being paused
@@ -145,12 +168,6 @@ class GameEngine extends Component {
     } else {
       void 0; // don't pause if we haven't started
     }
-  }
-
-  // Restarts our game
-  changeJumpKey(event) {
-    console.log('s');
-    this.setState({ jumpKey: event.keyCode, changingKey: false });
   }
 
   componentDidMount() {
@@ -195,6 +212,17 @@ class GameEngine extends Component {
    * Handle animation
    */
   componentDidUpdate() {
+    /*
+     * Helpful for debugging
+     */
+    // componentDidUpdate(prevProps, prevState) {
+    // Object.entries(this.props).forEach(([key, val]) =>
+    //   prevProps[key] !== val && console.log(`Prop '${key}' changed`)
+    // );
+    // Object.entries(this.state).forEach(([key, val]) =>
+    //   prevState[key] !== val && console.log(`State '${key}' changed`)
+    // );
+
     // don't update if game has not started
     if (this.state.gameStartTime && !this.state.paused) {
       // don't begin a jump if no jump was initialized
@@ -260,18 +288,7 @@ class GameEngine extends Component {
 
   render() {
     const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => {
-      if (this.state.changingKey) {
-        this.changeJumpKey(e);
-      } else {
-        this.handleKeyPress(e);
-      }
-    });
-
-    window.addEventListener(
-      'resize',
-      this.debounce(this.handleWindowResize, 500)
-    );
+    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
     window.addEventListener(
       'resize',
