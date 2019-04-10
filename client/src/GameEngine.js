@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
+import ChangeKeyMenu from './ChangeKeyMenu.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
@@ -21,6 +22,8 @@ const UPDATE_TIMEOUT = 0.01;
 const SCROLL_SPEED = 1 / 5;
 const INITIAL_STATE = {
   paused: false,
+  jumpKey: 32,
+  changingKey: false,
   x: 60,
   y: 360,
   jumpStartTime: null,
@@ -54,6 +57,7 @@ class GameEngine extends Component {
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
+    this.changeJumpKey = this.changeJumpKey.bind(this);
   }
 
   /*
@@ -81,7 +85,10 @@ class GameEngine extends Component {
    * character from jumping mid-jump
    */
   handleKeyPress(event) {
-    if (event.keyCode === 32 && this.state.jumpState === jump.STOP) {
+    if (
+      event.keyCode === this.state.jumpKey &&
+      this.state.jumpState === jump.STOP
+    ) {
       if (!this.state.gameStartTime) {
         this.setState({
           gameStartTime: new Date().getTime()
@@ -138,6 +145,12 @@ class GameEngine extends Component {
     } else {
       void 0; // don't pause if we haven't started
     }
+  }
+
+  // Restarts our game
+  changeJumpKey(event) {
+    console.log('s');
+    this.setState({ jumpKey: event.keyCode, changingKey: false });
   }
 
   componentDidMount() {
@@ -247,7 +260,18 @@ class GameEngine extends Component {
 
   render() {
     const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
+    docBody.addEventListener('keypress', e => {
+      if (this.state.changingKey) {
+        this.changeJumpKey(e);
+      } else {
+        this.handleKeyPress(e);
+      }
+    });
+
+    window.addEventListener(
+      'resize',
+      this.debounce(this.handleWindowResize, 500)
+    );
 
     window.addEventListener(
       'resize',
@@ -257,6 +281,7 @@ class GameEngine extends Component {
     // now we need to account for other players that should be rendered
     let boxes = undefined;
     if (this.state.players) {
+      // TODO: need unique key for players
       boxes = this.state.players.map(player => {
         return (
           <rect
@@ -341,12 +366,20 @@ class GameEngine extends Component {
             viewBox={'0 0 2000 1000'}
             preserveAspectRatio={'xMinYMin meet'}
           >
-            <PauseMenu
-              windowHeight={this.state.windowHeight}
-              windowWidth={this.state.windowWidth}
-              resume={() => this.resumeGame()}
-              restart={() => this.restartGame()}
-            />
+            {this.state.changingKey ? (
+              <ChangeKeyMenu
+                windowHeight={this.state.windowHeight}
+                windowWidth={this.state.windowWidth}
+              />
+            ) : (
+              <PauseMenu
+                windowHeight={this.state.windowHeight}
+                windowWidth={this.state.windowWidth}
+                resume={() => this.resumeGame()}
+                restart={() => this.restartGame()}
+                changeKey={() => this.setState({ changingKey: true })}
+              />
+            )}
           </SVGLayer>
         ) : (
           <></>
