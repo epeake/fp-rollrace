@@ -370,6 +370,7 @@ class GameEngine extends Component {
               <ChangeKeyMenu
                 windowHeight={this.state.windowHeight}
                 windowWidth={this.state.windowWidth}
+                jumpKey={this.state.jumpKey}
               />
             ) : (
               <PauseMenu

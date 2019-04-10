@@ -31,6 +31,16 @@ export default function Map(props) {
       >
         Press New Jump Key
       </text>
+      <text
+        x={(window.innerWidth - MENU_WIDTH / 2) / 2 + 300}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 360}
+      >
+        {`Current Key: ${
+          props.jumpKey === 32
+            ? 'SPACE'
+            : String.fromCharCode(props.jumpKey).toUpperCase()
+        }`}
+      </text>
       />
     </g>
   );
