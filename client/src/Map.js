@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const MapPath = styled.path`
   fill: none;
   stroke: #000000;
-  stroke-width: 5;
+  stroke-width: 6;
   stroke-linecap: butt;
   stroke-linejoin: miter;
   stroke-opacity: 1;
@@ -15,8 +15,8 @@ export default function Map(props) {
     <g transform={`translate(${props.translation} 0)`}>
       <MapPath
         d={
-          'm 0, 442\
-                    h 159\
+          'm 0 442\
+                  h 159\
                   v -79\
                   h 159\
                   v 79\
@@ -123,7 +123,7 @@ export default function Map(props) {
 
       <MapPath
         d={
-          'm 2340, 100\
+          'm 2340 100\
           h 511\
           v -111\
           h 159\

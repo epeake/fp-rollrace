@@ -1,0 +1,37 @@
+MAP ALGO ITERATIVE
+
+MAKE SPRITE WORK WITH TRANSLATION NOT Y
+
+EFFICIENCY OF LOOKUPS WITH SEGMENT TREE
+
+36 37 xcord ycord
+
+47 48 - instead of max min
+
+113 del
+
+192 getting stuck on flats so need to offset init?
+
+————
+ATOM
+
+17 d
+
+19 translationStartTime == Game start time
+
+33 check for walls 80 to front edge make CONST
+
+35 1 is eps
+
+36 check top or bottom of cube for collisions
+
+44 pauseOffset => MAKE gameOffset now
+
+64-82 Pauseoffset
+
+Whole jump mechanics diff.  Check how integrate new version
+
+Update at end
+
+BUGS:
+Dealing with multiple paths

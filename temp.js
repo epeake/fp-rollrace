@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import {findMapSpan, buildMapHashtable} from './mapParser.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
@@ -27,20 +27,20 @@ const INITIAL_STATE = {
   paused: false,
   jumpKey: 32,
   changingKey: false,
-  x: 60, // maybe not necessary
+  x: 60,  // maybe not necessary
   y: 360,
   jumpStartTime: null,
+  descendStartTime: null,
   gameStartTime: null,
   mapTranslation: 0,
   pauseOffsetStart: 0,
-  blockOffsetStart: 0,
   gameOffset: 0,
   translationOffset: 0,
   yStart: 400,
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
-  players: undefined
+  players: undefined,
 };
 
 class GameEngine extends Component {
@@ -56,11 +56,7 @@ class GameEngine extends Component {
     this.timeout = null;
     this.mapTimeout = null;
     this.mapLength = findMapSpan(this.props.mapProps.map);
-    this.map = buildMapHashtable(
-      this.mapLength,
-      this.props.mapProps.strokeWidth,
-      this.props.mapProps.map
-    );
+    this.map = buildMapHashtable(this.mapLength, this.props.mapProps.strokeWidth, this.props.mapProps.map);
 
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -162,8 +158,7 @@ class GameEngine extends Component {
         this.state.gameOffset +
         new Date().getTime() -
         this.state.pauseOffsetStart,
-      translationOffset:
-        this.state.translationOffset +
+      translationOffset: this.state.translationOffset +
         new Date().getTime() -
         this.state.pauseOffsetStart,
       jumpStartTime:
@@ -183,6 +178,7 @@ class GameEngine extends Component {
     //       this.state.pauseOffsetStart
     //   });
     // }
+
   }
 
   // Pauses our game
@@ -254,106 +250,80 @@ class GameEngine extends Component {
     if (this.state.gameStartTime && !this.state.paused) {
       // don't begin a jump if no jump was initialized
       const currentTime = new Date().getTime();
-      let { blocked, jumpState } = this.state;
-      if (this.state.jumpState !== jump.STOP) {
-        // mid jump case
-        if (currentTime - this.state.jumpStartTime < JUMP_TIME) {
-          /*
-           * Need to clear timeout or the calls start to stack up and too many
-           * fire one after another, changing the scroll speed and causing
-           * extra computation.
-           */
-          clearTimeout(this.mapTimeout);
-          this.mapTimeout = setTimeout(() => {
-            this.setState({
-              mapTranslation:
-                (this.state.gameStartTime -
-                  currentTime +
-                  this.state.translationOffset) *
-                SCROLL_SPEED,
-              y:
-                this.state.yStart -
-                Math.abs(
-                  Math.abs(
-                    ((currentTime - this.state.jumpStartTime) / JUMP_TIME) *
-                      2 *
-                      JUMP_HEIGHT -
-                      JUMP_HEIGHT
-                  ) - JUMP_HEIGHT
-                )
-            });
-          }, UPDATE_TIMEOUT); // prevent max depth calls
-        } else {
-          /*
-           * stop jump when jump should be over and return the sprite to the
-           * original prejump location
-           */
-          this.setState({
-            jumpState: jump.STOP,
-            y: this.state.yStart,
-            mapTranslation:
-              (this.state.gameStartTime -
-                currentTime +
-                this.state.translationOffset) *
-              SCROLL_SPEED
-          });
-        }
-      } else {
-        clearTimeout(this.mapTimeout);
-        this.mapTimeout = setTimeout(() => {
-          this.setState({
-            mapTranslation:
-              (this.state.gameStartTime -
-                currentTime +
-                this.state.translationOffset) *
-              SCROLL_SPEED
-          });
-        }, UPDATE_TIMEOUT);
-      }
+      let {blocked, jumpState, yStart, descendStartTime, mapTranslation, jumpStartTime} = this.state;
 
-      const currX = Math.round(
-        this.state.x -
-          (this.state.gameStartTime - currentTime + this.state.gameOffset) *
-            SCROLL_SPEED
-      );
+
+
+
+
+      const currX = Math.round(this.state.x - (this.state.gameStartTime - currentTime + this.state.gameOffset) * SCROLL_SPEED);
 
       // we check in a 3 window range
-      let currMap = [
-        ...this.map[currX + SPRITE_SIDE],
-        ...this.map[currX + 1 + SPRITE_SIDE],
-        ...this.map[currX + 2 + SPRITE_SIDE]
-      ];
+      let currMap = [...this.map[currX + SPRITE_SIDE], ...this.map[currX + 1 + SPRITE_SIDE], ...this.map[currX + 2 + SPRITE_SIDE]];
 
-      currMap.forEach(location => {
-        if (
-          location[0] === 'b' &&
-          (location[1] <= this.state.y <= location[2] ||
-            location[1] <= this.state.y + SPRITE_SIDE <= location[2])
-        ) {
+
+      currMap.forEach((location) =>{
+        if (location[0] == 'b' &&
+        (location[1] <= this.state.y <= location[2] ||
+          location[1] <= this.state.y + SPRITE_SIDE <= location[2])){
           blocked = true;
+          pauseOffsetStart = currentTime;
         }
-      });
+      })
 
-      currMap = [
-        ...currMap,
-        ...this.map[currX],
-        ...this.map[currX + 1],
-        ...this.map[currX + 2]
-      ];
-      currMap.forEach(location => {
-        if (
-          location[0] === 'h' &&
-          (location[1] - FLOOR_THRESH <= this.state.y <= location[1] ||
-            location[1] - FLOOR_THRESH <=
-              this.state.y + SPRITE_SIDE <=
-              location[1])
-        ) {
+      // append back end of character
+      currMap = [...currMap, ...this.map[currX], ...this.map[currX + 1], ...this.map[currX + 2]];
+      currMap.forEach((location) =>{
+        if (location[0] == 'h' &&
+        (location[1] - FLOOR_THRESH <= this.state.y <= location[1] ||
+          location[1] - FLOOR_THRESH <= this.state.y + SPRITE_SIDE <= location[1])){
           jumpState = jump.STOP;
-        } else {
-          if (jumpState === jump.STOP) {
+        }else{
+          if (jumpState == jump.STOP){
+            yStart = y;
+            jumpState = jump.DOWN;
+            descendStartTime = new Date().getTime();
           }
         }
-      });
+      })
+
+      if (jumpState === jump.DOWN) {
+
+
+        y = yStart + (currentTime - descendStartTime) * JUMP_SPEED;
+      } else if (jumpState === jump.UP) {
+        // mid jump case
+        if ((currentTime - jumpStartTime) * JUMP_SPEED <= JUMP_HEIGHT) {
+
+
+          y =
+            this.state.yStart - (currentTime - jumpStartTime) * JUMP_SPEED;
+        } else {
+
+          yStart = y;
+          jumpState = jump.DOWN;
+          descendStartTime = new Date().getTime();
+        }
+      }
+      if (!blocked){
+      mapTranslation = (this.state.gameStartTime -
+        currentTime +
+        this.state.translationOffset) *
+      SCROLL_SPEED;
+    }
+      clearTimeout(this.mapTimeout);
+        this.mapTimeout = setTimeout(() => {
+          this.setState({
+            mapTranslation: mapTranslation,
+            y: y,
+            jumpState: jumpState,
+            yStart: yStart,
+            mapTranslationStart: mapTranslationStart,
+            blocked: blocked,
+            descendStartTime: descendStartTime,
+            jumpStartTime: jumpStartTime
+          });
+        }, UPDATE_TIMEOUT);
     }
   }
 
@@ -479,3 +449,95 @@ class GameEngine extends Component {
 }
 
 export default GameEngine;
+
+
+
+
+
+
+
+
+
+
+
+
+// /*
+// * Finds the boundaries of all our map paths so that we can allocate enough
+// * space for our map hash table.
+// *
+// * @params: allPaths: Array<string> our SVG path strings
+// *
+// * @outputs: Array<int> [xMin, xMax, yMin, yMax] Out map boundaries
+// */
+// const findMapSpan = allPaths => {
+//   let xMax = yMax = -Infinity;
+//   let xMin = yMin = Infinity;
+//   let xCurr, yCurr, ySplit;
+//   let i;
+//
+//   // find x and y span
+//   allPaths.forEach(path => {
+//     const splitPath = path.split(/[hv]/);
+//     const startPosition = splitPath[0].split(" ");  // assumes no comma
+//     xCurr = parseInt(startPosition[1]);  // initiallize and initial checks
+//     xMin = Math.min(xCurr, xMin)
+//     // yCurr = parseInt(startPosition[2]);
+//     // yMax = Math.max(yMax, yCurr);
+//     // yMin = Math.min(yMin, yCurr);
+//     for (i = 1; i < splitPath.length; i++) {
+//       if (i % 2 === 1) {  // assumes first h then v
+//         xCurr += eval(splitPath[i].trim().replace(/ /g, "+"));  // replace all
+//       }
+//       // else {
+//       //   ySplit = splitPath[i].trim().split(" ");
+//       //   ySplit.forEach(y => {
+//       //     yCurr += parseInt(y)
+//       //     yMax = Math.max(yMax, yCurr);
+//       //     yMin = Math.min(yMin, yCurr);
+//       //   });
+//       // }
+//     }
+//     xMax = Math.max(xMax, xCurr);
+//   })
+//
+//   return [xMin, xMax]
+// };
+//
+// findMapSpan(['m 2340 100 h 511 v -111 h 159 v 175 h 206 v -127 h 127 v -111 h 143 v 238 h 127 v -95 h 111 v 95 h 111 v -95 h 143 v 95 h 159 v -190 h 127 v 159 h 175 v -111 h 159 v 111 h 143 v -95 h 127 v 95 h 476'])
+// findMapSpan(['m 2340 100'])  // expect [2340, 2340, 100, 100]
+// findMapSpan(['m 0 0'])  // expect [0, 0, 0, 0]
+// findMapSpan(['m 100 0 h 511 v -111 h 159 v 175 h 206 v -127'])  // expect [100, 976, -111, 64]
+// findMapSpan(['m 100 0 h 511'])  // expect [100, 611, 0, 0]
+// findMapSpan(['m 100 0 h 511 2 3 0 v -111 -3 h 159 v 3 175 -1 7 h 206 v -127'])  // expect [100, 983, -114, 70]
+//
+//
+// const buildMapHashtable = (allPaths, bounds) => {
+//   const { xMin, xMax } = bounds;
+//   const xRange = xMax - xMin;
+//   const hashedPaths = Array(xRange).fill([]);  // array of arrays
+//   let xCurr, yCurr, xNext, yNext, ySplit, xSplit;
+//   let i;
+//
+//   // populate map
+//   allPaths.forEach(path => {
+//     const splitPath = path.split(/[hv]/);
+//     const startPosition = splitPath[0].split(" ");  // assumes no comma
+//     xCurr = parseInt(startPosition[1]);  // initiallize and initial checks
+//     yCurr = parseInt(startPosition[2]);
+//     for (i = 1; i < splitPath.length; i++) {
+//       if (i % 2 === 1) {  // assumes first h then v
+//         xNext = xCurr + eval(splitPath[i].trim().replace(/ /g, "+"));
+//         for (i = xCurr; i <= xNext; i++) {
+//           currMap[i].push(['h', yCurr])  // mark that it is ground, and the y position
+//         }
+//       } else {
+//         yStart = yCurr;
+//         yCurr += eval(splitPath[i].trim().replace(/ /g, "+"))
+//         ySplit.forEach(y => {
+//           currMap.push(['v', yStart, yCurr])  // mark that it is wall, and the y positions
+//         });
+//       }
+//     }
+//     hashedPaths.push()
+//   })
+// };
