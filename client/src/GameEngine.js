@@ -35,8 +35,13 @@ const INITIAL_STATE = {
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
-  players: undefined
+  players: undefined,
+  color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
+    255})`
 };
+
+// time between updates sent to the server
+const UPDATE_INTERVAL = 40; // milliseconds
 
 class GameEngine extends Component {
   constructor(props) {
@@ -171,15 +176,6 @@ class GameEngine extends Component {
   }
 
   componentDidMount() {
-    /*
-      create a player with its coordinates
-      to be sent to the server
-    */
-    const player = {
-      x: this.state.x,
-      y: this.state.y
-    };
-
     this.socket.on('connect', () => {
       /*
         Pass the player and a call back that will give back
@@ -191,10 +187,6 @@ class GameEngine extends Component {
         The call back is used in order to make sure that the players
         are set after the emit call
       */
-      this.socket.emit('NEW_PLAYER', player, data => {
-        this.setState({ players: data });
-        // update everyone else
-      });
 
       /*
         this will occur when another player has joined
@@ -202,6 +194,51 @@ class GameEngine extends Component {
       */
       this.socket.on('PLAYER', data => {
         this.setState({ players: data });
+      });
+
+      /* 
+        Update the server with location of the 
+        players map ever UPDATE_INTERVAL milliseconds.
+
+        Also emit a CHANGE_POS event that allows
+        server to update all other players on position of this player
+       */
+
+      setInterval(() => {
+        const updatePlayer = {
+          mapTrans: this.state.mapTranslation,
+          y: this.state.y,
+          color: this.state.color,
+          key: this.socket.id
+        };
+        // use a callback
+        this.socket.emit('CHANGE_POS', updatePlayer, data => {
+          this.setState({ players: data });
+        });
+      }, UPDATE_INTERVAL);
+
+      /*
+        Using the mapTranslation allows THIS player to keep track of where OTHER 
+        players are in the game. 
+      */
+      const player = {
+        mapTrans: this.state.mapTranslation,
+        y: this.state.y,
+        color: this.state.color,
+        key: this.socket.id
+      };
+
+      /*
+        When a new player connects send the player
+        to the server. The call back will have data about other players.
+        
+        To avoid having empty `rect' elements only set the state of 
+        the players when there is data sent from the server
+      */
+      this.socket.emit('NEW_PLAYER', player, data => {
+        if (data !== undefined && data.length > 0) {
+          this.setState({ players: data });
+        }
       });
     });
   }
@@ -296,38 +333,41 @@ class GameEngine extends Component {
     );
 
     // now we need to account for other players that should be rendered
-    let boxes = undefined;
-    if (this.state.players) {
+    const boxes = [
+      <rect
+        key={this.socket.id}
+        rx={15}
+        ry={15}
+        x={this.state.x}
+        y={this.state.y}
+        height={80}
+        width={80}
+        fill={this.state.color}
+      />
+    ];
+
+    if (this.state.players !== undefined) {
       // TODO: need unique key for players
-      boxes = this.state.players.map(player => {
-        return (
-          <rect
-            rx={15}
-            ry={15}
-            x={player.x}
-            y={player.y}
-            height={80}
-            width={80}
-            fill={`rgb(${Math.random() * 255}, ${Math.random() *
-              255}, ${Math.random() * 255})`}
-          />
-        );
-      });
-    } else {
-      boxes = (
-        <rect
-          rx={15}
-          ry={15}
-          x={this.state.x}
-          y={this.state.y}
-          height={80}
-          width={80}
-          fill={`rgb(${Math.random() * 255}, ${Math.random() *
-            255}, ${Math.random() * 255})`}
-        />
+      boxes.push(
+        this.state.players.map(player => {
+          return (
+            <rect
+              key={player.id}
+              rx={15}
+              ry={15}
+              // this difference allows for other players
+              // to be rendered at different places in the map
+              // based on their x coordinate
+              x={this.state.mapTranslation - player.mapTrans}
+              y={player.y}
+              height={80}
+              width={80}
+              fill={player.color}
+            />
+          );
+        })
       );
     }
-
     return (
       <>
         <SVGLayer
@@ -339,17 +379,9 @@ class GameEngine extends Component {
                   
           <Map translation={this.state.mapTranslation} />
           {boxes}
-          <rect
-            rx={15}
-            ry={15}
-            x={this.state.x}
-            y={this.state.y}
-            height={80}
-            width={80}
-            fill={'orange'}
-          />
           <g onClick={() => this.pauseGame()}>
             <rect
+              key={'pause-bkrnd'}
               rx={15}
               ry={15}
               x={15}
@@ -359,6 +391,7 @@ class GameEngine extends Component {
               fill={'black'}
             />
             <rect
+              key={'lft-line'}
               rx={5}
               ry={5}
               x={28}
@@ -368,6 +401,7 @@ class GameEngine extends Component {
               fill={'white'}
             />
             <rect
+              key={'rt-line'}
               rx={5}
               ry={5}
               x={43}
