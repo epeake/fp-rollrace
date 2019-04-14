@@ -39,6 +39,10 @@ class Tutorial extends Component {
       jumpState: 'UP'
     });
   }
+  componentDidMount() {
+    const docBody = document.querySelector('body');
+    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
+  }
 
   componentDidUpdate() {
     const currentTime = new Date().getTime();
@@ -78,9 +82,6 @@ class Tutorial extends Component {
   }
 
   render() {
-    const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
-
     return (
       <Tut>
         <h1> Welcome to Rollrace! Press spacebar to jump </h1>
