@@ -17,25 +17,29 @@ const jump = {
   UP: 1,
   DOWN: 2
 };
-const JUMP_HEIGHT = 150;
-const JUMP_TIME = 500;
-const UPDATE_TIMEOUT = 0.01;
-const SCROLL_SPEED = 1 / 5;
+//const JUMP_HEIGHT = 150;
+const UPDATE_TIMEOUT = 0.0001;
+const JUMP_SPEED = 0.0009;
+const JUMP_POWER = 0.6;
+const SCROLL_SPEED = 0.2;
 const SPRITE_SIDE = 80;
-const FLOOR_THRESH = 2;
+const FLOOR_THRESH = 10;
 const INITIAL_STATE = {
   paused: false,
+  blocked: false,
   jumpKey: 32,
   changingKey: false,
   x: 60, // maybe not necessary
   y: 360,
   jumpStartTime: null,
+  descendStartTime: null,
   gameStartTime: null,
+  mapTranslationStartTime: null,
   mapTranslation: 0,
+  mapTranslationStart: 0,
   pauseOffsetStart: 0,
-  blockOffsetStart: 0,
-  gameOffset: 0,
-  translationOffset: 0,
+  timePaused: 0,
+  totalGameTime: 0,
   yStart: 400,
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
@@ -94,14 +98,17 @@ class GameEngine extends Component {
 
   // Initiates jump
   handleJumpKey() {
+    let { gameStartTime, mapTranslationStartTime } = this.state;
+    const currentTime = new Date().getTime();
     if (!this.state.gameStartTime) {
-      this.setState({
-        gameStartTime: new Date().getTime()
-      });
+      gameStartTime = currentTime;
+      mapTranslationStartTime = currentTime;
     }
 
     this.setState({
-      jumpStartTime: new Date().getTime(),
+      gameStartTime: gameStartTime,
+      mapTranslationStartTime: mapTranslationStartTime,
+      jumpStartTime: currentTime,
       yStart: this.state.y,
       jumpState: jump.UP
     });
@@ -156,20 +163,13 @@ class GameEngine extends Component {
 
   // Resumes our after being paused
   resumeGame() {
+    const timeElapsed = new Date().getTime() - this.state.pauseOffsetStart;
     this.setState({
       paused: false,
-      gameOffset:
-        this.state.gameOffset +
-        new Date().getTime() -
-        this.state.pauseOffsetStart,
-      translationOffset:
-        this.state.translationOffset +
-        new Date().getTime() -
-        this.state.pauseOffsetStart,
-      jumpStartTime:
-        this.state.jumpStartTime +
-        new Date().getTime() -
-        this.state.pauseOffsetStart
+      timePaused: this.state.timePaused + timeElapsed,
+      mapTranslationStartTime: this.state.mapTranslationStartTime + timeElapsed,
+      jumpStartTime: this.state.jumpStartTime + timeElapsed,
+      descendStartTime: this.state.descendStartTime + timeElapsed
     });
     // } else if (this.state.blocked) {
     //   this.setState({
@@ -254,106 +254,136 @@ class GameEngine extends Component {
     if (this.state.gameStartTime && !this.state.paused) {
       // don't begin a jump if no jump was initialized
       const currentTime = new Date().getTime();
-      let { blocked, jumpState } = this.state;
-      if (this.state.jumpState !== jump.STOP) {
-        // mid jump case
-        if (currentTime - this.state.jumpStartTime < JUMP_TIME) {
-          /*
-           * Need to clear timeout or the calls start to stack up and too many
-           * fire one after another, changing the scroll speed and causing
-           * extra computation.
-           */
-          clearTimeout(this.mapTimeout);
-          this.mapTimeout = setTimeout(() => {
-            this.setState({
-              mapTranslation:
-                (this.state.gameStartTime -
-                  currentTime +
-                  this.state.translationOffset) *
-                SCROLL_SPEED,
-              y:
-                this.state.yStart -
-                Math.abs(
-                  Math.abs(
-                    ((currentTime - this.state.jumpStartTime) / JUMP_TIME) *
-                      2 *
-                      JUMP_HEIGHT -
-                      JUMP_HEIGHT
-                  ) - JUMP_HEIGHT
-                )
-            });
-          }, UPDATE_TIMEOUT); // prevent max depth calls
-        } else {
-          /*
-           * stop jump when jump should be over and return the sprite to the
-           * original prejump location
-           */
-          this.setState({
-            jumpState: jump.STOP,
-            y: this.state.yStart,
-            mapTranslation:
-              (this.state.gameStartTime -
-                currentTime +
-                this.state.translationOffset) *
-              SCROLL_SPEED
-          });
-        }
-      } else {
-        clearTimeout(this.mapTimeout);
-        this.mapTimeout = setTimeout(() => {
-          this.setState({
-            mapTranslation:
-              (this.state.gameStartTime -
-                currentTime +
-                this.state.translationOffset) *
-              SCROLL_SPEED
-          });
-        }, UPDATE_TIMEOUT);
-      }
+      let {
+        blocked,
+        jumpState,
+        y,
+        yStart,
+        gameStartTime,
+        timePaused,
+        descendStartTime,
+        mapTranslation,
+        mapTranslationStart,
+        mapTranslationStartTime,
+        jumpStartTime
+      } = this.state;
 
-      const currX = Math.round(
-        this.state.x -
-          (this.state.gameStartTime - currentTime + this.state.gameOffset) *
-            SCROLL_SPEED
-      );
+      let onPath = false;
+      let atWall = false;
+
+      const currX = Math.round(this.state.x - mapTranslation);
 
       // we check in a 3 window range
-      let currMap = [
-        ...this.map[currX + SPRITE_SIDE],
-        ...this.map[currX + 1 + SPRITE_SIDE],
-        ...this.map[currX + 2 + SPRITE_SIDE]
-      ];
-
-      currMap.forEach(location => {
-        if (
-          location[0] === 'b' &&
-          (location[1] <= this.state.y <= location[2] ||
-            location[1] <= this.state.y + SPRITE_SIDE <= location[2])
-        ) {
-          blocked = true;
-        }
-      });
-
-      currMap = [
-        ...currMap,
-        ...this.map[currX],
-        ...this.map[currX + 1],
-        ...this.map[currX + 2]
-      ];
-      currMap.forEach(location => {
-        if (
-          location[0] === 'h' &&
-          (location[1] - FLOOR_THRESH <= this.state.y <= location[1] ||
-            location[1] - FLOOR_THRESH <=
-              this.state.y + SPRITE_SIDE <=
-              location[1])
-        ) {
-          jumpState = jump.STOP;
+      // let currMap = [
+      //   ...this.map[currX + SPRITE_SIDE],
+      //   ...this.map[currX + 1 + SPRITE_SIDE],
+      //   ...this.map[currX + 2 + SPRITE_SIDE],
+      // ];
+      for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
+        this.map[currX + i + SPRITE_SIDE].forEach(location => {
+          //console.log(location);
+          if (location[0] === 'b') {
+            if (
+              (location[1] <= y && y <= location[2]) ||
+              (location[1] <= y + SPRITE_SIDE && y + SPRITE_SIDE <= location[2])
+            ) {
+              //console.log('blocked')
+              atWall = true;
+            }
+          } else if (
+            location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+            y + SPRITE_SIDE <= location[1]
+          ) {
+            //console.log(y);
+            //console.log(362-1 <= 200 + 80 <= 362);
+            //console.log(location);
+            onPath = true;
+          }
+        });
+      }
+      //console.log(currMap)
+      if (atWall !== blocked) {
+        //console.log('blocked')
+        //console.log(atWall !== blocked);
+        if (blocked) {
+          blocked = false;
+          mapTranslationStartTime = currentTime;
+          //pause
         } else {
-          if (jumpState === jump.STOP) {
+          //console.log('blocked')
+          blocked = true;
+          mapTranslationStart = mapTranslation;
+          //unpause
+        }
+      }
+      if (jumpState !== jump.UP) {
+        // for (let i = 0; i <= 2; i++){
+        //   currMap[i] = this.map[currX + i]
+        // }
+        for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
+          this.map[currX + i].forEach(location => {
+            if (
+              location[0] === 'h' &&
+              (location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+                y + SPRITE_SIDE <= location[1])
+            ) {
+              //console.log(y);
+              //console.log(362-1 <= 200 + 80 <= 362);
+              //console.log(location);
+              onPath = true;
+            }
+          });
+        }
+
+        if (onPath !== (jumpState === jump.STOP)) {
+          if (onPath) {
+            //console.log('on path')
+            jumpState = jump.STOP;
+          } else {
+            yStart = y;
+            jumpState = jump.DOWN;
+            descendStartTime = currentTime;
           }
         }
-      });
+      }
+      if (jumpState === jump.DOWN) {
+        //console.log('fell');
+        y = yStart + 0.5 * (currentTime - descendStartTime) ** 2 * JUMP_SPEED;
+      } else if (jumpState === jump.UP) {
+        // mid jump case
+        //console.log(JUMP_POWER - JUMP_SPEED*(currentTime - jumpStartTime));
+        if (JUMP_POWER - JUMP_SPEED * (currentTime - jumpStartTime) >= 0) {
+          y =
+            yStart -
+            ((currentTime - jumpStartTime) * JUMP_POWER -
+              0.5 * (currentTime - jumpStartTime) ** 2 * JUMP_SPEED);
+        } else {
+          //console.log('descending');
+          yStart = y;
+          jumpState = jump.DOWN;
+          descendStartTime = currentTime;
+        }
+      }
+      if (!blocked) {
+        mapTranslation =
+          mapTranslationStart -
+          (currentTime - mapTranslationStartTime) * SCROLL_SPEED;
+      }
+      clearTimeout(this.mapTimeout);
+      this.mapTimeout = setTimeout(() => {
+        this.setState({
+          totalGameTime: gameStartTime - currentTime - timePaused,
+          mapTranslation: mapTranslation,
+          mapTranslationStart: mapTranslationStart,
+          mapTranslationStartTime: mapTranslationStartTime,
+          y: y,
+          jumpState: jumpState,
+          yStart: yStart,
+          blocked: blocked,
+          descendStartTime: descendStartTime,
+          jumpStartTime: jumpStartTime
+        });
+      }, UPDATE_TIMEOUT);
     }
   }
 
@@ -407,8 +437,11 @@ class GameEngine extends Component {
           height={this.state.windowHeight}
           width={this.state.windowWidth}
         >
-                  
-          <Map translation={this.state.mapTranslation} />
+          <Map
+            translation={this.state.mapTranslation}
+            map={this.props.mapProps.map}
+            stroke={this.props.mapProps.strokeWidth}
+          />
           {boxes}
           <rect
             rx={15}
