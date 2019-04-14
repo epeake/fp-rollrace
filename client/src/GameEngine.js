@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
+import Timer from './Timer.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
@@ -370,6 +371,9 @@ class GameEngine extends Component {
     }
     return (
       <>
+        <div>
+          <Timer />
+        </div>
         <SVGLayer
           viewBox={'0 0 1000 2000'}
           preserveAspectRatio={'xMaxYMin slice'}
