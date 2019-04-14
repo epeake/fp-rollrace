@@ -24,6 +24,7 @@ const JUMP_SPEED = 0.0009; // acceleration
 const JUMP_POWER = 0.6; // jumping velocity
 const SCROLL_SPEED = 0.2;
 const SPRITE_SIDE = 80;
+const WALL_THRESH = 5;
 const FLOOR_THRESH = 10;
 const INITIAL_STATE = {
   paused: false,
@@ -294,25 +295,31 @@ class GameEngine extends Component {
       const currX = Math.round(this.state.x - mapTranslation);
 
       // Scan to detect paths and walls for front edge of sprite
-      for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
-        const locations = this.map[currX + i + SPRITE_SIDE];
-        for (let j = 0; j < locations.length; j++) {
-          if (locations[j][0] === 'b') {
-            if (
-              (locations[j][1] <= y && y <= locations[j][2]) ||
-              (locations[j][1] <= y + SPRITE_SIDE &&
-                y + SPRITE_SIDE <= locations[j][2])
-            ) {
-              atWall = true;
+      (() => {
+        for (let i = 0; i < WALL_THRESH; i++) {
+          const locations = this.map[currX + i + SPRITE_SIDE];
+          for (let j = 0; j < locations.length; j++) {
+            if (onPath && atWall) {
+              return;
             }
-          } else if (
-            locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
-            y + SPRITE_SIDE <= locations[j][1]
-          ) {
-            onPath = true;
+            if (atWall === false && locations[j][0] === 'b') {
+              if (
+                (locations[j][1] <= y && y <= locations[j][2]) ||
+                (locations[j][1] <= y + SPRITE_SIDE &&
+                  y + SPRITE_SIDE <= locations[j][2])
+              ) {
+                atWall = true;
+              }
+            } else if (
+              onPath === false &&
+              locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+              y + SPRITE_SIDE <= locations[j][1]
+            ) {
+              onPath = true;
+            }
           }
         }
-      }
+      })();
       // either becomes blocked or unblocked
       if (atWall !== blocked) {
         if (blocked) {
@@ -326,18 +333,21 @@ class GameEngine extends Component {
       // only run if we are not currently going up
       if (jumpState !== jump.UP) {
         // Scan to detect paths for trailing edge of sprite
-        for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
-          const locations = this.map[currX + i];
-          for (let j = 0; j < locations.length; j++) {
-            if (
-              locations[j][0] === 'h' &&
-              (locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
-                y + SPRITE_SIDE <= locations[j][1])
-            ) {
-              onPath = true;
+        (() => {
+          for (let i = 0; i < WALL_THRESH; i++) {
+            const locations = this.map[currX + i];
+            for (let j = 0; j < locations.length; j++) {
+              if (
+                locations[j][0] === 'h' &&
+                (locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+                  y + SPRITE_SIDE <= locations[j][1])
+              ) {
+                onPath = true;
+                return;
+              }
             }
           }
-        }
+        })();
 
         // either begin fall or stop fall
         if (onPath !== (jumpState === jump.STOP)) {
@@ -354,8 +364,9 @@ class GameEngine extends Component {
       // falling action
       if (jumpState === jump.DOWN) {
         y = yStart + 0.5 * (currentTime - descendStartTime) ** 2 * JUMP_SPEED;
-        // jumping action
-      } else if (jumpState === jump.UP) {
+      }
+      // jumping action
+      else if (jumpState === jump.UP) {
         if (JUMP_POWER - JUMP_SPEED * (currentTime - jumpStartTime) >= 0) {
           y =
             yStart -
