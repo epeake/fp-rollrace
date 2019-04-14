@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
+import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import Timer from './Timer.js';
 import styled from 'styled-components';
 // for client socket
@@ -17,29 +18,36 @@ const jump = {
   UP: 1,
   DOWN: 2
 };
-const JUMP_HEIGHT = 150;
-const JUMP_TIME = 500;
-const UPDATE_TIMEOUT = 0.01;
-const SCROLL_SPEED = 1 / 5;
+//const JUMP_HEIGHT = 150;
+const UPDATE_TIMEOUT = 0.0001;
+const JUMP_SPEED = 0.0009; // acceleration
+const JUMP_POWER = 0.6; // jumping velocity
+const SCROLL_SPEED = 0.2;
+const SPRITE_SIDE = 80;
+const FLOOR_THRESH = 10;
 const INITIAL_STATE = {
   paused: false,
+  blocked: false,
   jumpKey: 32,
   changingKey: false,
-  x: 60,
+  x: 60, // maybe not necessary
   y: 360,
   jumpStartTime: null,
+  descendStartTime: null,
   gameStartTime: null,
+  mapTranslationStartTime: null,
   mapTranslation: 0,
+  mapTranslationStart: 0,
   pauseOffsetStart: 0,
-  pauseOffset: 0,
-  yStart: 400,
+  timePaused: 0,
+  yStart: 400, // seems very arbitrary
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
   players: undefined,
   color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
     255})`
-};
+}; //
 
 // time between updates sent to the server
 const UPDATE_INTERVAL = 40; // milliseconds
@@ -56,6 +64,12 @@ class GameEngine extends Component {
     this.socket = io.connect('http://localhost:3001');
     this.timeout = null;
     this.mapTimeout = null;
+    this.mapLength = findMapSpan(this.props.mapProps.map);
+    this.map = buildMapHashtable(
+      this.mapLength,
+      this.props.mapProps.strokeWidth,
+      this.props.mapProps.map
+    );
 
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -89,14 +103,17 @@ class GameEngine extends Component {
 
   // Initiates jump
   handleJumpKey() {
+    let { gameStartTime, mapTranslationStartTime } = this.state;
+    const currentTime = new Date().getTime();
     if (!this.state.gameStartTime) {
-      this.setState({
-        gameStartTime: new Date().getTime()
-      });
+      gameStartTime = currentTime;
+      mapTranslationStartTime = currentTime;
     }
 
     this.setState({
-      jumpStartTime: new Date().getTime(),
+      gameStartTime: gameStartTime,
+      mapTranslationStartTime: mapTranslationStartTime,
+      jumpStartTime: currentTime,
       yStart: this.state.y,
       jumpState: jump.UP
     });
@@ -151,16 +168,13 @@ class GameEngine extends Component {
 
   // Resumes our after being paused
   resumeGame() {
+    const timeElapsed = new Date().getTime() - this.state.pauseOffsetStart;
     this.setState({
       paused: false,
-      pauseOffset:
-        this.state.pauseOffset +
-        new Date().getTime() -
-        this.state.pauseOffsetStart,
-      jumpStartTime:
-        this.state.jumpStartTime +
-        new Date().getTime() -
-        this.state.pauseOffsetStart
+      timePaused: this.state.timePaused + timeElapsed,
+      mapTranslationStartTime: this.state.mapTranslationStartTime + timeElapsed,
+      jumpStartTime: this.state.jumpStartTime + timeElapsed,
+      descendStartTime: this.state.descendStartTime + timeElapsed
     });
   }
 
@@ -245,8 +259,6 @@ class GameEngine extends Component {
   }
 
   /*
-   * TODO: CLEAN UP ONCE WE MERGE WITH KAI
-   *
    * Handle animation
    */
   componentDidUpdate() {
@@ -261,66 +273,121 @@ class GameEngine extends Component {
     //   prevState[key] !== val && console.log(`State '${key}' changed`)
     // );
 
-    // don't update if game has not started
+    // don't update if game has not started or is paused
     if (this.state.gameStartTime && !this.state.paused) {
-      // don't begin a jump if no jump was initialized
-      if (this.state.jumpState !== jump.STOP) {
-        const currentTime = new Date().getTime();
+      const currentTime = new Date().getTime();
+      const { jumpStartTime } = this.state;
+      let {
+        blocked,
+        jumpState,
+        y,
+        yStart,
+        descendStartTime,
+        mapTranslation,
+        mapTranslationStart,
+        mapTranslationStartTime
+      } = this.state;
 
-        // mid jump case
-        if (currentTime - this.state.jumpStartTime < JUMP_TIME) {
-          /*
-           * Need to clear timeout or the calls start to stack up and too many
-           * fire one after another, changing the scroll speed and causing
-           * extra computation.
-           */
-          clearTimeout(this.mapTimeout);
-          this.mapTimeout = setTimeout(() => {
-            this.setState({
-              mapTranslation:
-                (this.state.gameStartTime -
-                  currentTime +
-                  this.state.pauseOffset) *
-                SCROLL_SPEED,
-              y:
-                this.state.yStart -
-                Math.abs(
-                  Math.abs(
-                    ((currentTime - this.state.jumpStartTime) / JUMP_TIME) *
-                      2 *
-                      JUMP_HEIGHT -
-                      JUMP_HEIGHT
-                  ) - JUMP_HEIGHT
-                )
-            });
-          }, UPDATE_TIMEOUT); // prevent max depth calls
-        } else {
-          /*
-           * stop jump when jump should be over and return the sprite to the
-           * original prejump location
-           */
-          this.setState({
-            jumpState: jump.STOP,
-            y: this.state.yStart,
-            mapTranslation:
-              (this.state.gameStartTime -
-                currentTime +
-                this.state.pauseOffset) *
-              SCROLL_SPEED
-          });
+      let onPath = false;
+      let atWall = false;
+
+      const currX = Math.round(this.state.x - mapTranslation);
+
+      // Scan to detect paths and walls for front edge of sprite
+      for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
+        const locations = this.map[currX + i + SPRITE_SIDE];
+        for (let j = 0; j < locations.length; j++) {
+          if (locations[j][0] === 'b') {
+            if (
+              (locations[j][1] <= y && y <= locations[j][2]) ||
+              (locations[j][1] <= y + SPRITE_SIDE &&
+                y + SPRITE_SIDE <= locations[j][2])
+            ) {
+              atWall = true;
+            }
+          } else if (
+            locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+            y + SPRITE_SIDE <= locations[j][1]
+          ) {
+            onPath = true;
+          }
         }
-      } else {
-        clearTimeout(this.mapTimeout);
-        this.mapTimeout = setTimeout(() => {
-          this.setState({
-            mapTranslation:
-              (this.state.gameStartTime -
-                new Date().getTime() +
-                this.state.pauseOffset) *
-              SCROLL_SPEED
-          });
-        }, UPDATE_TIMEOUT);
       }
+      // either becomes blocked or unblocked
+      if (atWall !== blocked) {
+        if (blocked) {
+          blocked = false;
+          mapTranslationStartTime = currentTime;
+        } else {
+          blocked = true;
+          mapTranslationStart = mapTranslation;
+        }
+      }
+      // only run if we are not currently going up
+      if (jumpState !== jump.UP) {
+        // Scan to detect paths for trailing edge of sprite
+        for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
+          const locations = this.map[currX + i];
+          for (let j = 0; j < locations.length; j++) {
+            if (
+              locations[j][0] === 'h' &&
+              (locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+                y + SPRITE_SIDE <= locations[j][1])
+            ) {
+              onPath = true;
+            }
+          }
+        }
+
+        // either begin fall or stop fall
+        if (onPath !== (jumpState === jump.STOP)) {
+          if (onPath) {
+            jumpState = jump.STOP;
+          } else {
+            yStart = y;
+            jumpState = jump.DOWN;
+            descendStartTime = currentTime;
+          }
+        }
+      }
+
+      // falling action
+      if (jumpState === jump.DOWN) {
+        y = yStart + 0.5 * (currentTime - descendStartTime) ** 2 * JUMP_SPEED;
+        // jumping action
+      } else if (jumpState === jump.UP) {
+        if (JUMP_POWER - JUMP_SPEED * (currentTime - jumpStartTime) >= 0) {
+          y =
+            yStart -
+            ((currentTime - jumpStartTime) * JUMP_POWER -
+              0.5 * (currentTime - jumpStartTime) ** 2 * JUMP_SPEED);
+        } else {
+          yStart = y;
+          jumpState = jump.DOWN;
+          descendStartTime = currentTime;
+        }
+      }
+      // don't update background if blocked
+      if (!blocked) {
+        mapTranslation =
+          mapTranslationStart -
+          (currentTime - mapTranslationStartTime) * SCROLL_SPEED;
+      }
+      // set all states
+      clearTimeout(this.mapTimeout);
+      this.mapTimeout = setTimeout(() => {
+        this.setState({
+          mapTranslation: mapTranslation,
+          mapTranslationStart: mapTranslationStart,
+          mapTranslationStartTime: mapTranslationStartTime,
+          y: y,
+          jumpState: jumpState,
+          yStart: yStart,
+          blocked: blocked,
+          descendStartTime: descendStartTime,
+          jumpStartTime: jumpStartTime
+        });
+      }, UPDATE_TIMEOUT);
     }
   }
 
@@ -380,8 +447,11 @@ class GameEngine extends Component {
           height={this.state.windowHeight}
           width={this.state.windowWidth}
         >
-                  
-          <Map translation={this.state.mapTranslation} />
+          <Map
+            translation={this.state.mapTranslation}
+            map={this.props.mapProps.map}
+            stroke={this.props.mapProps.strokeWidth}
+          />
           {boxes}
           <g onClick={() => this.pauseGame()}>
             <rect
