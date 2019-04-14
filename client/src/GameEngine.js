@@ -260,21 +260,23 @@ class GameEngine extends Component {
 
       // Scan to detect paths and walls for front edge of sprite
       for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
-        this.map[currX + i + SPRITE_SIDE].forEach(location => {
-          if (location[0] === 'b') {
+        const locations = this.map[currX + i + SPRITE_SIDE];
+        for (let j = 0; j < locations.length; j++) {
+          if (locations[j][0] === 'b') {
             if (
-              (location[1] <= y && y <= location[2]) ||
-              (location[1] <= y + SPRITE_SIDE && y + SPRITE_SIDE <= location[2])
+              (locations[j][1] <= y && y <= locations[j][2]) ||
+              (locations[j][1] <= y + SPRITE_SIDE &&
+                y + SPRITE_SIDE <= locations[j][2])
             ) {
               atWall = true;
             }
           } else if (
-            location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
-            y + SPRITE_SIDE <= location[1]
+            locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+            y + SPRITE_SIDE <= locations[j][1]
           ) {
             onPath = true;
           }
-        });
+        }
       }
       // either becomes blocked or unblocked
       if (atWall !== blocked) {
@@ -290,15 +292,16 @@ class GameEngine extends Component {
       if (jumpState !== jump.UP) {
         // Scan to detect paths for trailing edge of sprite
         for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
-          this.map[currX + i].forEach(location => {
+          const locations = this.map[currX + i];
+          for (let j = 0; j < locations.length; j++) {
             if (
-              location[0] === 'h' &&
-              (location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
-                y + SPRITE_SIDE <= location[1])
+              locations[j][0] === 'h' &&
+              (locations[j][1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
+                y + SPRITE_SIDE <= locations[j][1])
             ) {
               onPath = true;
             }
-          });
+          }
         }
 
         // either begin fall or stop fall
