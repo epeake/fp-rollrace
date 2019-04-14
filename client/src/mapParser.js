@@ -37,7 +37,7 @@ export const findMapSpan = allPaths => {
 // Bug is need last of map to be a V or else small cut off.  Does not affect performance though.  Need to make sure in alternating order
 export const buildMapHashtable = (xMax, strokeWidth, allPaths) => {
   const xRange = xMax;
-  let hashedPaths = Array.apply(null, Array(xRange)).map(elt => []); // array of arrays
+  const hashedPaths = Array.apply(null, Array(xRange)).map(() => []); // array of arrays
   let xCurr, yCurr, xNext, yNext, v;
   let i, j;
 

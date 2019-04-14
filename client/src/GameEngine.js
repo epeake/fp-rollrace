@@ -40,7 +40,6 @@ const INITIAL_STATE = {
   mapTranslationStart: 0,
   pauseOffsetStart: 0,
   timePaused: 0,
-  totalGameTime: 0,
   yStart: 400, // seems very arbitrary
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
@@ -48,7 +47,7 @@ const INITIAL_STATE = {
   players: undefined,
   color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
     255})`
-};
+}; //
 
 // time between updates sent to the server
 const UPDATE_INTERVAL = 40; // milliseconds
@@ -277,18 +276,16 @@ class GameEngine extends Component {
     // don't update if game has not started or is paused
     if (this.state.gameStartTime && !this.state.paused) {
       const currentTime = new Date().getTime();
+      const { gameStartTime, timePaused, jumpStartTime } = this.state;
       let {
         blocked,
         jumpState,
         y,
         yStart,
-        gameStartTime,
-        timePaused,
         descendStartTime,
         mapTranslation,
         mapTranslationStart,
-        mapTranslationStartTime,
-        jumpStartTime
+        mapTranslationStartTime
       } = this.state;
 
       let onPath = false;
@@ -380,7 +377,6 @@ class GameEngine extends Component {
       clearTimeout(this.mapTimeout);
       this.mapTimeout = setTimeout(() => {
         this.setState({
-          totalGameTime: gameStartTime - currentTime - timePaused,
           mapTranslation: mapTranslation,
           mapTranslationStart: mapTranslationStart,
           mapTranslationStartTime: mapTranslationStartTime,
