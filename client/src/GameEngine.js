@@ -19,8 +19,8 @@ const jump = {
 };
 //const JUMP_HEIGHT = 150;
 const UPDATE_TIMEOUT = 0.0001;
-const JUMP_SPEED = 0.0009;
-const JUMP_POWER = 0.6;
+const JUMP_SPEED = 0.0009; // acceleration
+const JUMP_POWER = 0.6; // jumping velocity
 const SCROLL_SPEED = 0.2;
 const SPRITE_SIDE = 80;
 const FLOOR_THRESH = 10;
@@ -40,7 +40,7 @@ const INITIAL_STATE = {
   pauseOffsetStart: 0,
   timePaused: 0,
   totalGameTime: 0,
-  yStart: 400,
+  yStart: 400, // seems very arbitrary
   jumpState: jump.STOP,
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
@@ -171,18 +171,6 @@ class GameEngine extends Component {
       jumpStartTime: this.state.jumpStartTime + timeElapsed,
       descendStartTime: this.state.descendStartTime + timeElapsed
     });
-    // } else if (this.state.blocked) {
-    //   this.setState({
-    //     blocked: false,
-    //     translationOffset: this.state.translationOffset +
-    //       new Date().getTime() -
-    //       this.state.pauseOffsetStart,
-    //     jumpStartTime:
-    //       this.state.jumpStartTime +
-    //       new Date().getTime() -
-    //       this.state.pauseOffsetStart
-    //   });
-    // }
   }
 
   // Pauses our game
@@ -234,8 +222,6 @@ class GameEngine extends Component {
   }
 
   /*
-   * TODO: CLEAN UP ONCE WE MERGE WITH KAI
-   *
    * Handle animation
    */
   componentDidUpdate() {
@@ -250,9 +236,8 @@ class GameEngine extends Component {
     //   prevState[key] !== val && console.log(`State '${key}' changed`)
     // );
 
-    // don't update if game has not started
+    // don't update if game has not started or is paused
     if (this.state.gameStartTime && !this.state.paused) {
-      // don't begin a jump if no jump was initialized
       const currentTime = new Date().getTime();
       let {
         blocked,
@@ -273,53 +258,37 @@ class GameEngine extends Component {
 
       const currX = Math.round(this.state.x - mapTranslation);
 
-      // we check in a 3 window range
-      // let currMap = [
-      //   ...this.map[currX + SPRITE_SIDE],
-      //   ...this.map[currX + 1 + SPRITE_SIDE],
-      //   ...this.map[currX + 2 + SPRITE_SIDE],
-      // ];
+      // Scan to detect paths and walls for front edge of sprite
       for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
         this.map[currX + i + SPRITE_SIDE].forEach(location => {
-          //console.log(location);
           if (location[0] === 'b') {
             if (
               (location[1] <= y && y <= location[2]) ||
               (location[1] <= y + SPRITE_SIDE && y + SPRITE_SIDE <= location[2])
             ) {
-              //console.log('blocked')
               atWall = true;
             }
           } else if (
             location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
             y + SPRITE_SIDE <= location[1]
           ) {
-            //console.log(y);
-            //console.log(362-1 <= 200 + 80 <= 362);
-            //console.log(location);
             onPath = true;
           }
         });
       }
-      //console.log(currMap)
+      // either becomes blocked or unblocked
       if (atWall !== blocked) {
-        //console.log('blocked')
-        //console.log(atWall !== blocked);
         if (blocked) {
           blocked = false;
           mapTranslationStartTime = currentTime;
-          //pause
         } else {
-          //console.log('blocked')
           blocked = true;
           mapTranslationStart = mapTranslation;
-          //unpause
         }
       }
+      // only run if we are not currently going up
       if (jumpState !== jump.UP) {
-        // for (let i = 0; i <= 2; i++){
-        //   currMap[i] = this.map[currX + i]
-        // }
+        // Scan to detect paths for trailing edge of sprite
         for (let i = 0; i < Math.ceil(FLOOR_THRESH / 2); i++) {
           this.map[currX + i].forEach(location => {
             if (
@@ -327,17 +296,14 @@ class GameEngine extends Component {
               (location[1] - FLOOR_THRESH <= y + SPRITE_SIDE &&
                 y + SPRITE_SIDE <= location[1])
             ) {
-              //console.log(y);
-              //console.log(362-1 <= 200 + 80 <= 362);
-              //console.log(location);
               onPath = true;
             }
           });
         }
 
+        // either begin fall or stop fall
         if (onPath !== (jumpState === jump.STOP)) {
           if (onPath) {
-            //console.log('on path')
             jumpState = jump.STOP;
           } else {
             yStart = y;
@@ -346,29 +312,30 @@ class GameEngine extends Component {
           }
         }
       }
+
+      // falling action
       if (jumpState === jump.DOWN) {
-        //console.log('fell');
         y = yStart + 0.5 * (currentTime - descendStartTime) ** 2 * JUMP_SPEED;
+        // jumping action
       } else if (jumpState === jump.UP) {
-        // mid jump case
-        //console.log(JUMP_POWER - JUMP_SPEED*(currentTime - jumpStartTime));
         if (JUMP_POWER - JUMP_SPEED * (currentTime - jumpStartTime) >= 0) {
           y =
             yStart -
             ((currentTime - jumpStartTime) * JUMP_POWER -
               0.5 * (currentTime - jumpStartTime) ** 2 * JUMP_SPEED);
         } else {
-          //console.log('descending');
           yStart = y;
           jumpState = jump.DOWN;
           descendStartTime = currentTime;
         }
       }
+      // don't update background if blocked
       if (!blocked) {
         mapTranslation =
           mapTranslationStart -
           (currentTime - mapTranslationStartTime) * SCROLL_SPEED;
       }
+      // set all states
       clearTimeout(this.mapTimeout);
       this.mapTimeout = setTimeout(() => {
         this.setState({
