@@ -276,7 +276,7 @@ class GameEngine extends Component {
     // don't update if game has not started or is paused
     if (this.state.gameStartTime && !this.state.paused) {
       const currentTime = new Date().getTime();
-      const { gameStartTime, timePaused, jumpStartTime } = this.state;
+      const { jumpStartTime } = this.state;
       let {
         blocked,
         jumpState,
