@@ -29,10 +29,24 @@ io.on('connection', socket => {
 			tell this newly connected socket about the other players
 			player
 		*/
-    const arr = Array.from(players.values());
+    const arr = Array.from(players.values()).filter(playerData => {
+      return playerData.key !== socket.id;
+    });
+
     fn(arr);
     // tell all other sockets about the player that just joined
-    io.emit('PLAYER', arr);
+    socket.broadcast.emit('PLAYER', arr);
+  });
+
+  socket.on('CHANGE_POS', (player, fn) => {
+    players.set(socket.id, player);
+    const arr = Array.from(players.values()).filter(playerData => {
+      return playerData.key !== socket.id;
+    });
+
+    fn(arr);
+    // tell all other sockets about the player that just joined
+    socket.broadcast.emit('CHANGE_POS', arr);
   });
 
   socket.on('disconnect', () => {
