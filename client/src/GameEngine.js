@@ -5,6 +5,7 @@ import ChangeKeyMenu from './ChangeKeyMenu.js';
 import ProgressBar from './ProgressBar.js';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import Timer from './Timer.js';
+import Tutorial from './Tutorial.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
@@ -31,6 +32,7 @@ const WALL_THRESH = 3;
 const FLOOR_THRESH = 5;
 
 const INITIAL_STATE = {
+  tutorial: false,
   paused: false,
   blocked: false,
   jumpKey: 32,
@@ -476,83 +478,106 @@ class GameEngine extends Component {
         })
       );
     }
-    return (
-      <>
-        <div>
-          <Timer />
-        </div>
-        <SVGLayer
-          viewBox={'0 0 2000 5000'}
-          preserveAspectRatio={'xMaxYMin slice'}
-          height={this.state.windowHeight}
-          width={this.state.windowWidth}
-        >
-          <ProgressBar y={TOOLBAR_Y} />
-          <Map
-            translation={this.state.mapTranslation}
-            map={this.props.mapProps.map}
-            stroke={this.props.mapProps.strokeWidth}
-          />
-          {boxes}
-          <g onClick={() => this.pauseGame()}>
-            <rect
-              key={'pause-bkrnd'}
-              rx={15}
-              ry={15}
-              x={15}
-              y={TOOLBAR_Y}
-              height={50}
-              width={50}
-              fill={'black'}
-            />
-            <rect
-              key={'lft-line'}
-              rx={5}
-              ry={5}
-              x={28}
-              y={TOOLBAR_Y + 13}
-              height={25}
-              width={10}
-              fill={'white'}
-            />
-            <rect
-              key={'rt-line'}
-              rx={5}
-              ry={5}
-              x={43}
-              y={TOOLBAR_Y + 13}
-              height={25}
-              width={10}
-              fill={'white'}
-            />
-          </g>
-        </SVGLayer>
-        {this.state.paused ? (
+
+    if (!this.state.tutorial) {
+      return (
+        <>
+          <div>
+            <Timer />
+          </div>
           <SVGLayer
-            viewBox={'0 0 2000 1000'}
-            preserveAspectRatio={'xMinYMin meet'}
+            viewBox={'0 0 2000 5000'}
+            preserveAspectRatio={'xMaxYMin slice'}
+            height={this.state.windowHeight}
+            width={this.state.windowWidth}
           >
-            {this.state.changingKey ? (
-              <ChangeKeyMenu
-                windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
-                jumpKey={this.state.jumpKey}
+            <ProgressBar y={TOOLBAR_Y} />
+            <Map
+              translation={this.state.mapTranslation}
+              map={this.props.mapProps.map}
+              stroke={this.props.mapProps.strokeWidth}
+            />
+            {boxes}
+            <g onClick={() => this.pauseGame()}>
+              <rect
+                key={'pause-bkrnd'}
+                rx={15}
+                ry={15}
+                x={15}
+                y={15}
+                height={50}
+                width={50}
+                fill={'black'}
               />
-            ) : (
-              <PauseMenu
-                windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
-                resume={() => this.resumeGame()}
-                restart={() => this.restartGame()}
-                changeKey={() => this.setState({ changingKey: true })}
+              <rect
+                key={'lft-line'}
+                rx={5}
+                ry={5}
+                x={28}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
               />
-            )}
+              <rect
+                key={'rt-line'}
+                rx={5}
+                ry={5}
+                x={43}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
+              />
+
+              <g onClick={() => this.setState({ tutorial: true })}>
+                {' '}
+                {/* pauses game because within pausing div*/}
+                <rect
+                  key={'help-me'}
+                  rx={15}
+                  ry={15}
+                  x={115}
+                  y={15}
+                  height={50}
+                  width={50}
+                  fill={'pink'}
+                />
+                <text x={135} y={45} height={50} width={50}>
+                  ?
+                </text>
+              </g>
+            </g>
           </SVGLayer>
-        ) : (
-          <></>
-        )}
-      </>
-    );
+          {this.state.paused ? (
+            <SVGLayer
+              viewBox={'0 0 2000 1000'}
+              preserveAspectRatio={'xMinYMin meet'}
+            >
+              {this.state.changingKey ? (
+                <ChangeKeyMenu
+                  windowHeight={this.state.windowHeight}
+                  windowWidth={this.state.windowWidth}
+                  jumpKey={this.state.jumpKey}
+                />
+              ) : (
+                <PauseMenu
+                  windowHeight={this.state.windowHeight}
+                  windowWidth={this.state.windowWidth}
+                  resume={() => this.resumeGame()}
+                  restart={() => this.restartGame()}
+                  changeKey={() => this.setState({ changingKey: true })}
+                />
+              )}
+            </SVGLayer>
+          ) : (
+            <></>
+          )}
+        </>
+      );
+    } else {
+      return <Tutorial handlePlay={() => this.setState({ tutorial: false })} />;
+    }
   }
 }
 
