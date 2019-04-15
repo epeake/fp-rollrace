@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
+import ProgressBar from './ProgressBar.js';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import Timer from './Timer.js';
 import styled from 'styled-components';
@@ -19,21 +20,23 @@ const jump = {
   DOWN: 2
 };
 
+const TOOLBAR_Y = 15;
 const UPDATE_TIMEOUT = 0.5; // time between location updates and state change checks
 const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0009; // acceleration
 const JUMP_POWER = 0.6; // jumping velocity
 const SCROLL_SPEED = 0.25;
-const SPRITE_SIDE = 80;
+const SPRITE_SIDE = 100;
 const WALL_THRESH = 3;
 const FLOOR_THRESH = 5;
+
 const INITIAL_STATE = {
   paused: false,
   blocked: false,
   jumpKey: 32,
   changingKey: false,
-  x: 60, // maybe not necessary
-  y: 360,
+  x: 53, // maybe not necessary
+  y: 340,
   jumpStartTime: null,
   descendStartTime: null,
   gameStartTime: null,
@@ -239,8 +242,8 @@ class GameEngine extends Component {
         this.setState({ players: data });
       });
 
-      /* 
-        Update the server with location of the 
+      /*
+        Update the server with location of the
         players map ever UPDATE_INTERVAL milliseconds.
 
         Also emit a CHANGE_POS event that allows
@@ -261,8 +264,8 @@ class GameEngine extends Component {
       }, UPDATE_INTERVAL);
 
       /*
-        Using the mapTranslation allows THIS player to keep track of where OTHER 
-        players are in the game. 
+        Using the mapTranslation allows THIS player to keep track of where OTHER
+        players are in the game.
       */
       const player = {
         mapTrans: this.state.mapTranslation,
@@ -274,8 +277,8 @@ class GameEngine extends Component {
       /*
         When a new player connects send the player
         to the server. The call back will have data about other players.
-        
-        To avoid having empty `rect' elements only set the state of 
+
+        To avoid having empty `rect' elements only set the state of
         the players when there is data sent from the server
       */
       this.socket.emit('NEW_PLAYER', player, data => {
@@ -445,8 +448,8 @@ class GameEngine extends Component {
         ry={15}
         x={this.state.x}
         y={this.state.y}
-        height={80}
-        width={80}
+        height={SPRITE_SIDE}
+        width={SPRITE_SIDE}
         fill={this.state.color}
       />
     ];
@@ -465,8 +468,8 @@ class GameEngine extends Component {
               // based on their x coordinate
               x={this.state.mapTranslation - player.mapTrans}
               y={player.y}
-              height={80}
-              width={80}
+              height={SPRITE_SIDE}
+              width={SPRITE_SIDE}
               fill={player.color}
             />
           );
@@ -479,11 +482,12 @@ class GameEngine extends Component {
           <Timer />
         </div>
         <SVGLayer
-          viewBox={'0 0 1000 2000'}
+          viewBox={'0 0 2000 5000'}
           preserveAspectRatio={'xMaxYMin slice'}
           height={this.state.windowHeight}
           width={this.state.windowWidth}
         >
+          <ProgressBar y={TOOLBAR_Y} />
           <Map
             translation={this.state.mapTranslation}
             map={this.props.mapProps.map}
@@ -496,7 +500,7 @@ class GameEngine extends Component {
               rx={15}
               ry={15}
               x={15}
-              y={15}
+              y={TOOLBAR_Y}
               height={50}
               width={50}
               fill={'black'}
@@ -506,7 +510,7 @@ class GameEngine extends Component {
               rx={5}
               ry={5}
               x={28}
-              y={28}
+              y={TOOLBAR_Y + 13}
               height={25}
               width={10}
               fill={'white'}
@@ -516,7 +520,7 @@ class GameEngine extends Component {
               rx={5}
               ry={5}
               x={43}
-              y={28}
+              y={TOOLBAR_Y + 13}
               height={25}
               width={10}
               fill={'white'}

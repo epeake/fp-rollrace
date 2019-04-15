@@ -1,14 +1,27 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 
 //specifies the x coordinate of the rectangle and starting point
-const LEFT_POS = 50;
+const X_POS = 900;
+
+const SpriteOne = styled.ellipse`
+  fill: #ff0000;
+`;
+
+const SpriteTwo = styled.ellipse`
+  fill: #00ff00;
+`;
+
+const Bar = styled.rect`
+  fill: #280b0b;
+`;
 
 class ProgressBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      player_1_pos: LEFT_POS,
-      player_2_pos: LEFT_POS
+      player_1_pos: X_POS,
+      player_2_pos: X_POS
     };
   }
 
@@ -28,31 +41,23 @@ class ProgressBar extends Component {
 
   render() {
     return (
-      <svg>
-        <rect
-          style={{ fill: '#280b0b' }}
-          width="200"
-          height="20"
-          x={LEFT_POS}
-          y="90"
+      <g>
+        <Bar width={200} height={20} x={X_POS} y={this.props.y} />
+
+        <SpriteOne
+          cx={this.state.player_1_pos} /*update player one position*/
+          cy={this.props.y + 10} /* offset */
+          rx={2.0}
+          ry={9.0}
         />
 
-        <ellipse
-          style={{ fill: '#ff0000' }}
-          cx={this.state.player_1_pos} //update player one position
-          cy="100"
-          rx="2.0"
-          ry="9.0"
+        <SpriteTwo
+          cx={this.state.player_2_pos} /*update player two position*/
+          cy={this.props.y + 10}
+          rx={2.0}
+          ry={9.0}
         />
-
-        <ellipse
-          style={{ fill: '#00ff00' }}
-          cx={this.state.player_2_pos} //update player two position
-          cy="100"
-          rx="2.0"
-          ry="9.0"
-        />
-      </svg>
+      </g>
     );
   }
 }
