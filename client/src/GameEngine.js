@@ -29,7 +29,7 @@ const JUMP_POWER = 0.6; // jumping velocity
 const SCROLL_SPEED = 0.25;
 const SPRITE_SIDE = 100;
 const WALL_THRESH = 3;
-const FLOOR_THRESH = 5;
+const FLOOR_THRESH = 15;
 
 const INITIAL_STATE = {
   tutorial: false,
@@ -168,6 +168,10 @@ class GameEngine extends Component {
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
+
+    // resetting temporary variables
+    this.mapTranslation = INITIAL_STATE.mapTranslation;
+    this.y = INITIAL_STATE.y;
 
     /*
      * make sure window is correct size
