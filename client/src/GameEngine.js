@@ -537,13 +537,13 @@ class GameEngine extends Component {
                   key={'help-me'}
                   rx={15}
                   ry={15}
-                  x={900}
+                  x={115}
                   y={15}
                   height={50}
                   width={50}
                   fill={'pink'}
                 />
-                <text x={920} y={45} height={50} width={50}>
+                <text x={135} y={45} height={50} width={50}>
                   ?
                 </text>
               </g>
