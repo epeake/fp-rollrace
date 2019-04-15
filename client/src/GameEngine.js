@@ -3,6 +3,7 @@ import Map from './Map.js';
 import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
 import Timer from './Timer.js';
+import Tutorial from './Tutorial.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
@@ -22,6 +23,7 @@ const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
 const SCROLL_SPEED = 1 / 5;
 const INITIAL_STATE = {
+  tutorial: false,
   paused: false,
   jumpKey: 32,
   changingKey: false,
@@ -197,8 +199,8 @@ class GameEngine extends Component {
         this.setState({ players: data });
       });
 
-      /* 
-        Update the server with location of the 
+      /*
+        Update the server with location of the
         players map ever UPDATE_INTERVAL milliseconds.
 
         Also emit a CHANGE_POS event that allows
@@ -219,8 +221,8 @@ class GameEngine extends Component {
       }, UPDATE_INTERVAL);
 
       /*
-        Using the mapTranslation allows THIS player to keep track of where OTHER 
-        players are in the game. 
+        Using the mapTranslation allows THIS player to keep track of where OTHER
+        players are in the game.
       */
       const player = {
         mapTrans: this.state.mapTranslation,
@@ -232,8 +234,8 @@ class GameEngine extends Component {
       /*
         When a new player connects send the player
         to the server. The call back will have data about other players.
-        
-        To avoid having empty `rect' elements only set the state of 
+
+        To avoid having empty `rect' elements only set the state of
         the players when there is data sent from the server
       */
       this.socket.emit('NEW_PLAYER', player, data => {
@@ -369,79 +371,101 @@ class GameEngine extends Component {
         })
       );
     }
-    return (
-      <>
-        <div>
-          <Timer />
-        </div>
-        <SVGLayer
-          viewBox={'0 0 1000 2000'}
-          preserveAspectRatio={'xMaxYMin slice'}
-          height={this.state.windowHeight}
-          width={this.state.windowWidth}
-        >
-                  
-          <Map translation={this.state.mapTranslation} />
-          {boxes}
-          <g onClick={() => this.pauseGame()}>
-            <rect
-              key={'pause-bkrnd'}
-              rx={15}
-              ry={15}
-              x={15}
-              y={15}
-              height={50}
-              width={50}
-              fill={'black'}
-            />
-            <rect
-              key={'lft-line'}
-              rx={5}
-              ry={5}
-              x={28}
-              y={28}
-              height={25}
-              width={10}
-              fill={'white'}
-            />
-            <rect
-              key={'rt-line'}
-              rx={5}
-              ry={5}
-              x={43}
-              y={28}
-              height={25}
-              width={10}
-              fill={'white'}
-            />
-          </g>
-        </SVGLayer>
-        {this.state.paused ? (
+    if (!this.state.tutorial) {
+      return (
+        <>
+          <div>
+            <Timer />
+          </div>
           <SVGLayer
-            viewBox={'0 0 2000 1000'}
-            preserveAspectRatio={'xMinYMin meet'}
+            viewBox={'0 0 1000 2000'}
+            preserveAspectRatio={'xMaxYMin slice'}
+            height={this.state.windowHeight}
+            width={this.state.windowWidth}
           >
-            {this.state.changingKey ? (
-              <ChangeKeyMenu
-                windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
-                jumpKey={this.state.jumpKey}
+                    
+            <Map translation={this.state.mapTranslation} />
+            {boxes}
+            <g onClick={() => this.pauseGame()}>
+              <rect
+                key={'pause-bkrnd'}
+                rx={15}
+                ry={15}
+                x={15}
+                y={15}
+                height={50}
+                width={50}
+                fill={'black'}
               />
-            ) : (
-              <PauseMenu
-                windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
-                resume={() => this.resumeGame()}
-                restart={() => this.restartGame()}
-                changeKey={() => this.setState({ changingKey: true })}
+              <rect
+                key={'lft-line'}
+                rx={5}
+                ry={5}
+                x={28}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
               />
-            )}
+              <rect
+                key={'rt-line'}
+                rx={5}
+                ry={5}
+                x={43}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
+              />
+
+              <g onClick={() => this.setState({ tutorial: true })}>
+                {' '}
+                {/* pauses game because within pausing div*/}
+                <rect
+                  key={'help-me'}
+                  rx={15}
+                  ry={15}
+                  x={900}
+                  y={15}
+                  height={50}
+                  width={50}
+                  fill={'pink'}
+                />
+                <text x={920} y={45} height={50} width={50}>
+                  ?
+                </text>
+              </g>
+            </g>
           </SVGLayer>
-        ) : (
-          <></>
-        )}
-      </>
-    );
+          {this.state.paused ? (
+            <SVGLayer
+              viewBox={'0 0 2000 1000'}
+              preserveAspectRatio={'xMinYMin meet'}
+            >
+              {this.state.changingKey ? (
+                <ChangeKeyMenu
+                  windowHeight={this.state.windowHeight}
+                  windowWidth={this.state.windowWidth}
+                  jumpKey={this.state.jumpKey}
+                />
+              ) : (
+                <PauseMenu
+                  windowHeight={this.state.windowHeight}
+                  windowWidth={this.state.windowWidth}
+                  resume={() => this.resumeGame()}
+                  restart={() => this.restartGame()}
+                  changeKey={() => this.setState({ changingKey: true })}
+                />
+              )}
+            </SVGLayer>
+          ) : (
+            <></>
+          )}
+        </>
+      );
+    } else {
+      return <Tutorial handlePlay={() => this.setState({ tutorial: false })} />;
+    }
   }
 }
 

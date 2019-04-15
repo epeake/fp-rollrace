@@ -10,6 +10,7 @@ const Tut = styled.div`
   text-align: center;
   width: 800px;
 `;
+
 const JUMP_HEIGHT = 150;
 const JUMP_TIME = 500;
 const UPDATE_TIMEOUT = 0.01;
@@ -91,6 +92,23 @@ class Tutorial extends Component {
           height={window.innerHeight}
           width={window.innerWidth}
         >
+          <g onClick={() => this.props.handlePlay()}>
+            <rect
+              key={'help-me'}
+              rx={15}
+              ry={15}
+              x={15}
+              y={15}
+              height={50}
+              width={50}
+              fill={'green'}
+            />
+
+            <text x={25} y={45} height={50} width={50}>
+              Play!
+            </text>
+          </g>
+
           <rect
             rx={15}
             ry={15}
