@@ -72,7 +72,7 @@ class GameEngine extends Component {
      * each game will have a socket to connect back to the server
      * store the other players as a member for THIS player
      */
-    this.socket = io.connect('http://localhost:3001');
+    this.socket = io.connect();
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
