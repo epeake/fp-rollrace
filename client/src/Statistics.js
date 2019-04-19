@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import statistics from './buttonSVGs/statistics.svg';
 import return2menu from './buttonSVGs/return2menu.svg';
 class Statistics extends Component {
@@ -8,7 +8,7 @@ class Statistics extends Component {
     this.handleClick = this.handleClick.bind(this);
   }
   handleClick() {
-    this.props.GoToMenu();
+    this.props.goToMenu();
   }
   render() {
     return (
@@ -27,10 +27,9 @@ class Statistics extends Component {
     );
   }
 }
-/*
-  Statistics.propTypes = {
-    GoToMenu: PropTypes.func.isRequired
-  };
-  */
+
+Statistics.propTypes = {
+  goToMenu: PropTypes.func.isRequired
+};
 
 export default Statistics;

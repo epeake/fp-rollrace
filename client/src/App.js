@@ -13,6 +13,11 @@ const StyledTitle = styled(title)`
   height: 100;
 `;
 
+const StyledButton = styled.img`
+  display: block;
+  margin: auto;
+`;
+
 /* eslint-disable react/prefer-stateless-function */
 class App extends Component {
   constructor(props) {
@@ -39,39 +44,34 @@ class App extends Component {
             {},
             { map: this.state.map, strokeWidth: this.state.strokeWidth }
           )}
+          GoToMenu={this.handleGoToMenu}
         />
       );
     }
     if (mode === 'menu') {
+      // <div className="settings-button">
       return (
         <div>
           <StyledTitle />
-          <div class="play-button">
-            <img
+          <div className="play-button">
+            <StyledButton
               src={realbutton}
               height="50"
-              className="playlogo"
               alt="play"
               onClick={() => this.setState({ mode: 'game' })}
             />
-            <div class="settings-button">
-              <img
-                src={settingsbutton}
-                height="50"
-                className="settinsglogo"
-                alt="settings"
-                onClick={() => this.setState({ mode: 'settings' })}
-              />
-              <div>
-                <img
-                  src={statsbutton}
-                  height="50"
-                  className="statslogo"
-                  alt="stats"
-                  onClick={() => this.setState({ mode: 'stats' })}
-                />
-              </div>
-            </div>
+            <StyledButton
+              src={settingsbutton}
+              height="50"
+              alt="settings"
+              onClick={() => this.setState({ mode: 'settings' })}
+            />
+            <StyledButton
+              src={statsbutton}
+              height="50"
+              alt="stats"
+              onClick={() => this.setState({ mode: 'stats' })}
+            />
           </div>
         </div>
       );
@@ -80,14 +80,14 @@ class App extends Component {
     if (mode === 'settings') {
       return (
         <div>
-          <Settings GoToMenu={this.handleGoToMenu} />
+          <Settings goToMenu={this.handleGoToMenu} />
         </div>
       );
     }
     if (mode === 'stats') {
       return (
         <div>
-          <Statistics GoToMenu={this.handleGoToMenu} />
+          <Statistics goToMenu={this.handleGoToMenu} />
         </div>
       );
     }

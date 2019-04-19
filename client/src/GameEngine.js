@@ -196,6 +196,27 @@ class GameEngine extends Component {
     });
   }
 
+  /*
+  resumeGame(){
+    this.mapTranslation = INITIAL_STATE.mapTranslation;
+    this.y = INITIAL_STATE.y;
+
+
+    this.timeout = null;
+    this.renderInterval = null;
+    this.updateInterval = null;
+
+    const restartState = Object.assign({}, INITIAL_STATE, {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
+
+    this.setState(restartState);
+
+    this.props.GoToMenu();
+  }
+*/
+
   // Pauses our game
   pauseGame() {
     if (this.state.gameStartTime) {
