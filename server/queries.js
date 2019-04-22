@@ -1,15 +1,13 @@
-const { pool } = require('./db-config');
-
-// const pool = new Pool({
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE,
-//   port: process.env.DB_PORT,
-//   host: process.env.DB_HOST,
-//   ssl: true,
-//   max: 20,
-//   idleTimeoutMillis: 30000,
-// });
+const pool = new Pool({
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,
+  ssl: true,
+  max: 20,
+  idleTimeoutMillis: 30000
+});
 
 const createUser = (request, response) => {
   const { username, password } = request.body;
