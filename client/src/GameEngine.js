@@ -9,6 +9,23 @@ import Tutorial from './Tutorial.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
+import request from 'request';
+
+const postBody = {
+  username: 'epeake223',
+  password: '12345'
+};
+
+request.post(
+  {
+    url: 'http://localhost:3000/api/users',
+    body: postBody,
+    json: true
+  },
+  function(error, response, body) {
+    console.log(body);
+  }
+);
 
 const SVGLayer = styled.svg`
   position: absolute;

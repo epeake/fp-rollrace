@@ -1,4 +1,6 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const { createUser } = require('./queries');
 
 const app = express();
 
@@ -16,9 +18,12 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// TODO: Add any middleware here
+// middleware for parsing
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// TODO: Add your routes here
+// Make new user
+app.post('/api/users', createUser);
 
 module.exports = {
   app
