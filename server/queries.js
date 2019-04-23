@@ -22,8 +22,8 @@ const createUser = (request, response) => {
       'INSERT INTO account (username, password, total_multi_wins, total_multi_games, total_games) VALUES ($1, $2, 0, 0, 0)',
       [username, password],
 
-      //NEED TO FIGURE OUT HOW TO MAKE NOT CRASH IF NOT VALID
-      (error, result) => {
+      // NEED TO FIGURE OUT HOW TO MAKE NOT CRASH IF NOT VALID
+      error => {
         if (error) {
           throw error;
         }
