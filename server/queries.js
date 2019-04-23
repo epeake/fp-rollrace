@@ -19,7 +19,7 @@ const createUser = (request, response) => {
   (async function() {
     const client = await pool.connect();
     await client.query(
-      'INSERT INTO account (username, password) VALUES ($1, $2)',
+      'INSERT INTO account (username, password, total_multi_wins, total_multi_games, total_games) VALUES ($1, $2, 0, 0, 0)',
       [username, password],
 
       //NEED TO FIGURE OUT HOW TO MAKE NOT CRASH IF NOT VALID
@@ -36,7 +36,6 @@ const createUser = (request, response) => {
 
 const getUser = (request, response) => {
   const username = request.params.id.substring(1);
-  console.log(username);
 
   (async function() {
     const client = await pool.connect();

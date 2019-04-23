@@ -127,12 +127,10 @@ class LoginWindow extends Component {
         <br />
         <br />
         <button type="button" onClick={this.getUser}>
-          {' '}
-          Login{' '}
+          Login
         </button>
         <button type="button" onClick={this.createUser}>
-          {' '}
-          Create User{' '}
+          Create User
         </button>
       </div>
     );
