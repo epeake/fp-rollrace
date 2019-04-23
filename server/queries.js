@@ -21,15 +21,37 @@ const createUser = (request, response) => {
     await client.query(
       'INSERT INTO account (username, password) VALUES ($1, $2)',
       [username, password],
+
+      //NEED TO FIGURE OUT HOW TO MAKE NOT CRASH IF NOT VALID
       (error, result) => {
         if (error) {
           throw error;
         }
-        response.status(201).send(`User added with ID: ${result.insertId}`);
+        response.status(201).send('User added');
       }
     );
     client.release();
   })();
 };
 
-module.exports = { createUser };
+const getUser = (request, response) => {
+  const username = request.params.id.substring(1);
+  console.log(username);
+
+  (async function() {
+    const client = await pool.connect();
+    await client.query(
+      'SELECT * FROM account WHERE username = $1',
+      [username],
+      (error, result) => {
+        if (error) {
+          throw error;
+        }
+        response.status(200).send(result);
+      }
+    );
+    client.release();
+  })();
+};
+
+module.exports = { createUser, getUser };

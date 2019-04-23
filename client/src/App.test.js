@@ -5,10 +5,11 @@ import Settings from './settings.js';
 import Statistics from './Statistics.js';
 import GameEngine from './GameEngine.js';
 
-describe('App rendering tests', () => {
+describe('Main Menu rendering tests', () => {
   let app;
   beforeEach(async () => {
     app = mount(<App />);
+    app.setState({ mode: 'menu' });
   });
 
   test('Starts in main menu with 3 button buttons', () => {

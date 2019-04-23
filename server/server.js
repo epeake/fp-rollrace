@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { createUser } = require('./queries');
+const { createUser, getUser } = require('./queries');
 
 const app = express();
 
@@ -24,6 +24,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Make new user
 app.post('/api/users', createUser);
+
+// Fetch specific user
+app.get('/api/users/:id', getUser);
 
 module.exports = {
   app
