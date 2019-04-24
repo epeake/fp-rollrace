@@ -26,8 +26,19 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "db-errors": "^0.2.2",
     "express": "^4.16.4",
+    "knex": "^0.16.5",
+    "objection": "^1.6.8",
     "pg": "^7.10.0",
-    "socket.io": "^2.2.0"
-  }
+    "socket.io": "^2.2.0",
+    "sqlite3": "^4.0.6"
+  },
+  "engines": {
+    "node": "10.15.x"
+  },
+  "cacheDirectories": [
+    "node_modules"
+  ],
+  "heroku-postbuild": "npm install"
 }

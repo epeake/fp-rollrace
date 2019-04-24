@@ -41,7 +41,11 @@ class LoginWindow extends Component {
         url: 'http://localhost:3000/api/users',
         body: {
           username: this.state.username,
-          password: this.state.password
+          password: this.state.password,
+          total_games: 0,
+          total_multi_games: 0,
+          total_multi_wins: 0,
+          map_1_time: -1
         },
         json: true
       };
@@ -79,10 +83,10 @@ class LoginWindow extends Component {
       request
         .get(options)
         .then(resp => {
-          if (resp.rows.length === 0) {
+          if (resp.length === 0) {
             alert('Could not find user');
           } else {
-            const match = resp.rows[0]; // because usernames unique
+            const match = resp[0]; // because usernames unique
             if (match.password !== this.state.password) {
               alert('Incorrect username/password combination');
             } else {
