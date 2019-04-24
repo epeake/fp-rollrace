@@ -63,6 +63,18 @@ export default function Map(props) {
         opacity={1}
         onClick={() => props.changeKey()}
       />
+
+      <rect
+        rx={30}
+        ry={30}
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 320}
+        height={BUTTON_HEIGHT}
+        width={BUTTON_WIDTH}
+        fill={'yellow'}
+        opacity={1}
+        onClick={props.goToMenu}
+      />
     </g>
   );
 }
