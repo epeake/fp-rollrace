@@ -884,9 +884,8 @@ class GameEngine extends Component {
 
   // sets gameStartTime and starts the necessary animation loops
   startLoops() {
-    const currentTime = new Date().getTime();
-    this.variables.gameStartTime = currentTime;
-    this.variables.mapTranslationStartTime = currentTime;
+    this.variables.gameStartTime = new Date().getTime();
+    this.variables.mapTranslationStartTime = new Date().getTime();
     this.variables.motionChange = this.findNextChange();
 
     this.updateInterval = setInterval(() => {
