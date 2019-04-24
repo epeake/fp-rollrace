@@ -41,5 +41,10 @@
       "prettier --single-quote --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "pg": "^7.10.0",
+    "pg-promise": "^8.6.5"
   }
 }

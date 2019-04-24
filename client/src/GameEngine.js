@@ -1160,6 +1160,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
+                  goToMenu={this.props.goToMenu}
                 />
               )}
             </SVGLayer>
