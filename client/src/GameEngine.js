@@ -25,18 +25,20 @@ const jump = {
 const UPDATE_INTERVAL = 40; // milliseconds
 
 const TOOLBAR_Y = 15;
-const UPDATE_TIMEOUT = 1; // time between motionChange updates
-const RENDER_TIMEOUT = 30; // time between rerenders
-const JUMP_SPEED = 0.0008; // acceleration
-const JUMP_POWER = 0.6; // jumping velocity
-const SCROLL_SPEED = 0.2;
+const UPDATE_TIMEOUT = 20; // time between motionChange updates
+const RENDER_TIMEOUT = 20; // time between rerenders
+const JUMP_SPEED = 0.0013; // acceleration
+const JUMP_POWER = 0.7; // jumping velocity
+const SCROLL_SPEED = 0.4;
 const SPRITE_SIDE = 100;
+const PATH_THRESH = 5;
 
 const INITIAL_STATE = {
   tutorial: false,
   paused: false,
   gameover: false,
-  jumpKey: 32,
+  jumpKey: 32, // space bar
+  startKey: 115, // s key
   changingKey: false,
 
   y: 350,
@@ -58,7 +60,7 @@ const INITIAL_VARIABLES = {
   // will take an object of the following form {time: , event: } options for event are block, go, land, and fall
   motionChange: undefined,
 
-  yStart: INITIAL_STATE.y, // seems very arbitrary
+  yStart: INITIAL_STATE.y,
   jumpState: jump.STOP,
   jumpStartTime: undefined,
   descendStartTime: undefined,
@@ -75,7 +77,7 @@ class GameEngine extends Component {
   constructor(props) {
     super(props);
 
-    this.state = INITIAL_STATE;
+    this.state = Object.assign({}, INITIAL_STATE);
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
     /*
@@ -87,7 +89,6 @@ class GameEngine extends Component {
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
-    this.bufferInterval = null;
 
     this.mapLength = findMapSpan(this.props.mapProps.map);
     this.map = buildMapHashtable(
@@ -130,7 +131,7 @@ class GameEngine extends Component {
   handleJumpKey() {
     this.variables.jumpState = jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
-    this.updateChangeMotion();
+    this.variables.motionChange = this.findNextChange();
   }
 
   // Changes our current jump key
@@ -148,9 +149,15 @@ class GameEngine extends Component {
     } else if (
       event.keyCode === this.state.jumpKey &&
       this.variables.jumpState === jump.STOP &&
-      !this.state.paused
+      !this.state.paused &&
+      this.variables.gameStartTime
     ) {
       this.handleJumpKey();
+    } else if (
+      !this.variables.gameStartTime &&
+      event.keyCode === this.state.startKey
+    ) {
+      this.startLoops();
     } else {
       void 0; // do nothing
     }
@@ -164,13 +171,11 @@ class GameEngine extends Component {
     });
   }
 
-  // Restarts our game
+  // restarts the game
   restartGame() {
     // clear loops
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
-
-    Object.assign(this.variables, INITIAL_VARIABLES);
 
     /*
      * make sure window is correct size
@@ -181,12 +186,10 @@ class GameEngine extends Component {
       windowHeight: window.innerHeight
     });
     this.setState(restartState);
-
-    // start game
-    this.startLoops();
+    this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
   }
 
-  // Resumes our game after being paused
+  // resumes the game after being paused
   resumeGame() {
     const timeElapsed = new Date().getTime() - this.variables.pauseOffsetStart;
 
@@ -206,7 +209,7 @@ class GameEngine extends Component {
     });
   }
 
-  // Pauses our game
+  // pauses the game
   pauseGame() {
     if (this.variables.gameStartTime) {
       this.variables.pauseOffsetStart = new Date().getTime();
@@ -243,7 +246,10 @@ class GameEngine extends Component {
     } = props;
 
     let currentX = Math.round(
-      this.variables.x + SPRITE_SIDE / 2 - mapTranslation
+      this.variables.x +
+        SPRITE_SIDE -
+        this.props.mapProps.strokeWidth -
+        mapTranslation
     );
 
     for (currentX; currentX <= maxX; currentX++) {
@@ -349,7 +355,7 @@ class GameEngine extends Component {
   }
 
   // detects the end of the current path and returns the time of arrival
-  AfindEndOfPath(props) {
+  findEndOfPath(props) {
     // declare local variables
     const {
       mapTranslation,
@@ -359,15 +365,24 @@ class GameEngine extends Component {
       atWall
     } = props;
 
-    let currentX = Math.round(this.variables.x - mapTranslation + SPRITE_SIDE);
+    let currentX = Math.round(this.variables.x - mapTranslation);
+    let foundPath = false; // whether or not we have found the start of the current path
 
     for (currentX; currentX <= this.mapLength; currentX++) {
       const locations = this.map[currentX];
       let found = false;
       for (let j = 0; j < locations.length; j++) {
         if (
-          locations[j][0] === 'h' &&
-          Math.abs(locations[j][1] - (y + SPRITE_SIDE)) < 9
+          !foundPath &&
+          Math.abs(locations[j][1] - (y + SPRITE_SIDE)) < PATH_THRESH
+        ) {
+          foundPath = true;
+        }
+        if (
+          locations[j][0] === 'b' ||
+          (locations[j][0] === 'h' &&
+            Math.abs(locations[j][1] - (y + SPRITE_SIDE)) < PATH_THRESH) ||
+          !foundPath
         ) {
           found = true;
         }
@@ -378,7 +393,7 @@ class GameEngine extends Component {
             mapTranslationStart: mapTranslationStart,
             mapTranslationStartTime: mapTranslationStartTime,
             atWall: atWall,
-            x: currentX - this.props.mapProps.strokeWidth * 2
+            x: currentX
           }),
           event: 'fall'
         };
@@ -400,9 +415,9 @@ class GameEngine extends Component {
   }
 
   /*
-  return the time when the sprite will reach the given y value also given the state of the game
-    comes from solving the distance function in getY for time
-  */
+   * return the time when the sprite will reach the given y value also given the state of the game
+   * comes from solving the distance function in getY for time
+   */
   getTimeForGivenY(props) {
     if (props.jumpState === jump.DOWN) {
       return (
@@ -427,9 +442,9 @@ class GameEngine extends Component {
   }
 
   /*
-  return the time when the sprite will reach the given x value also given the state of the game
-    comes from solving the distance function in getX for time
-  */
+   * return the time when the sprite will reach the given x value also given the state of the game
+   * comes from solving the distance function in getX for time
+   */
   getTimeForGivenX(props) {
     if (props.atWall === true) {
       console.log('return undefined');
@@ -512,7 +527,7 @@ class GameEngine extends Component {
     }
   }
 
-  // unfortunately this breaks something!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // determines what should happen when the sprite is stuck at a wall
   spriteAtWall(props) {
     // declare local variables
     const {
@@ -520,7 +535,6 @@ class GameEngine extends Component {
       y,
       mapTranslation,
       yStart,
-      x,
       descendStartTime,
       jumpState,
       jumpStartTime,
@@ -529,21 +543,22 @@ class GameEngine extends Component {
       mapTranslationStartTime
     } = props;
 
-    if (jumpState === jump.UP) {
-      let currentX = Math.round(x - mapTranslationStart);
-      let found = false;
-      let wall;
-      while (!found) {
-        const locations = this.map[currentX];
-        for (let j = 0; j < locations.length; j++) {
-          if (locations[j][0] === 'b') {
-            // need to add a case where there are two wall with the same x value
-            wall = locations[j];
-            found = true;
-          }
+    let currentX = Math.round(this.variables.x - mapTranslationStart);
+    let found = false;
+    let wall;
+    while (!found) {
+      const locations = this.map[currentX];
+      for (let j = 0; j < locations.length; j++) {
+        // need to add a case where there are two wall with the same x value
+        if (locations[j][0] === 'b') {
+          wall = locations[j];
+          found = true;
         }
-        currentX++;
       }
+      currentX++;
+    }
+
+    if (jumpState === jump.UP) {
       const peakTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
       if (
         this.getY({
@@ -570,22 +585,9 @@ class GameEngine extends Component {
           event: 'go'
         };
       }
-    } else {
-      // (this.jumpState === jump.DOWN)
-      let currentX = Math.round(x - mapTranslationStart);
-      let found = false;
-      let wall;
-      while (!found) {
-        const locations = this.map[currentX];
-        for (let j = 0; j < locations.length; j++) {
-          if (locations[j][0] === 'b') {
-            // need to add a case where there are two wall with the same x value
-            wall = locations[j];
-            found = true;
-          }
-        }
-        currentX++;
-      }
+    }
+    // (this.jumpState === jump.DOWN)
+    else {
       const timeToEscape = {
         time: this.getTimeForGivenY({
           yStart: yStart,
@@ -617,14 +619,178 @@ class GameEngine extends Component {
     }
   }
 
+  // determines what should happen when the sprite is moving along a path
+  spriteOnFlat(props) {
+    // declare local variables
+    const {
+      y,
+      mapTranslation,
+      yStart,
+      descendStartTime,
+      jumpState,
+      jumpStartTime,
+      atWall,
+      mapTranslationStart,
+      mapTranslationStartTime
+    } = props;
+    const endOfPath = this.findEndOfPath({
+      mapTranslation: mapTranslation,
+      y: y,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      atWall: atWall
+    });
+    const pathEnd = this.getX({
+      currentTime: endOfPath.time,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      mapTranslation: mapTranslation,
+      atWall: atWall
+    });
+    const wall = this.findWall({
+      mapTranslation: mapTranslation,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      maxX: pathEnd + SPRITE_SIDE,
+      descendStartTime: descendStartTime,
+      jumpStartTime: jumpStartTime,
+      jumpState: jumpState,
+      yStart: yStart,
+      y: y,
+      atWall: atWall
+    });
+
+    if (!wall || endOfPath.time < wall.time) {
+      return endOfPath;
+    } else {
+      return wall;
+    }
+  }
+
+  // determines what should happen when the sprite is moving up
+  spriteGoingUp(props) {
+    // declare local variables
+    const {
+      y,
+      mapTranslation,
+      yStart,
+      descendStartTime,
+      jumpState,
+      jumpStartTime,
+      atWall,
+      mapTranslationStart,
+      mapTranslationStartTime
+    } = props;
+    const jumpEndTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
+
+    const jumpEndX = this.getX({
+      currentTime: jumpEndTime,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      mapTranslation: mapTranslation,
+      atWall: atWall
+    });
+
+    const wall = this.findWall({
+      mapTranslation: mapTranslation,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      maxX: jumpEndX,
+      descendStartTime: descendStartTime,
+      jumpStartTime: jumpStartTime,
+      jumpState: jumpState,
+      yStart: yStart,
+      y: y,
+      atWall: atWall
+    });
+    if (!wall || wall.time > jumpEndTime) {
+      return { time: jumpEndTime, event: 'fall' };
+    } else {
+      return wall;
+    }
+  }
+
+  // determines what should happen when the sprite is moving down
+  spriteGoingDown(props) {
+    // declare local variables
+    const {
+      currentTime,
+      minY,
+      y,
+      mapTranslation,
+      yStart,
+      descendStartTime,
+      jumpState,
+      jumpStartTime,
+      atWall,
+      mapTranslationStart,
+      mapTranslationStartTime
+    } = props;
+    const maxX =
+      this.getX({
+        currentTime: this.getTimeForGivenY({
+          yStart: yStart,
+          y: minY,
+          descendStartTime: descendStartTime,
+          jumpState: jumpState,
+          jumpStartTime: jumpStartTime,
+          currentTime: currentTime
+        }),
+        mapTranslationStart: mapTranslationStart,
+        mapTranslationStartTime: mapTranslationStartTime,
+        mapTranslation: mapTranslation,
+        atWall: atWall
+      }) + SPRITE_SIDE;
+
+    const wall = this.findWall({
+      mapTranslation: mapTranslation,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      maxX: maxX,
+      descendStartTime: descendStartTime,
+      jumpStartTime: jumpStartTime,
+      jumpState: jumpState,
+      yStart: yStart,
+      y: y,
+      atWall: atWall
+    });
+
+    const path = this.findPath({
+      currentTime: currentTime,
+      mapTranslationStart: mapTranslationStart,
+      mapTranslationStartTime: mapTranslationStartTime,
+      mapTranslation: mapTranslation,
+      atWall: atWall,
+      yStart: yStart,
+      descendStartTime: descendStartTime,
+      jumpState: jumpState,
+      jumpStartTime: jumpStartTime,
+      maxX: maxX
+    });
+
+    if (wall && path) {
+      if (path.time <= wall.time) {
+        return path;
+      } else {
+        return wall;
+      }
+    } else if (wall) {
+      return wall;
+    } else if (path) {
+      return path;
+    } else {
+      console.log('panic'); // this shouldn't happen
+    }
+  }
+
   findNextChange() {
     // declare local variables
-    let currentTime = new Date().getTime();
-    let y = this.getY();
-    let mapTranslation = this.getMapTranslation();
-    let {
+    const currentTime = new Date().getTime();
+    const y = this.getY();
+    const mapTranslation = this.getMapTranslation();
+
+    const {
       yStart,
-      x,
       minY,
       descendStartTime,
       jumpState,
@@ -638,162 +804,82 @@ class GameEngine extends Component {
     if (jumpState !== jump.STOP || atWall === false) {
       if (atWall === true) {
         /*
-        3 options:
-          1. we jump over the wall
-          2. we fall until we are below the wall
-          3. we fall until we hit the ground
-        */
+         * 3 options:
+         *  1. the sprite jumps over the wall
+         *  2. the sprite falls until it is below the wall then it moves past the wall
+         *  3. the sprite falls until it hits the ground
+         */
         return this.spriteAtWall({
           currentTime: currentTime,
           y: y,
           yStart: yStart,
-          x: x,
           descendStartTime: descendStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
           atWall: atWall,
+          mapTranslation: mapTranslation,
           mapTranslationStart: mapTranslationStart,
           mapTranslationStartTime: mapTranslationStartTime
         });
-      } else if (jumpState === jump.STOP) {
-        // (this.AtWall === false)
-        const endOfPath = this.AfindEndOfPath({
-          mapTranslation: mapTranslation,
+      }
+      // (this.AtWall === false)
+      else if (jumpState === jump.STOP) {
+        /*
+         * 2 options:
+         *  1. the sprite hits a wall
+         *  2. the sprite falls off the path
+         */
+        return this.spriteOnFlat({
           y: y,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          atWall: atWall
-        });
-
-        //console.log(this.motionChange);
-        //console.log(new Date().getTime());
-        //console.log(this.getTimeForGivenX(endOfPath.time) + this.props.mapProps.strokeWidth * 2);
-        const pathEnd = this.getX({
-          currentTime: endOfPath.time,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          mapTranslation: mapTranslation,
-          atWall: atWall
-        });
-        //console.log(endOfPath);
-
-        const wall = this.findWall({
-          mapTranslation: mapTranslation,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          maxX: pathEnd + SPRITE_SIDE,
-          descendStartTime: descendStartTime,
-          jumpStartTime: jumpStartTime,
-          jumpState: jumpState,
           yStart: yStart,
-          y: y,
-          atWall: atWall
-        });
-        //console.log(this.motionChange);
-        if (!wall || endOfPath.time < wall.time) {
-          //console.log(wall);
-          //console.log(endOfPath);
-          return endOfPath;
-        } else {
-          return wall;
-        }
-        //console.log(wall, endOfPath);
-      } else if (jumpState === jump.UP) {
-        // we might get blocked
-        // same as this.jumpState === jump.STOP ?
-        const jumpEndTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
-
-        const jumpEndX = this.getX({
-          currentTime: jumpEndTime,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          mapTranslation: mapTranslation,
-          atWall: atWall
-        });
-
-        const wall = this.findWall({
-          mapTranslation: mapTranslation,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          maxX: jumpEndX,
           descendStartTime: descendStartTime,
-          jumpStartTime: jumpStartTime,
           jumpState: jumpState,
-          yStart: yStart,
-          y: y,
-          atWall: atWall
-        });
-        if (!wall || wall.time > jumpEndTime) {
-          //console.log('going down');
-          return { time: jumpEndTime, event: 'fall' };
-        } else {
-          return wall;
-        }
-      } else {
-        // (this.jumpState === jump.DOWN) we're falling so we might either get blocked or stop falling
-
-        const maxX =
-          this.getX({
-            currentTime: this.getTimeForGivenY({
-              yStart: yStart,
-              y: minY,
-              descendStartTime: descendStartTime,
-              jumpState: jumpState,
-              jumpStartTime: jumpStartTime,
-              currentTime: currentTime
-            }),
-            mapTranslationStart: mapTranslationStart,
-            mapTranslationStartTime: mapTranslationStartTime,
-            mapTranslation: mapTranslation,
-            atWall: atWall
-          }) + SPRITE_SIDE;
-
-        const wall = this.findWall({
-          mapTranslation: mapTranslation,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          maxX: maxX,
-          descendStartTime: descendStartTime,
           jumpStartTime: jumpStartTime,
-          jumpState: jumpState,
-          yStart: yStart,
-          y: y,
-          atWall: atWall
-        });
-
-        const path = this.findPath({
-          currentTime: currentTime,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          mapTranslation: mapTranslation,
           atWall: atWall,
+          mapTranslation: mapTranslation,
+          mapTranslationStart: mapTranslationStart,
+          mapTranslationStartTime: mapTranslationStartTime
+        });
+      } else if (jumpState === jump.UP) {
+        /*
+         * 2 options:
+         *  1. the sprite reaches max height and starts to fall down
+         *  2. the sprite hits a wall while going up
+         */
+        return this.spriteGoingUp({
+          y: y,
           yStart: yStart,
           descendStartTime: descendStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
-          maxX: maxX
+          atWall: atWall,
+          mapTranslation: mapTranslation,
+          mapTranslationStart: mapTranslationStart,
+          mapTranslationStartTime: mapTranslationStartTime
         });
-
-        if (wall && path) {
-          if (path.time <= wall.time) {
-            return path;
-          } else {
-            return wall;
-          }
-        } else if (wall) {
-          return wall;
-        } else if (path) {
-          return path;
-        } else {
-          console.log('panic');
-        }
+      }
+      // (this.jumpState === jump.DOWN)
+      else {
+        /*
+         * 2 options:
+         *  1. the sprite lands on a path
+         *  2. the sprite hits a wall while going down
+         */
+        return this.spriteGoingDown({
+          currentTime: currentTime,
+          minY: minY,
+          y: y,
+          yStart: yStart,
+          descendStartTime: descendStartTime,
+          jumpState: jumpState,
+          jumpStartTime: jumpStartTime,
+          atWall: atWall,
+          mapTranslation: mapTranslation,
+          mapTranslationStart: mapTranslationStart,
+          mapTranslationStartTime: mapTranslationStartTime
+        });
       }
     }
-  }
-
-  // generates and updates this.variables.motionChange
-  updateChangeMotion() {
-    this.variables.motionChange = this.findNextChange();
   }
 
   // sets gameStartTime and starts the necessary animation loops
@@ -801,22 +887,7 @@ class GameEngine extends Component {
     const currentTime = new Date().getTime();
     this.variables.gameStartTime = currentTime;
     this.variables.mapTranslationStartTime = currentTime;
-
-    this.updateChangeMotion();
-
-    this.renderInterval = setInterval(() => {
-      if (this.variables.motionChange && this.state.paused === false) {
-        if (this.getX() >= this.mapLength - 666) {
-          // 666 is a bad constant and should be declared elsewhere!
-          this.endGame();
-        } else {
-          this.setState({
-            mapTranslation: this.getMapTranslation(),
-            y: this.getY()
-          });
-        }
-      }
-    }, RENDER_TIMEOUT);
+    this.variables.motionChange = this.findNextChange();
 
     this.updateInterval = setInterval(() => {
       const currentTime = new Date().getTime();
@@ -825,8 +896,8 @@ class GameEngine extends Component {
         this.variables.motionChange.time - currentTime < 0 &&
         this.state.paused === false
       ) {
+        //console.log(this.variables.motionChange.event);
         if (this.variables.motionChange.event === 'block') {
-          //console.log('block');
           this.setState({
             mapTranslation: this.getMapTranslation({
               currentTime: this.variables.motionChange.time,
@@ -839,11 +910,9 @@ class GameEngine extends Component {
           this.variables.atWall = true;
           this.variables.mapTranslationStart = this.getMapTranslation();
         } else if (this.variables.motionChange.event === 'go') {
-          //console.log('go');
-          this.variables.mapTranslationStartTime = new Date().getTime();
+          this.variables.mapTranslationStartTime = currentTime;
           this.variables.atWall = false;
         } else if (this.variables.motionChange.event === 'land') {
-          //console.log('land');
           this.setState({
             y:
               this.getY({
@@ -858,28 +927,38 @@ class GameEngine extends Component {
           });
           this.variables.jumpState = jump.STOP;
           this.variables.yStart = this.getY();
-        } else {
           // this.variables.motionChange.event === 'fall'
-          //console.log('fall');
+        } else {
           this.variables.yStart = this.getY();
           this.variables.jumpState = jump.DOWN;
-          this.variables.descendStartTime = new Date().getTime();
+          this.variables.descendStartTime = currentTime;
         }
-        this.updateChangeMotion();
+        this.variables.motionChange = this.findNextChange();
       }
     }, UPDATE_TIMEOUT);
+
+    this.renderInterval = setInterval(() => {
+      if (this.variables.motionChange && this.state.paused === false) {
+        // 666 is a bad constant and should be declared elsewhere!
+        if (this.getX() >= this.mapLength - 666) {
+          this.endGame();
+        } else {
+          this.setState({
+            mapTranslation: this.getMapTranslation(),
+            y: this.getY()
+          });
+        }
+      }
+    }, RENDER_TIMEOUT);
   }
 
   componentWillUnmount() {
     // prevent memory leak by clearing/stopping loops
     clearInterval(this.renderInterval);
     clearInterval(this.updateInterval);
-    clearInterval(this.bufferInterval);
   }
 
   componentDidMount() {
-    this.startLoops();
-
     this.socket.on('connect', () => {
       /*
         Pass the player and a call back that will give back
@@ -1097,251 +1176,3 @@ class GameEngine extends Component {
 }
 
 export default GameEngine;
-
-/*
-findNextChange() {
-    // declare local variables
-    let currentTime = new Date().getTime();
-    let y = this.getY();
-    let mapTranslation = this.getMapTranslation();
-    let {
-      yStart,
-      x,
-      minY,
-      descendStartTime,
-      jumpState,
-      jumpStartTime,
-      atWall,
-      mapTranslationStart,
-      mapTranslationStartTime
-    } = this.variables;
-
-    // don't do anything if the character isn't moving
-    if (jumpState !== jump.STOP || atWall === false) { 
-      if (atWall === true) {
-        
-        3 options:
-          1. we jump over the wall
-          2. we fall until we are below the wall
-          3. we fall until we hit the ground
-        
-        
-       if (jumpState === jump.UP) {
-        let currentX = Math.round(x - mapTranslationStart);
-        let found = false;
-        let wall;
-        while (!found) {
-          const locations = this.map[currentX];
-          for (let j = 0; j < locations.length; j++) {
-            if (locations[j][0] === 'b') { // need to add a case where there are two wall with the same x value
-              wall = locations[j];
-              found = true;
-            }
-          }
-          currentX++;
-        }
-        const peakTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
-        if (
-          this.getY({
-            currentTime: peakTime,
-            descendStartTime: descendStartTime,
-            jumpStartTime: jumpStartTime,
-            jumpState: jumpState,
-            yStart: yStart,
-            y: y
-          }) >
-          wall[1] - SPRITE_SIDE
-        ) {
-          return { time: peakTime, event: 'fall' };
-        } else {
-          return {
-            time: this.getTimeForGivenY({
-              yStart: yStart,
-              y: wall[1] - SPRITE_SIDE,
-              descendStartTime: descendStartTime,
-              jumpState: jumpState,
-              jumpStartTime: jumpStartTime,
-              currentTime: currentTime
-            }),
-            event: 'go'
-          };
-        }
-      } else { // (this.jumpState === jump.DOWN)
-        let currentX = Math.round(x - mapTranslationStart);
-        let found = false;
-        let wall;
-        while (!found) {
-          const locations = this.map[currentX];
-          for (let j = 0; j < locations.length; j++) {
-            if (locations[j][0] === 'b') { // need to add a case where there are two wall with the same x value
-              wall = locations[j];
-              found = true;
-            }
-          }
-          currentX++;
-        }
-        const timeToEscape = {
-          time: this.getTimeForGivenY({
-            yStart: yStart,
-            y: wall[2],
-            descendStartTime: descendStartTime,
-            jumpState: jumpState,
-            jumpStartTime: jumpStartTime,
-            currentTime: currentTime
-          }),
-          event: 'go'
-        };
-        const timeToLand = this.findPath({
-          currentTime: currentTime,
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          mapTranslation: mapTranslation,
-          atWall: atWall,
-          yStart: yStart,
-          descendStartTime: descendStartTime,
-          jumpState: jumpState,
-          jumpStartTime: jumpStartTime,
-          maxX: currentX + SPRITE_SIDE
-        });
-        if (!timeToLand || timeToLand.time > timeToEscape.time) {
-          return timeToEscape;
-        } else {
-          return timeToLand;
-        }
-      }
-    }
-    else if (jumpState === jump.STOP) { // (this.AtWall === false)
-      const endOfPath = this.AfindEndOfPath({
-        mapTranslation: mapTranslation,
-        y: y,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        atWall: atWall
-      });
-
-      //console.log(this.motionChange);
-      //console.log(new Date().getTime());
-      //console.log(this.getTimeForGivenX(endOfPath.time) + this.props.mapProps.strokeWidth * 2);
-      const pathEnd = this.getX({
-        currentTime: endOfPath.time,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        mapTranslation: mapTranslation,
-        atWall: atWall
-      });
-      //console.log(endOfPath);
-
-      const wall = this.findWall({
-        mapTranslation: mapTranslation,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        maxX: pathEnd + SPRITE_SIDE,
-        descendStartTime: descendStartTime,
-        jumpStartTime: jumpStartTime,
-        jumpState: jumpState,
-        yStart: yStart,
-        y: y,
-        atWall: atWall
-      });
-      //console.log(this.motionChange);
-      if (!wall || endOfPath.time < wall.time) {
-        //console.log(wall);
-        //console.log(endOfPath);
-        return endOfPath;
-      } else {
-        return wall;
-      }
-      //console.log(wall, endOfPath);
-    } else if (jumpState === jump.UP) {
-      // we might get blocked
-      // same as this.jumpState === jump.STOP ?
-      const jumpEndTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
-
-      const jumpEndX = this.getX({
-        currentTime: jumpEndTime,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        mapTranslation: mapTranslation,
-        atWall: atWall
-      });
-
-      const wall = this.findWall({
-        mapTranslation: mapTranslation,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        maxX: jumpEndX,
-        descendStartTime: descendStartTime,
-        jumpStartTime: jumpStartTime,
-        jumpState: jumpState,
-        yStart: yStart,
-        y: y,
-        atWall: atWall
-      });
-      if (!wall || wall.time > jumpEndTime) {
-        //console.log('going down');
-        return { time: jumpEndTime, event: 'fall' };
-      } else {
-        return wall;
-      }
-    } else { // (this.jumpState === jump.DOWN) we're falling so we might either get blocked or stop falling
-
-
-      const maxX =
-        this.getX({
-          currentTime: this.getTimeForGivenY({
-            yStart: yStart,
-            y: minY,
-            descendStartTime: descendStartTime,
-            jumpState: jumpState,
-            jumpStartTime: jumpStartTime,
-            currentTime: currentTime
-          }),
-          mapTranslationStart: mapTranslationStart,
-          mapTranslationStartTime: mapTranslationStartTime,
-          mapTranslation: mapTranslation,
-          atWall: atWall
-        }) + SPRITE_SIDE;
-
-      const wall = this.findWall({
-        mapTranslation: mapTranslation,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        maxX: maxX,
-        descendStartTime: descendStartTime,
-        jumpStartTime: jumpStartTime,
-        jumpState: jumpState,
-        yStart: yStart,
-        y: y,
-        atWall: atWall
-      });
-
-      const path = this.findPath({
-        currentTime: currentTime,
-        mapTranslationStart: mapTranslationStart,
-        mapTranslationStartTime: mapTranslationStartTime,
-        mapTranslation: mapTranslation,
-        atWall: atWall,
-        yStart: yStart,
-        descendStartTime: descendStartTime,
-        jumpState: jumpState,
-        jumpStartTime: jumpStartTime,
-        maxX: maxX
-      });
-
-      if (wall && path) {
-        if (path.time <= wall.time) {
-          return path;
-        } else {
-          return wall;
-        }
-      } else if (wall) {
-        return wall;
-      } else if (path) {
-        return path;
-      } else {
-        console.log('panic');
-      }
-    }
-  }
-}
-*/
