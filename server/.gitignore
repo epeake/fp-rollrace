@@ -9,9 +9,6 @@
 # production
 /build
 
-# produciton seed
-/seeds/prod
-
 # sqlite
 rollrace.db
 rollrace-test.db
