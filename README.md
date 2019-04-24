@@ -84,7 +84,7 @@ The skeleton is setup for CI with Travis-CI. Travis will build the client and te
 
 ## Deploying to Heroku
 
-Link to Heroku App: https://protected-forest-90798.herokuapp.com/
+Link to Heroku App: https://rollrace.herokuapp.com/
 
 Your application can be deployed to [Heroku](heroku.com) using the approach demonstrated in this [repository](https://github.com/mars/heroku-cra-node). The key additions to the top-level `package.json` file to enable Heroku deployment:
 
