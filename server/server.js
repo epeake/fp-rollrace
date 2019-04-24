@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
-const { Model, ValidationError } = require('objection');
+const { Model } = require('objection'); // ValidationError
 const Accounts = require('./models/Accounts');
 
 // Bind all Models to a knex instance.
@@ -12,14 +12,6 @@ Model.knex(knex);
 const { wrapError, DBError } = require('db-errors');
 
 const app = express();
-
-// Cross-Origin-Resource-Sharing headers tell the browser is OK for this page to request resources
-// from another domain (which is otherwise prohibited as a security mechanism)
-const corsOptions = {
-  methods: ['GET', 'PUT', 'POST', 'DELETE'],
-  origin: '*',
-  allowedHeaders: ['Content-Type', 'Accept', 'X-Requested-With', 'Origin']
-};
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -35,7 +27,15 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// middleware for parsing
+// Cross-Origin-Resource-Sharing headers tell the browser is OK for this page to request resources
+// from another domain (which is otherwise prohibited as a security mechanism)
+const corsOptions = {
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Accept', 'X-Requested-With', 'Origin']
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
