@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 exports.seed = function(knex, Promise) {
-  const contents = fs.readFileSync('seed.json');
+  const contents = fs.readFileSync('seeds/dev/dev-seed.json');
   const data = JSON.parse(contents);
 
   // Deletes ALL existing entries

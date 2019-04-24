@@ -38,7 +38,10 @@ class LoginWindow extends Component {
       this.state.password !== ''
     ) {
       const options = {
-        url: 'http://localhost:3000/api/users',
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'http://rollrace.herokuapp.com') + `/api/users/`,
         body: {
           username: this.state.username,
           password: this.state.password,
@@ -76,7 +79,11 @@ class LoginWindow extends Component {
       this.state.password !== ''
     ) {
       const options = {
-        url: `http://localhost:3000/api/users/:${this.state.username}`,
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'http://rollrace.herokuapp.com') +
+          `/api/users/:${this.state.username}`,
         json: true
       };
 
