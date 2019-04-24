@@ -15,38 +15,25 @@ module.exports = {
     connection: {
       filename: './rollrace.db'
     },
+    seeds: {
+      directory: './seeds/dev'
+    },
     useNullAsDefault: true
   },
 
   production: {
-    client: 'postgresql',
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    port: process.env.DB_PORT,
-    host: process.env.DB_HOST,
+    client: 'pg',
+    connection: {
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      port: process.env.DB_PORT,
+      host: process.env.DB_HOST,
+      ssl: true
+    },
     pool: {
       min: 2,
       max: 10
-    },
-    ssl: true
+    }
   }
 };
-
-//   production: {
-//     client: 'postgresql',
-//     connection: {
-//       database: 'my_db',
-//       user:     'username',
-//       password: 'password'
-//     },
-//     pool: {
-//       min: 2,
-//       max: 10
-//     },
-//     migrations: {
-//       tableName: 'knex_migrations'
-//     }
-//   }
-//
-// };

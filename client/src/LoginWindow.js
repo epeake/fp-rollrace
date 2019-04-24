@@ -14,6 +14,7 @@ class LoginWindow extends Component {
     this.handleUsername = this.handleTextUpdate.bind(this, 'username');
     this.handlePassword = this.handleTextUpdate.bind(this, 'password');
     this.hasWhitespace = this.hasWhitespace.bind(this);
+    this.playGuest = this.playGuest.bind(this);
     this.createUser = this.createUser.bind(this);
     this.getUser = this.getUser.bind(this);
   }
@@ -31,14 +32,30 @@ class LoginWindow extends Component {
     );
   }
 
+  playGuest() {
+    const guestAccount = {
+      username: 'guest',
+      password: '',
+      total_games: 0,
+      total_multi_games: 0,
+      total_multi_wins: 0,
+      map_1_time: -1
+    };
+    this.props.hendleLogin(guestAccount);
+  }
+
   createUser() {
     if (
       !this.hasWhitespace() &&
       this.state.username !== '' &&
-      this.state.password !== ''
+      this.state.password !== '' &&
+      this.state.username !== 'guest' // exclusive to guest account
     ) {
       const options = {
-        url: 'http://localhost:3000/api/users',
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'http://rollrace.herokuapp.com') + `/api/users/`,
         body: {
           username: this.state.username,
           password: this.state.password,
@@ -76,7 +93,11 @@ class LoginWindow extends Component {
       this.state.password !== ''
     ) {
       const options = {
-        url: `http://localhost:3000/api/users/:${this.state.username}`,
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'http://rollrace.herokuapp.com') +
+          `/api/users/:${this.state.username}`,
         json: true
       };
 
@@ -135,6 +156,9 @@ class LoginWindow extends Component {
         </button>
         <button type="button" onClick={this.createUser}>
           Create User
+        </button>
+        <button type="button" onClick={this.playGuest}>
+          Play As Guest
         </button>
       </div>
     );

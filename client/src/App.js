@@ -45,7 +45,7 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.user); // for debugging
+    // console.log(this.state.user); // for debugging
     const { mode } = this.state;
     if (mode === 'login') {
       return <LoginWindow hendleLogin={this.hendleLogin} />;
