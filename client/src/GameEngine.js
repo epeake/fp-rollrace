@@ -25,7 +25,7 @@ const jump = {
 const UPDATE_INTERVAL = 40; // milliseconds
 
 const TOOLBAR_Y = 15;
-const UPDATE_TIMEOUT = 20; // time between motionChange updates
+const UPDATE_TIMEOUT = 15; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
 const JUMP_POWER = 0.7; // jumping velocity
