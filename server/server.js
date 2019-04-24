@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
