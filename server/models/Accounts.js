@@ -18,7 +18,7 @@ class Accounts extends Model {
         password: { type: 'string', pattern: '[^s]' },
         total_games: { type: 'integer', default: '0' },
         total_multi_games: { type: 'integer', default: '0' },
-        map_1_time: { type: 'integer', default: '0' }
+        map_1: { type: 'integer', default: '0' }
       }
     };
   }
