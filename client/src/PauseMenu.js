@@ -104,7 +104,7 @@ export default function Map(props) {
         fill={'blue'}
         opacity={1}
         //having this causes the app to go to menu as long as you just press pause
-        onClick={props.exitToMenu()}
+        //onClick={props.exitToMenu()}
       />
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
