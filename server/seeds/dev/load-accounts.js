@@ -8,7 +8,7 @@ exports.seed = function(knex, Promise) {
 
   // Deletes ALL existing entries
   // Use batch insert because we have too many articles for simple insert
-  return knex('Accounts')
+  return knex('Users')
     .del()
-    .then(() => knex.batchInsert('Accounts', data, 100));
+    .then(() => knex.batchInsert('Users', data, 100));
 };

@@ -1,50 +1,11 @@
 [
   {
-    "username": "josh",
-    "password": "abc",
-    "total_games": "32",
-    "total_multi_games": "9",
-    "total_multi_wins": "0",
-    "map_1": "320"
-  },
-  {
-    "username": "elijah",
-    "password": "passwordz",
-    "total_games": "9",
+    "googleId": "111216980333337153369",
+    "givenName": "Jack",
+    "email": "jboi@google.edu",
+    "total_games": "10",
     "total_multi_games": "9",
     "total_multi_wins": "9",
     "map_1": "120"
-  },
-  {
-    "username": "kai",
-    "password": "friz",
-    "total_games": "19",
-    "total_multi_games": "9",
-    "total_multi_wins": "6",
-    "map_1": "220"
-  },
-  {
-    "username": "bryan",
-    "password": "adsfkjsdfhqwo0r80q00q0ew8r0q12344121234",
-    "total_games": "999999999",
-    "total_multi_games": "55",
-    "total_multi_wins": "6",
-    "map_1": "20"
-  },
-  {
-    "username": "antho",
-    "password": "a$",
-    "total_games": "32",
-    "total_multi_games": "9",
-    "total_multi_wins": "0",
-    "map_1": "420"
-  },
-  {
-    "username": "gad",
-    "password": "g_a_d",
-    "total_games": "88",
-    "total_multi_games": "20",
-    "total_multi_wins": "13",
-    "map_1": "270"
   }
 ]

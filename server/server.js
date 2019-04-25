@@ -4,7 +4,13 @@ const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
 const { Model, ValidationError } = require('objection'); // ValidationError
-const Accounts = require('./models/Accounts');
+const Users = require('./models/Users');
+const session = require('express-session');
+const passport = require('passport');
+const BearerStrategy = require('passport-http-bearer').Strategy;
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
 Model.knex(knex);
@@ -39,56 +45,89 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
-// Make new user
-app.post('/api/users', (request, response, next) => {
-  Accounts.query()
-    .insertAndFetch(request.body)
-    .then(rows => {
-      response.send(rows);
-    }, next);
-});
+// const authenticationMiddleware = (request, response, next) => {
+//   if (request.isAuthenticated()){
+//     return next(); // we are good, proceed to the next handler
+//   }
+//   return response.sendStatus(403); // forbidden
+// };
 
-// TODOOOOOO GET RID OF 1 WITH MIDDLEWARE?
-// Fetch specific user
-app.get('/api/users/:username&:password', (request, response, next) => {
-  const username = request.params.username.substring(1);
-  const password = request.params.password.substring(1);
-  Accounts.query()
-    .where('username', username)
-    .where('password', password)
-    .then(rows => {
-      response.send(rows);
-    }, next);
-});
+passport.use(
+  new BearerStrategy((token, done) => {
+    googleClient
+      .verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      })
+      .then(async ticket => {
+        const payload = ticket.getPayload();
+        let currUser = await Users.query().findOne('googleId', payload.sub);
+        if (!currUser) {
+          Users.query()
+            .insertAndFetch({
+              googleId: payload.sub,
+              givenName: payload.given_name,
+              email: payload.email,
+              total_games: 0,
+              total_multi_games: 0,
+              total_multi_wins: 0,
+              map_1: -1
+            })
+            .then(rows => done(null, rows));
+        } else {
+          done(null, currUser);
+        }
+      })
+      .catch(error => {
+        done(error);
+      });
+  })
+);
 
-app.put('/api/users/:id', (request, response, next) => {
-  const { id } = request.body.contents.id;
-  const { time } = request.body.contents.time;
-  const { type } = request.body.type;
-
-  // make sure correct user
-  if (id !== parseInt(request.params.id.substring(1), 10)) {
-    throw new ValidationError({
-      statusCode: 400,
-      message: 'URL id and request id do not match'
-    });
+// Google login
+app.post(
+  '/login',
+  passport.authenticate('bearer', { session: false }),
+  (request, response, next) => {
+    response.sendStatus(200);
   }
-  if (type === 'end') {
-    (async () => {
-      const user = await Accounts.query().findById(id);
-      if (user.map_1 === -1 || user.map_1 > time) {
-        // REPLACE WITH GENERICCC
-        user
-          .$query()
-          .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })
-          .then(rows => {
-            response.send(rows);
-          }, next);
-      }
-    })();
+);
+
+// authenticationMiddleware,
+app.put(
+  '/api/users/',
+
+  (request, response, next) => {
+    console.log(request.isAuthenticated(), request.user);
+    // const { id } = request.body.contents.id;
+    // const { time } = request.body.contents.time;
+    // const { type } = request.body.type;
+    //
+    // // make sure correct user
+    // if (id !== parseInt(request.params.id.substring(1), 10)) {
+    //   throw new ValidationError({
+    //     statusCode: 400,
+    //     message: 'URL id and request id do not match'
+    //   });
+    // }
+    // if (type === 'end') {
+    //   (async () => {
+    //     const user = await Users.query().findById(id);
+    //     if (user.map_1 === -1 || user.map_1 > time) {
+    //       // REPLACE WITH GENERICCC
+    //       user
+    //         .$query()
+    //         .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })
+    //         .then(rows => {
+    //           response.send(rows);
+    //         }, next);
+    //     }
+    //   })();
+    // }
   }
-});
+);
 
 // Simple error handler.
 app.use((error, request, response, next) => {
