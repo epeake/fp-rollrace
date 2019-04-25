@@ -63,9 +63,9 @@ app.get('/api/users/:username&:password', (request, response, next) => {
 });
 
 app.put('/api/users/:id', (request, response, next) => {
-  const id = request.body.contents.id;
-  const time = request.body.contents.time;
-  const type = request.body.type;
+  const { id } = request.body.contents.id;
+  const { time } = request.body.contents.time;
+  const { type } = request.body.type;
 
   // make sure correct user
   if (id !== parseInt(request.params.id.substring(1), 10)) {
@@ -77,8 +77,8 @@ app.put('/api/users/:id', (request, response, next) => {
   if (type === 'end') {
     (async () => {
       const user = await Accounts.query().findById(id);
-      if (user.map_1 == -1 || user.map_1 > time) {
-        //// REPLACE WITH GENERICCC
+      if (user.map_1 === -1 || user.map_1 > time) {
+        // REPLACE WITH GENERICCC
         user
           .$query()
           .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })

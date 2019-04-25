@@ -14,8 +14,8 @@ class Accounts extends Model {
 
       properties: {
         id: { type: 'integer' },
-        username: { type: 'string', pattern: '[^s]' },
-        password: { type: 'string', pattern: '[^s]' },
+        username: { type: 'string', pattern: '\\S' },
+        password: { type: 'string', pattern: '\\S' },
         total_games: { type: 'integer', default: '0' },
         total_multi_games: { type: 'integer', default: '0' },
         map_1: { type: 'integer', default: '0' }
