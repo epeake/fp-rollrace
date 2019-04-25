@@ -105,6 +105,7 @@ class GameEngine extends Component {
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
+    this.exitToMenu = this.exitToMenu.bind(this);
   }
 
   /*
@@ -221,6 +222,23 @@ class GameEngine extends Component {
     }
   }
 
+  // exits to main menu
+  exitToMenu() {
+    this.timeout = null;
+    this.renderInterval = null;
+    this.updateInterval = null;
+
+    // resetting temporary variables
+    this.mapTranslation = INITIAL_STATE.mapTranslation;
+    this.y = INITIAL_STATE.y;
+    const restartState = Object.assign({}, INITIAL_STATE, {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
+    this.setState(restartState);
+
+    this.props.goToMenu();
+  }
   // set gameover flag
   endGame() {
     this.pauseGame();
@@ -1160,7 +1178,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
-                  goToMenu={this.props.goToMenu}
+                  exitToMenu={() => this.exitToMenu()}
                 />
               )}
             </SVGLayer>
