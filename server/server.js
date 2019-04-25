@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
-const { Model } = require('objection'); // ValidationError
+const { Model, ValidationError } = require('objection'); // ValidationError
 const Accounts = require('./models/Accounts');
 
 // Bind all Models to a knex instance.
@@ -49,14 +49,45 @@ app.post('/api/users', (request, response, next) => {
     }, next);
 });
 
+// TODOOOOOO GET RID OF 1 WITH MIDDLEWARE?
 // Fetch specific user
-app.get('/api/users/:username', (request, response, next) => {
+app.get('/api/users/:username&:password', (request, response, next) => {
   const username = request.params.username.substring(1);
+  const password = request.params.password.substring(1);
   Accounts.query()
     .where('username', username)
+    .where('password', password)
     .then(rows => {
       response.send(rows);
     }, next);
+});
+
+app.put('/api/users/:id', (request, response, next) => {
+  const { id } = request.body.contents.id;
+  const { time } = request.body.contents.time;
+  const { type } = request.body.type;
+
+  // make sure correct user
+  if (id !== parseInt(request.params.id.substring(1), 10)) {
+    throw new ValidationError({
+      statusCode: 400,
+      message: 'URL id and request id do not match'
+    });
+  }
+  if (type === 'end') {
+    (async () => {
+      const user = await Accounts.query().findById(id);
+      if (user.map_1 === -1 || user.map_1 > time) {
+        // REPLACE WITH GENERICCC
+        user
+          .$query()
+          .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })
+          .then(rows => {
+            response.send(rows);
+          }, next);
+      }
+    })();
+  }
 });
 
 // Simple error handler.

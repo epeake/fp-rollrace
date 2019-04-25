@@ -39,7 +39,7 @@ class LoginWindow extends Component {
       total_games: 0,
       total_multi_games: 0,
       total_multi_wins: 0,
-      map_1_time: -1
+      map_1: -1
     };
     this.props.hendleLogin(guestAccount);
   }
@@ -55,14 +55,14 @@ class LoginWindow extends Component {
         url:
           (process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'http://rollrace.herokuapp.com') + `/api/users/`,
+            : 'https://rollrace.herokuapp.com') + `/api/users/`,
         body: {
           username: this.state.username,
           password: this.state.password,
           total_games: 0,
           total_multi_games: 0,
           total_multi_wins: 0,
-          map_1_time: -1
+          map_1: -1
         },
         json: true
       };
@@ -96,8 +96,8 @@ class LoginWindow extends Component {
         url:
           (process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'http://rollrace.herokuapp.com') +
-          `/api/users/:${this.state.username}`,
+            : 'https://rollrace.herokuapp.com') +
+          `/api/users/:${this.state.username}&:${this.state.password}`,
         json: true
       };
 

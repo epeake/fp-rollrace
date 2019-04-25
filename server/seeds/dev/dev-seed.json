@@ -5,7 +5,7 @@
     "total_games": "32",
     "total_multi_games": "9",
     "total_multi_wins": "0",
-    "map_1_time": "320"
+    "map_1": "320"
   },
   {
     "username": "elijah",
@@ -13,7 +13,7 @@
     "total_games": "9",
     "total_multi_games": "9",
     "total_multi_wins": "9",
-    "map_1_time": "120"
+    "map_1": "120"
   },
   {
     "username": "kai",
@@ -21,7 +21,7 @@
     "total_games": "19",
     "total_multi_games": "9",
     "total_multi_wins": "6",
-    "map_1_time": "220"
+    "map_1": "220"
   },
   {
     "username": "bryan",
@@ -29,7 +29,7 @@
     "total_games": "999999999",
     "total_multi_games": "55",
     "total_multi_wins": "6",
-    "map_1_time": "20"
+    "map_1": "20"
   },
   {
     "username": "antho",
@@ -37,7 +37,7 @@
     "total_games": "32",
     "total_multi_games": "9",
     "total_multi_wins": "0",
-    "map_1_time": "420"
+    "map_1": "420"
   },
   {
     "username": "gad",
@@ -45,6 +45,6 @@
     "total_games": "88",
     "total_multi_games": "20",
     "total_multi_wins": "13",
-    "map_1_time": "270"
+    "map_1": "270"
   }
 ]

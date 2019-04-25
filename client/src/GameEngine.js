@@ -7,6 +7,7 @@ import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import Timer from './Timer.js';
 import Tutorial from './Tutorial.js';
 import styled from 'styled-components';
+import request from 'request-promise-native';
 // for client socket
 import io from 'socket.io-client';
 
@@ -77,7 +78,12 @@ class GameEngine extends Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign({}, INITIAL_STATE);
+    this.state = Object.assign(
+      {},
+      INITIAL_STATE,
+      { user: this.props.user },
+      { map: this.props.mapName }
+    );
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
     /*
@@ -105,6 +111,22 @@ class GameEngine extends Component {
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
+    this.endGame = this.endGame.bind(this);
+    this.findWall = this.findWall.bind(this);
+    this.findPath = this.findPath.bind(this);
+    this.findEndOfPath = this.findEndOfPath.bind(this);
+    this.checkAtWall = this.checkAtWall.bind(this);
+    this.getTimeForGivenY = this.getTimeForGivenY.bind(this);
+    this.getTimeForGivenX = this.getTimeForGivenX.bind(this);
+    this.getX = this.getX.bind(this);
+    this.getMapTranslation = this.getMapTranslation.bind(this);
+    this.getY = this.getY.bind(this);
+    this.spriteAtWall = this.spriteAtWall.bind(this);
+    this.spriteOnFlat = this.spriteOnFlat.bind(this);
+    this.spriteGoingUp = this.spriteGoingUp.bind(this);
+    this.spriteGoingDown = this.spriteGoingDown.bind(this);
+    this.findNextChange = this.findNextChange.bind(this);
+    this.startLoops = this.startLoops.bind(this);
     this.exitToMenu = this.exitToMenu.bind(this);
   }
 
@@ -241,10 +263,42 @@ class GameEngine extends Component {
   }
   // set gameover flag
   endGame() {
-    this.pauseGame();
-    this.setState({
-      gameover: true
-    });
+    const user = this.state.user;
+    if (
+      this.state.username !== 'guest' // exclusive to guest account
+    ) {
+      const options = {
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'https://rollrace.herokuapp.com') +
+          `/api/users/:${this.state.user.id}`,
+        body: {
+          type: 'end',
+          contents: {
+            id: user.id,
+            time: parseInt(
+              (new Date().getTime() -
+                this.variables.gameStartTime +
+                this.variables.timePaused) /
+                1000
+            )
+          }
+        },
+        json: true
+      };
+      request
+        .put(options)
+        .then(resp => {
+          // console.log(resp)  // for debugging
+          this.pauseGame();
+          this.setState({
+            gameover: true,
+            user: resp
+          });
+        })
+        .catch(err => console.log(err));
+    }
   }
 
   // detects a future wall and returns the time of collision
