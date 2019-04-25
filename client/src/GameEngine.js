@@ -111,22 +111,23 @@ class GameEngine extends Component {
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
-    // this.endGame = this.endGame.bind(this);
-    // this.findWall = this.findWall.bind(this);
-    // this.findPath = this.findPath.bind(this);
-    // this.findEndOfPath = this.findEndOfPath.bind(this);
-    // this.checkAtWall = this.checkAtWall.bind(this);
-    // this.getTimeForGivenY = this.getTimeForGivenY.bind(this);
-    // this.getTimeForGivenX = this.getTimeForGivenX.bind(this);
-    // this.getX = this.getX.bind(this);
-    // this.getMapTranslation = this.getMapTranslation.bind(this);
-    // this.getY = this.getY.bind(this);
-    // this.spriteAtWall = this.spriteAtWall.bind(this);
-    // this.spriteOnFlat = this.spriteOnFlat.bind(this);
-    // this.spriteGoingUp = this.spriteGoingUp.bind(this);
-    // this.spriteGoingDown = this.spriteGoingDown.bind(this);
-    // this.findNextChange = this.findNextChange.bind(this);
-    // this.startLoops = this.startLoops.bind(this);
+    this.endGame = this.endGame.bind(this);
+    this.findWall = this.findWall.bind(this);
+    this.findPath = this.findPath.bind(this);
+    this.findEndOfPath = this.findEndOfPath.bind(this);
+    this.checkAtWall = this.checkAtWall.bind(this);
+    this.getTimeForGivenY = this.getTimeForGivenY.bind(this);
+    this.getTimeForGivenX = this.getTimeForGivenX.bind(this);
+    this.getX = this.getX.bind(this);
+    this.getMapTranslation = this.getMapTranslation.bind(this);
+    this.getY = this.getY.bind(this);
+    this.spriteAtWall = this.spriteAtWall.bind(this);
+    this.spriteOnFlat = this.spriteOnFlat.bind(this);
+    this.spriteGoingUp = this.spriteGoingUp.bind(this);
+    this.spriteGoingDown = this.spriteGoingDown.bind(this);
+    this.findNextChange = this.findNextChange.bind(this);
+    this.startLoops = this.startLoops.bind(this);
+    this.exitToMenu = this.exitToMenu.bind(this);
   }
 
   /*
@@ -243,6 +244,23 @@ class GameEngine extends Component {
     }
   }
 
+  // exits to main menu
+  exitToMenu() {
+    this.timeout = null;
+    this.renderInterval = null;
+    this.updateInterval = null;
+
+    // resetting temporary variables
+    this.mapTranslation = INITIAL_STATE.mapTranslation;
+    this.y = INITIAL_STATE.y;
+    const restartState = Object.assign({}, INITIAL_STATE, {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
+    this.setState(restartState);
+
+    this.props.goToMenu();
+  }
   // set gameover flag
   endGame() {
     const user = this.state.user;
@@ -1214,7 +1232,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
-                  goToMenu={this.props.goToMenu}
+                  exitToMenu={() => this.exitToMenu()}
                 />
               )}
             </SVGLayer>
