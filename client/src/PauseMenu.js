@@ -39,6 +39,16 @@ export default function Map(props) {
         opacity={1}
         onClick={() => props.resume()}
       />
+      <text
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 120}
+        font-family="Verdana"
+        font-size="35"
+        fill="#FFFF00"
+        onClick={() => props.resume()}
+      >
+        Resume
+      </text>
 
       <rect
         rx={30}
@@ -51,6 +61,16 @@ export default function Map(props) {
         opacity={1}
         onClick={() => props.restart()}
       />
+      <text
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 200}
+        font-family="Verdana"
+        font-size="35"
+        fill="#FFFF00"
+        onClick={() => props.restart()}
+      >
+        Restart
+      </text>
 
       <rect
         rx={30}
@@ -63,6 +83,16 @@ export default function Map(props) {
         opacity={1}
         onClick={() => props.changeKey()}
       />
+      <text
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 275}
+        font-family="Verdana"
+        font-size="35"
+        fill="#FFFF00"
+        onClick={() => props.changeKey()}
+      >
+        Change Key
+      </text>
 
       <rect
         rx={30}
@@ -71,10 +101,21 @@ export default function Map(props) {
         y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 320}
         height={BUTTON_HEIGHT}
         width={BUTTON_WIDTH}
-        fill={'yellow'}
+        fill={'blue'}
         opacity={1}
-        onClick={props.goToMenu}
+        //having this causes the app to go to menu as long as you just press pause
+        //onClick={props.exitToMenu()}
       />
+      <text
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 360}
+        font-family="Verdana"
+        font-size="35"
+        fill="#FFFF00"
+        onClick={() => props.exitToMenu()}
+      >
+        Go To Menu
+      </text>
     </g>
   );
 }
