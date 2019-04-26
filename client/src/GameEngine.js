@@ -26,13 +26,14 @@ const jump = {
 const UPDATE_INTERVAL = 40; // milliseconds
 
 const TOOLBAR_Y = 15;
-const UPDATE_TIMEOUT = 15; // time between motionChange updates
+const UPDATE_TIMEOUT = 20; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
 const JUMP_POWER = 0.7; // jumping velocity
 const SCROLL_SPEED = 0.4;
 const SPRITE_SIDE = 100;
 const PATH_THRESH = 5;
+const TIME_THRESH = RENDER_TIMEOUT;
 
 const INITIAL_STATE = {
   tutorial: false,
@@ -154,7 +155,10 @@ class GameEngine extends Component {
   handleJumpKey() {
     this.variables.jumpState = jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
-    this.variables.motionChange = this.findNextChange();
+    this.variables.motionChange = undefined;
+    (async () => {
+      this.variables.motionChange = this.findNextChange();
+    })();
   }
 
   // Changes our current jump key
@@ -244,11 +248,12 @@ class GameEngine extends Component {
     }
   }
 
+  // I'm pretty sure this should just be in the componentDidUnmount lifecycle function
   // exits to main menu
   exitToMenu() {
     this.timeout = null;
-    this.renderInterval = null;
-    this.updateInterval = null;
+    clearInterval(this.updateInterval);
+    clearInterval(this.renderInterval);
 
     // resetting temporary variables
     this.mapTranslation = INITIAL_STATE.mapTranslation;
@@ -518,7 +523,7 @@ class GameEngine extends Component {
    * comes from solving the distance function in getX for time
    */
   getTimeForGivenX(props) {
-    if (props.atWall === true) {
+    if (props.atWall) {
       console.log('return undefined');
       return undefined;
     } else {
@@ -562,7 +567,7 @@ class GameEngine extends Component {
       atWall: this.variables.atWall
     }
   ) {
-    if (props.atWall === true || this.state.paused === true) {
+    if (props.atWall || this.state.paused) {
       return this.state.mapTranslation;
     } else {
       return (
@@ -583,7 +588,7 @@ class GameEngine extends Component {
       y: this.state.y
     }
   ) {
-    if (props.jumpState === jump.STOP || this.state.paused === true) {
+    if (props.jumpState === jump.STOP || this.state.paused) {
       return props.y;
     } else if (props.jumpState === jump.DOWN) {
       return (
@@ -873,8 +878,8 @@ class GameEngine extends Component {
     } = this.variables;
 
     // don't do anything if the character isn't moving
-    if (jumpState !== jump.STOP || atWall === false) {
-      if (atWall === true) {
+    if (jumpState !== jump.STOP || !atWall) {
+      if (atWall) {
         /*
          * 3 options:
          *  1. the sprite jumps over the wall
@@ -894,7 +899,7 @@ class GameEngine extends Component {
           mapTranslationStartTime: mapTranslationStartTime
         });
       }
-      // (this.AtWall === false)
+      // (!this.AtWall)
       else if (jumpState === jump.STOP) {
         /*
          * 2 options:
@@ -951,6 +956,8 @@ class GameEngine extends Component {
           mapTranslationStartTime: mapTranslationStartTime
         });
       }
+    } else {
+      return { time: undefined, event: 'nothing' };
     }
   }
 
@@ -958,58 +965,68 @@ class GameEngine extends Component {
   startLoops() {
     this.variables.gameStartTime = new Date().getTime();
     this.variables.mapTranslationStartTime = new Date().getTime();
-    this.variables.motionChange = this.findNextChange();
+    (async () => {
+      this.variables.motionChange = this.findNextChange();
+    })();
 
     this.updateInterval = setInterval(() => {
       const currentTime = new Date().getTime();
+      const adjustedTime = this.variables.motionChange.time;
       if (
         this.variables.motionChange &&
-        this.variables.motionChange.time - currentTime < 0 &&
-        this.state.paused === false
+        this.variables.motionChange.event !== 'nothing' &&
+        adjustedTime - currentTime < TIME_THRESH &&
+        !this.state.paused
       ) {
+        //console.log(adjustedTime - currentTime);
         //console.log(this.variables.motionChange.event);
+
+        const y =
+          this.getY({
+            currentTime: adjustedTime,
+            descendStartTime: this.variables.descendStartTime,
+            jumpStartTime: this.variables.jumpStartTime,
+            jumpState: this.variables.jumpState,
+            yStart: this.variables.yStart,
+            y: this.state.y
+          }) -
+          this.props.mapProps.strokeWidth / 2;
         if (this.variables.motionChange.event === 'block') {
+          const mapTranslation = this.getMapTranslation({
+            currentTime: adjustedTime,
+            mapTranslationStart: this.variables.mapTranslationStart,
+            mapTranslationStartTime: this.variables.mapTranslationStartTime,
+            mapTranslation: this.state.mapTranslation,
+            atWall: this.variables.atWall
+          });
           this.setState({
-            mapTranslation: this.getMapTranslation({
-              currentTime: this.variables.motionChange.time,
-              mapTranslationStart: this.variables.mapTranslationStart,
-              mapTranslationStartTime: this.variables.mapTranslationStartTime,
-              mapTranslation: this.state.mapTranslation,
-              atWall: this.variables.atWall
-            })
+            mapTranslation: mapTranslation
           });
           this.variables.atWall = true;
-          this.variables.mapTranslationStart = this.getMapTranslation();
+          this.variables.mapTranslationStart = mapTranslation;
         } else if (this.variables.motionChange.event === 'go') {
           this.variables.mapTranslationStartTime = currentTime;
           this.variables.atWall = false;
         } else if (this.variables.motionChange.event === 'land') {
           this.setState({
-            y:
-              this.getY({
-                currentTime: this.variables.motionChange.time,
-                descendStartTime: this.variables.descendStartTime,
-                jumpStartTime: this.variables.jumpStartTime,
-                jumpState: this.variables.jumpState,
-                yStart: this.variables.yStart,
-                y: this.state.y
-              }) -
-              this.props.mapProps.strokeWidth / 2
+            y: y
           });
           this.variables.jumpState = jump.STOP;
-          this.variables.yStart = this.getY();
-          // this.variables.motionChange.event === 'fall'
-        } else {
-          this.variables.yStart = this.getY();
+          this.variables.yStart = y;
+        } else if (this.variables.motionChange.event === 'fall') {
+          this.variables.yStart = y;
           this.variables.jumpState = jump.DOWN;
           this.variables.descendStartTime = currentTime;
         }
-        this.variables.motionChange = this.findNextChange();
+        this.variables.motionChange = undefined;
+        (async () => {
+          this.variables.motionChange = this.findNextChange();
+        })();
       }
     }, UPDATE_TIMEOUT);
 
     this.renderInterval = setInterval(() => {
-      if (this.variables.motionChange && this.state.paused === false) {
+      if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
         if (this.getX() >= this.mapLength - 666) {
           this.endGame();
