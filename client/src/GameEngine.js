@@ -972,6 +972,7 @@ class GameEngine extends Component {
       const currentTime = new Date().getTime();
       if (
         this.variables.motionChange &&
+        this.variables.motionChange.event !== 'nothing' &&
         this.variables.motionChange.time - currentTime < 0 &&
         !this.state.paused
       ) {
