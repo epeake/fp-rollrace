@@ -66,12 +66,12 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-// const authenticationMiddleware = (request, response, next) => {
-//   if (request.isAuthenticated()){
-//     return next(); // we are good, proceed to the next handler
-//   }
-//   return response.sendStatus(403); // forbidden
-// };
+const authenticationMiddleware = (request, response, next) => {
+  if (request.isAuthenticated()) {
+    return next(); // we are good, proceed to the next handler
+  }
+  return response.sendStatus(403); // forbidden
+};
 
 passport.use(
   new BearerStrategy((token, done) => {
@@ -106,40 +106,32 @@ passport.use(
 app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
-  (request, response, next) => {
-    console.log(request.isAuthenticated(), request.session);
+  (request, response) => {
     response.sendStatus(200);
   }
 );
 
-// authenticationMiddleware,
-app.put(
-  '/api/users/',
-
-  (request, response, next) => {
-    const { contents } = request.body.contents;
-    const { type } = request.body.type;
-
-    if (type === 'end') {
-      (async () => {
-        const user = await Users.query().findById(request.user.id);
-        console.log(user, contents, type);
-        if (user.map_1 === -1 || user.map_1 > contents.time) {
-          // REPLACE WITH GENERICCC
-          user
-            .$query()
-            .patchAndFetch({
-              map_1: contents.time,
-              total_games: user.total_games + 1
-            })
-            .then(rows => {
-              response.send(rows);
-            }, next);
-        }
-      })();
-    }
+// update player's stats
+app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
+  if (request.body.type === 'end') {
+    (async () => {
+      const user = await Users.query().findById(request.user.id);
+      if (user.map_1 === -1 || user.map_1 > request.body.contents.time) {
+        // TODOOO MAKE THIS NOT HARDCODEEE
+        // REPLACE WITH GENERICCC
+        user
+          .$query()
+          .patchAndFetch({
+            map_1: request.body.contents.time,
+            total_games: user.total_games + 1
+          })
+          .then(rows => {
+            response.send(rows);
+          }, next);
+      }
+    })();
   }
-);
+});
 
 // Simple error handler.
 app.use((error, request, response, next) => {

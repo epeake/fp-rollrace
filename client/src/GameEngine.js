@@ -81,7 +81,7 @@ class GameEngine extends Component {
     this.state = Object.assign(
       {},
       INITIAL_STATE,
-      { user: this.props.user },
+      { guest: this.props.guest },
       { map: this.props.mapName }
     );
     this.variables = Object.assign({}, INITIAL_VARIABLES);
@@ -246,9 +246,15 @@ class GameEngine extends Component {
 
   // set gameover flag
   endGame() {
-    // const user = this.state.user;
+    const finishTime = parseInt(
+      (new Date().getTime() -
+        this.variables.gameStartTime +
+        this.variables.timePaused) /
+        1000
+    );
+
     if (
-      this.state.username !== 'guest' // exclusive to guest account
+      !this.state.guest // exclusive to members
     ) {
       const options = {
         url:
@@ -258,27 +264,40 @@ class GameEngine extends Component {
         body: {
           type: 'end',
           contents: {
-            time: parseInt(
-              (new Date().getTime() -
-                this.variables.gameStartTime +
-                this.variables.timePaused) /
-                1000
-            )
+            time: finishTime
           }
         },
         json: true
       };
       request
         .put(options)
-        .then(resp => {
+        .then(() => {
           // console.log(resp)  // for debugging
           this.pauseGame();
           this.setState({
-            gameover: true,
-            user: resp
+            gameover: true
           });
         })
         .catch(err => console.log(err));
+    } else {
+      this.pauseGame();
+      if (finishTime < this.state.guest.map_1) {
+        // TODOOOO MAKE THIS NOT HARDCODEEEEE
+        this.setState({
+          guest: Object.assign(this.state.guest, {
+            gameover: true,
+            map_1: finishTime,
+            total_games: this.state.guest.total_games + 1
+          })
+        });
+      } else {
+        this.setState({
+          guest: Object.assign(this.state.guest, {
+            gameover: true,
+            total_games: this.state.guest.total_games + 1
+          })
+        });
+      }
     }
   }
 
@@ -992,7 +1011,7 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange && this.state.paused === false) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - 8000) {
+        if (this.getX() >= this.mapLength - 667) {
           this.endGame();
         } else {
           this.setState({
