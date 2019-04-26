@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
-const { Model, ValidationError } = require('objection'); // ValidationError
+const { Model } = require('objection'); // ValidationError
 const Users = require('./models/Users');
 const session = require('express-session');
 const passport = require('passport');
@@ -44,8 +44,27 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: '109482dnijfn9234',
+    resave: false,
+    saveUninitialized: false
+  })
+);
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  Users.query()
+    .findOne('id', id)
+    .then(user => {
+      done(null, user);
+    });
+});
 
 // const authenticationMiddleware = (request, response, next) => {
 //   if (request.isAuthenticated()){
@@ -63,22 +82,19 @@ passport.use(
       })
       .then(async ticket => {
         const payload = ticket.getPayload();
-        let currUser = await Users.query().findOne('googleId', payload.sub);
-        if (!currUser) {
-          Users.query()
-            .insertAndFetch({
-              googleId: payload.sub,
-              givenName: payload.given_name,
-              email: payload.email,
-              total_games: 0,
-              total_multi_games: 0,
-              total_multi_wins: 0,
-              map_1: -1
-            })
-            .then(rows => done(null, rows));
-        } else {
-          done(null, currUser);
+        let user = await Users.query().findOne('googleId', payload.sub);
+        if (!user) {
+          user = await Users.query().insertAndFetch({
+            googleId: payload.sub,
+            givenName: payload.given_name,
+            email: payload.email,
+            total_games: 0,
+            total_multi_games: 0,
+            total_multi_wins: 0,
+            map_1: -1
+          });
         }
+        done(null, user);
       })
       .catch(error => {
         done(error);
@@ -89,8 +105,9 @@ passport.use(
 // Google login
 app.post(
   '/login',
-  passport.authenticate('bearer', { session: false }),
+  passport.authenticate('bearer', { session: true }),
   (request, response, next) => {
+    console.log(request.isAuthenticated(), request.session);
     response.sendStatus(200);
   }
 );
@@ -100,32 +117,27 @@ app.put(
   '/api/users/',
 
   (request, response, next) => {
-    console.log(request.isAuthenticated(), request.user);
-    // const { id } = request.body.contents.id;
-    // const { time } = request.body.contents.time;
-    // const { type } = request.body.type;
-    //
-    // // make sure correct user
-    // if (id !== parseInt(request.params.id.substring(1), 10)) {
-    //   throw new ValidationError({
-    //     statusCode: 400,
-    //     message: 'URL id and request id do not match'
-    //   });
-    // }
-    // if (type === 'end') {
-    //   (async () => {
-    //     const user = await Users.query().findById(id);
-    //     if (user.map_1 === -1 || user.map_1 > time) {
-    //       // REPLACE WITH GENERICCC
-    //       user
-    //         .$query()
-    //         .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })
-    //         .then(rows => {
-    //           response.send(rows);
-    //         }, next);
-    //     }
-    //   })();
-    // }
+    const { contents } = request.body.contents;
+    const { type } = request.body.type;
+
+    if (type === 'end') {
+      (async () => {
+        const user = await Users.query().findById(request.user.id);
+        console.log(user, contents, type);
+        if (user.map_1 === -1 || user.map_1 > contents.time) {
+          // REPLACE WITH GENERICCC
+          user
+            .$query()
+            .patchAndFetch({
+              map_1: contents.time,
+              total_games: user.total_games + 1
+            })
+            .then(rows => {
+              response.send(rows);
+            }, next);
+        }
+      })();
+    }
   }
 );
 

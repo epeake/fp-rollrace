@@ -246,7 +246,7 @@ class GameEngine extends Component {
 
   // set gameover flag
   endGame() {
-    const user = this.state.user;
+    // const user = this.state.user;
     if (
       this.state.username !== 'guest' // exclusive to guest account
     ) {
