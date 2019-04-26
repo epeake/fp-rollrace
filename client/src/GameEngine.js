@@ -955,6 +955,8 @@ class GameEngine extends Component {
           mapTranslationStartTime: mapTranslationStartTime
         });
       }
+    } else {
+      return { time: undefined, event: 'nothing' };
     }
   }
 
@@ -1005,7 +1007,7 @@ class GameEngine extends Component {
           this.variables.jumpState = jump.STOP;
           this.variables.yStart = this.getY();
           // this.variables.motionChange.event === 'fall'
-        } else {
+        } else if (this.variables.motionChange.event === 'fall') {
           this.variables.yStart = this.getY();
           this.variables.jumpState = jump.DOWN;
           this.variables.descendStartTime = currentTime;
@@ -1018,7 +1020,7 @@ class GameEngine extends Component {
     }, UPDATE_TIMEOUT);
 
     this.renderInterval = setInterval(() => {
-      if (this.variables.motionChange && !this.state.paused) {
+      if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
         if (this.getX() >= this.mapLength - 666) {
           this.endGame();
