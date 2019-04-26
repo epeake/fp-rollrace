@@ -19,6 +19,7 @@
   "dependencies": {
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
+    "react-google-login": "^5.0.4",
     "react-scripts": "^2.1.8",
     "reactstrap": "^7.1.0",
     "request-promise-native": "^1.0.7",
