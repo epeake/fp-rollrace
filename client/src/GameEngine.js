@@ -1265,6 +1265,7 @@ class GameEngine extends Component {
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
                   exitToMenu={() => this.exitToMenu()}
+                  multi={this.state.multi}
                 />
               )}
             </SVGLayer>

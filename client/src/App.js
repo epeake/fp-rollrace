@@ -106,7 +106,7 @@ class App extends Component {
               src={realbutton}
               height="50"
               alt="play"
-              onClick={() => this.setState({ mode: 'game' })}
+              onClick={() => this.setState({ mode: 'game', multi: false })}
             />
             <StyledButton
               src={realbutton}

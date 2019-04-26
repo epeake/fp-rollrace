@@ -5,8 +5,32 @@ const MENU_WIDTH = 550;
 const BUTTON_HEIGHT = 50;
 const BUTTON_WIDTH = 300;
 
-export default function Map(props) {
+export default function PauseMenu(props) {
+  const restart = (
+    <g onClick={() => props.restart()}>
+      <rect
+        rx={30}
+        ry={30}
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 160}
+        height={BUTTON_HEIGHT}
+        width={BUTTON_WIDTH}
+        fill={'red'}
+        opacity={1}
+      />
+      <text
+        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
+        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 200}
+        fontFamily="Verdana"
+        fontSize="35"
+        fill="#FFFF00"
+      >
+        Restart
+      </text>
+    </g>
+  );
   // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
+
   return (
     <g>
       <rect
@@ -50,27 +74,7 @@ export default function Map(props) {
         Resume
       </text>
 
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 160}
-        height={BUTTON_HEIGHT}
-        width={BUTTON_WIDTH}
-        fill={'red'}
-        opacity={1}
-        onClick={() => props.restart()}
-      />
-      <text
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 200}
-        fontFamily="Verdana"
-        fontSize="35"
-        fill="#FFFF00"
-        onClick={() => props.restart()}
-      >
-        Restart
-      </text>
+      {!props.multi && restart}
 
       <rect
         rx={30}
@@ -103,8 +107,7 @@ export default function Map(props) {
         width={BUTTON_WIDTH}
         fill={'blue'}
         opacity={1}
-        //having this causes the app to go to menu as long as you just press pause
-        //onClick={props.exitToMenu()}
+        onClick={() => props.exitToMenu()}
       />
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
