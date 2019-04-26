@@ -46,7 +46,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: '109482dnijfn9234',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
   })
@@ -142,6 +142,19 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
     })();
   }
 });
+
+// get player's stats
+app.get(
+  '/api/users/stats',
+  authenticationMiddleware,
+  (request, response, next) => {
+    const user = Users.query()
+      .findById(request.user.id)
+      .then(rows => {
+        response.send(rows);
+      }, next);
+  }
+);
 
 // Simple error handler.
 app.use((error, request, response, next) => {

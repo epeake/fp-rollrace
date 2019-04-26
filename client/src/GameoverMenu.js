@@ -84,7 +84,7 @@ export default function GameoverMenu(props) {
           x={(window.innerWidth - MENU_WIDTH / 2) / 2 + 80}
           y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 140}
         >
-          {`Current Highscore: 42069`}
+          {`Current Highscore: 420`}
         </text>
       </g>
     </g>
