@@ -153,6 +153,7 @@ class GameEngine extends Component {
 
   // Initiates jump
   handleJumpKey() {
+    this.variables.yStart = this.getY();
     this.variables.jumpState = jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
     this.variables.motionChange = undefined;
@@ -620,7 +621,7 @@ class GameEngine extends Component {
       mapTranslationStartTime
     } = props;
 
-    let currentX = Math.round(this.variables.x - mapTranslationStart);
+    let currentX = Math.round(this.variables.x - mapTranslation);
     let found = false;
     let wall;
     while (!found) {
@@ -979,44 +980,41 @@ class GameEngine extends Component {
         !this.state.paused
       ) {
         //console.log(adjustedTime - currentTime);
-        //console.log(this.variables.motionChange.event);
+        console.log(this.variables.motionChange.event);
 
-        const y =
-          this.getY({
-            currentTime: adjustedTime,
-            descendStartTime: this.variables.descendStartTime,
-            jumpStartTime: this.variables.jumpStartTime,
-            jumpState: this.variables.jumpState,
-            yStart: this.variables.yStart,
-            y: this.state.y
-          }) -
-          this.props.mapProps.strokeWidth / 2;
+        const y = this.getY({
+          currentTime: adjustedTime,
+          descendStartTime: this.variables.descendStartTime,
+          jumpStartTime: this.variables.jumpStartTime,
+          jumpState: this.variables.jumpState,
+          yStart: this.variables.yStart,
+          y: this.state.y
+        });
+        const mapTranslation = this.getMapTranslation({
+          currentTime: adjustedTime,
+          mapTranslationStart: this.variables.mapTranslationStart,
+          mapTranslationStartTime: this.variables.mapTranslationStartTime,
+          mapTranslation: this.state.mapTranslation,
+          atWall: this.variables.atWall
+        });
         if (this.variables.motionChange.event === 'block') {
-          const mapTranslation = this.getMapTranslation({
-            currentTime: adjustedTime,
-            mapTranslationStart: this.variables.mapTranslationStart,
-            mapTranslationStartTime: this.variables.mapTranslationStartTime,
-            mapTranslation: this.state.mapTranslation,
-            atWall: this.variables.atWall
-          });
           this.setState({
             mapTranslation: mapTranslation
           });
           this.variables.atWall = true;
-          this.variables.mapTranslationStart = mapTranslation;
         } else if (this.variables.motionChange.event === 'go') {
+          this.variables.mapTranslationStart = mapTranslation;
           this.variables.mapTranslationStartTime = currentTime;
           this.variables.atWall = false;
         } else if (this.variables.motionChange.event === 'land') {
           this.setState({
-            y: y
+            y: y - this.props.mapProps.strokeWidth / 2
           });
           this.variables.jumpState = jump.STOP;
-          this.variables.yStart = y;
         } else if (this.variables.motionChange.event === 'fall') {
+          this.variables.descendStartTime = currentTime;
           this.variables.yStart = y;
           this.variables.jumpState = jump.DOWN;
-          this.variables.descendStartTime = currentTime;
         }
         this.variables.motionChange = undefined;
         (async () => {
