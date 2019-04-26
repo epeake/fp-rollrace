@@ -154,7 +154,10 @@ class GameEngine extends Component {
   handleJumpKey() {
     this.variables.jumpState = jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
-    this.variables.motionChange = this.findNextChange();
+    this.variables.motionChange = undefined;
+    (async () => {
+      this.variables.motionChange = this.findNextChange();
+    })();
   }
 
   // Changes our current jump key
@@ -244,11 +247,12 @@ class GameEngine extends Component {
     }
   }
 
+  // I'm pretty sure this should just be in the componentDidUnmount lifecycle function
   // exits to main menu
   exitToMenu() {
     this.timeout = null;
-    this.renderInterval = null;
-    this.updateInterval = null;
+    clearInterval(this.updateInterval);
+    clearInterval(this.renderInterval);
 
     // resetting temporary variables
     this.mapTranslation = INITIAL_STATE.mapTranslation;
@@ -518,7 +522,7 @@ class GameEngine extends Component {
    * comes from solving the distance function in getX for time
    */
   getTimeForGivenX(props) {
-    if (props.atWall === true) {
+    if (props.atWall) {
       console.log('return undefined');
       return undefined;
     } else {
@@ -562,7 +566,7 @@ class GameEngine extends Component {
       atWall: this.variables.atWall
     }
   ) {
-    if (props.atWall === true || this.state.paused === true) {
+    if (props.atWall || this.state.paused) {
       return this.state.mapTranslation;
     } else {
       return (
@@ -583,7 +587,7 @@ class GameEngine extends Component {
       y: this.state.y
     }
   ) {
-    if (props.jumpState === jump.STOP || this.state.paused === true) {
+    if (props.jumpState === jump.STOP || this.state.paused) {
       return props.y;
     } else if (props.jumpState === jump.DOWN) {
       return (
@@ -873,8 +877,8 @@ class GameEngine extends Component {
     } = this.variables;
 
     // don't do anything if the character isn't moving
-    if (jumpState !== jump.STOP || atWall === false) {
-      if (atWall === true) {
+    if (jumpState !== jump.STOP || !atWall) {
+      if (atWall) {
         /*
          * 3 options:
          *  1. the sprite jumps over the wall
@@ -894,7 +898,7 @@ class GameEngine extends Component {
           mapTranslationStartTime: mapTranslationStartTime
         });
       }
-      // (this.AtWall === false)
+      // (!this.AtWall)
       else if (jumpState === jump.STOP) {
         /*
          * 2 options:
@@ -958,14 +962,16 @@ class GameEngine extends Component {
   startLoops() {
     this.variables.gameStartTime = new Date().getTime();
     this.variables.mapTranslationStartTime = new Date().getTime();
-    this.variables.motionChange = this.findNextChange();
+    (async () => {
+      this.variables.motionChange = this.findNextChange();
+    })();
 
     this.updateInterval = setInterval(() => {
       const currentTime = new Date().getTime();
       if (
         this.variables.motionChange &&
         this.variables.motionChange.time - currentTime < 0 &&
-        this.state.paused === false
+        !this.state.paused
       ) {
         //console.log(this.variables.motionChange.event);
         if (this.variables.motionChange.event === 'block') {
@@ -1004,12 +1010,15 @@ class GameEngine extends Component {
           this.variables.jumpState = jump.DOWN;
           this.variables.descendStartTime = currentTime;
         }
-        this.variables.motionChange = this.findNextChange();
+        this.variables.motionChange = undefined;
+        (async () => {
+          this.variables.motionChange = this.findNextChange();
+        })();
       }
     }, UPDATE_TIMEOUT);
 
     this.renderInterval = setInterval(() => {
-      if (this.variables.motionChange && this.state.paused === false) {
+      if (this.variables.motionChange && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
         if (this.getX() >= this.mapLength - 666) {
           this.endGame();
