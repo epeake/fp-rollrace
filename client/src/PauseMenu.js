@@ -42,8 +42,8 @@ export default function Map(props) {
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
         y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 120}
-        font-family="Verdana"
-        font-size="35"
+        fontFamily="Verdana"
+        fontSize="35"
         fill="#FFFF00"
         onClick={() => props.resume()}
       >
@@ -64,8 +64,8 @@ export default function Map(props) {
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
         y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 200}
-        font-family="Verdana"
-        font-size="35"
+        fontFamily="Verdana"
+        fontSize="35"
         fill="#FFFF00"
         onClick={() => props.restart()}
       >
@@ -86,8 +86,8 @@ export default function Map(props) {
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
         y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 275}
-        font-family="Verdana"
-        font-size="35"
+        fontFamily="Verdana"
+        fontSize="35"
         fill="#FFFF00"
         onClick={() => props.changeKey()}
       >
@@ -109,8 +109,8 @@ export default function Map(props) {
       <text
         x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
         y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 360}
-        font-family="Verdana"
-        font-size="35"
+        fontFamily="Verdana"
+        fontSize="35"
         fill="#FFFF00"
         onClick={() => props.exitToMenu()}
       >

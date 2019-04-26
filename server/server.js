@@ -107,6 +107,7 @@ app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
   (request, response) => {
+    // console.log(request.user);  for debugging
     response.sendStatus(200);
   }
 );
@@ -123,6 +124,15 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
           .$query()
           .patchAndFetch({
             map_1: request.body.contents.time,
+            total_games: user.total_games + 1
+          })
+          .then(rows => {
+            response.send(rows);
+          }, next);
+      } else {
+        user
+          .$query()
+          .patchAndFetch({
             total_games: user.total_games + 1
           })
           .then(rows => {

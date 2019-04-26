@@ -40,6 +40,7 @@ class App extends Component {
       strokeWidth: 6, // must be an even number for the parsing algorithm
       guest: GUEST_ACCOUNT,
       mode: 'menu',
+      multi: false,
       loggedIn: false
     };
 
@@ -108,6 +109,12 @@ class App extends Component {
               onClick={() => this.setState({ mode: 'game' })}
             />
             <StyledButton
+              src={realbutton}
+              height="50"
+              alt="playmulti"
+              onClick={() => this.setState({ mode: 'game', multi: true })}
+            />
+            <StyledButton
               src={settingsbutton}
               height="50"
               alt="settings"
@@ -133,6 +140,7 @@ class App extends Component {
           )}
           goToMenu={this.handleGoToMenu}
           guest={this.state.guest}
+          multi={this.state.multi}
         />
       );
     }
