@@ -282,7 +282,9 @@ class GameEngine extends Component {
         .then(resp => {
           console.log(resp); // for debugging
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          throw Error(err);
+        });
     } else {
       if (finishTime < this.state.guest.map_1) {
         // TODOOOO MAKE THIS NOT HARDCODEEEEE

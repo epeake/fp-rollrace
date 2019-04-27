@@ -4,14 +4,14 @@ import styled from 'styled-components';
 import realbutton from './buttonSVGs/realPlaybutton.svg';
 import settingsbutton from './buttonSVGs/settingsbutton.svg';
 import statsbutton from './buttonSVGs/statsbutton.svg';
+import request from 'request-promise-native';
 import { ReactComponent as title } from './buttonSVGs/title.svg';
 import './App.css';
 import Settings from './settings.js';
 import Statistics from './Statistics.js';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 
-const GOOGLE_CLIENT_ID =
-  '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const GUEST_ACCOUNT = {
   total_games: 0,
@@ -39,6 +39,7 @@ class App extends Component {
       ],
       strokeWidth: 6, // must be an even number for the parsing algorithm
       guest: GUEST_ACCOUNT,
+      user: null,
       mode: 'menu',
       multi: false,
       loggedIn: false
@@ -48,6 +49,30 @@ class App extends Component {
     this.handleGoogleLogin = this.handleGoogleLogin.bind(this);
     this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
     this.handleGoogleLogout = this.handleGoogleLogout.bind(this);
+    this.handleStats = this.handleStats.bind(this);
+  }
+
+  // username and password both strings
+  handleStats() {
+    if (!this.state.guest) {
+      const options = {
+        url:
+          (process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'https://rollrace.herokuapp.com') + `/api/users/stats`,
+        json: true
+      };
+      request
+        .get(options)
+        .then(resp => {
+          this.setState({ user: resp });
+        })
+        .catch(err => {
+          throw Error(err);
+        });
+    } else {
+      this.setState({ user: this.state.guest });
+    }
   }
 
   handleGoogleLogin(response) {
@@ -59,9 +84,9 @@ class App extends Component {
     }).then(fetchResponse => {
       if (!fetchResponse.ok) {
         alert('Unable to authenticate', fetchResponse.statusText);
-        this.setState({ loggedIn: false });
+        this.setState({ loggedIn: false }, this.handleStats);
       } else {
-        this.setState({ loggedIn: true, guest: null });
+        this.setState({ loggedIn: true, guest: null }, this.handleStats);
       }
     });
   }
@@ -70,7 +95,7 @@ class App extends Component {
     console.log(err);
   }
   handleGoogleLogout() {
-    this.setState({ loggedIn: false, guest: GUEST_ACCOUNT });
+    this.setState({ loggedIn: false, guest: GUEST_ACCOUNT, user: null });
   }
 
   handleGoToMenu() {
@@ -127,8 +152,13 @@ class App extends Component {
               onClick={() => this.setState({ mode: 'stats' })}
             />
           </div>
-          {!this.state.loggedIn && loginButton}
-          {this.state.loggedIn && logoutButton}
+          <div>
+            <h3>
+              Current User: {this.state.user ? this.state.user.email : 'Guest'}
+            </h3>
+            {!this.state.loggedIn && loginButton}
+            {this.state.loggedIn && logoutButton}
+          </div>
         </div>
       );
     } else if (mode === 'game') {
@@ -155,7 +185,7 @@ class App extends Component {
     if (mode === 'stats') {
       return (
         <div>
-          <Statistics goToMenu={this.handleGoToMenu} />
+          <Statistics goToMenu={this.handleGoToMenu} user={this.state.user} />
         </div>
       );
     }

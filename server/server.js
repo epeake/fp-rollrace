@@ -46,7 +46,10 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret:
+      process.env.NODE_ENV !== 'production'
+        ? 'asfdasfdasf123412'
+        : process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
   })
@@ -148,7 +151,7 @@ app.get(
   '/api/users/stats',
   authenticationMiddleware,
   (request, response, next) => {
-    const user = Users.query()
+    Users.query()
       .findById(request.user.id)
       .then(rows => {
         response.send(rows);
