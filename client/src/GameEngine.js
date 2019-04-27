@@ -85,6 +85,7 @@ class GameEngine extends Component {
       map: this.props.mapName,
       multi: this.props.multi
     });
+
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
     if (this.props.multi) {
@@ -1196,7 +1197,7 @@ class GameEngine extends Component {
       return (
         <>
           <div>
-            <Timer />
+            <Timer pause={this.state.paused} multi={this.state.multi} />
           </div>
           <SVGLayer
             viewBox={'0 0 2000 5000'}
