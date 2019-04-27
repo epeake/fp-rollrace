@@ -17,6 +17,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "dotenv": "^7.0.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-google-login": "^5.0.4",
@@ -38,5 +39,7 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "start": "node -r dotenv/config index.js",
+  "watch": "nodemon --exec 'node -r dotenv/config' --ignore '*.test.js' index.js"
 }

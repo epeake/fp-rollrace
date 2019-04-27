@@ -3,7 +3,7 @@ import React from 'react';
 const MENU_HEIGHT = 550;
 const MENU_WIDTH = 700;
 
-export default function Map(props) {
+export default function ChangeKeyMenu(props) {
   // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
   return (
     <g>

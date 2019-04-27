@@ -46,7 +46,10 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: '109482dnijfn9234',
+    secret:
+      process.env.NODE_ENV !== 'production'
+        ? 'asfdasfdasf123412'
+        : process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
   })
@@ -107,6 +110,7 @@ app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
   (request, response) => {
+    // console.log(request.user);  for debugging
     response.sendStatus(200);
   }
 );
@@ -128,10 +132,32 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
           .then(rows => {
             response.send(rows);
           }, next);
+      } else {
+        user
+          .$query()
+          .patchAndFetch({
+            total_games: user.total_games + 1
+          })
+          .then(rows => {
+            response.send(rows);
+          }, next);
       }
     })();
   }
 });
+
+// get player's stats
+app.get(
+  '/api/users/stats',
+  authenticationMiddleware,
+  (request, response, next) => {
+    Users.query()
+      .findById(request.user.id)
+      .then(rows => {
+        response.send(rows);
+      }, next);
+  }
+);
 
 // Simple error handler.
 app.use((error, request, response, next) => {
