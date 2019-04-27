@@ -15,6 +15,7 @@ const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
 
 const GUEST_ACCOUNT = {
+  email: 'Guest',
   total_games: 0,
   total_multi_games: 0,
   total_multi_wins: 0,
