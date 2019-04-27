@@ -19,7 +19,12 @@ class Timer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = START_TIME;
+    this.state = Object.assign({}, START_TIME, {
+      guest: this.props.guest,
+      map: this.props.mapName,
+      multi: this.props.multi,
+      pause: this.props.pause
+    });
 
     this.timer = undefined;
 
@@ -27,60 +32,70 @@ class Timer extends Component {
   }
 
   tick() {
-    /*
-			function: tick()
+    if (!this.state.pause) {
+      /*
+  			function: tick()
 
-			Each time tick is called the minutes and seconds (state) are updated
-			so that the timer is diplaying in a MM:SS fomrat
-		*/
-    const { minutes, seconds } = this.state; // curr minutes and seconds
+  			Each time tick is called the minutes and seconds (state) are updated
+  			so that the timer is diplaying in a MM:SS fomrat
+  		*/
+      const { minutes, seconds } = this.state; // curr minutes and seconds
 
-    let resMinutes; // store resulting minutes
-    let resSeconds; // store resulting seconds
+      let resMinutes; // store resulting minutes
+      let resSeconds; // store resulting seconds
 
-    let intMin = parseInt(minutes, 10);
-    let intSec = parseInt(seconds, 10);
+      let intMin = parseInt(minutes, 10);
+      let intSec = parseInt(seconds, 10);
 
-    --intSec;
+      --intSec;
 
-    if (intSec < 0) {
-      // the seconds was previously 0 so reset to 59
-      intSec = 59;
-    }
-
-    if (intSec < 10) {
-      // singe digit, seconds need 0 in 10's place
-      resSeconds = `0${intSec}`;
-    } else {
-      resSeconds = `${intSec}`;
-    }
-
-    if (intMin === 0 && intSec === 0) {
-      // stop ticking when there is no more time left
-      clearInterval(this.timer);
-      this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
-      return;
-    }
-
-    if (intMin === 0) {
-      // there are 00 minutes left
-      resMinutes = '00';
-    } else {
-      // there is at least one minute
-      if (intSec === 59) {
-        // seconds was 0 and reset so minute is decremented
-        --intMin;
+      if (intSec < 0) {
+        // the seconds was previously 0 so reset to 59
+        intSec = 59;
       }
 
-      if (intMin < 10) {
-        // single digit, minutes needs 0 in tens place
-        resMinutes = `0${intMin}`;
+      if (intSec < 10) {
+        // singe digit, seconds need 0 in 10's place
+        resSeconds = `0${intSec}`;
       } else {
-        resMinutes = `${intMin}`;
+        resSeconds = `${intSec}`;
       }
-    }
 
-    this.setState({ minutes: resMinutes, seconds: resSeconds });
+      if (intMin === 0 && intSec === 0) {
+        // stop ticking when there is no more time left
+        clearInterval(this.timer);
+        this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
+        return;
+      }
+
+      if (intMin === 0) {
+        // there are 00 minutes left
+        resMinutes = '00';
+      } else {
+        // there is at least one minute
+        if (intSec === 59) {
+          // seconds was 0 and reset so minute is decremented
+          --intMin;
+        }
+
+        if (intMin < 10) {
+          // single digit, minutes needs 0 in tens place
+          resMinutes = `0${intMin}`;
+        } else {
+          resMinutes = `${intMin}`;
+        }
+      }
+
+      this.setState({ minutes: resMinutes, seconds: resSeconds });
+    }
+  }
+
+  //Use this method to handle props that are being updated in the parent class
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.pause !== this.props.pause && !this.props.multi) {
+      //Perform some operation
+      this.setState({ pause: nextProps.pause });
+    }
   }
 
   componentDidMount() {
