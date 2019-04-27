@@ -155,7 +155,7 @@ class App extends Component {
               src={statsbutton}
               height="50"
               alt="stats"
-              onClick={() => this.setState({ mode: 'stats' })}
+              onClick={() => this.setState({ mode: 'stats' }, this.handleStats)}
             />
           </div>
           <div>
