@@ -20,7 +20,7 @@ export default function Map(props) {
 }
 
 Map.propTypes = {
-  translation: PropTypes.string.isRequired,
-  map: PropTypes.string.isRequired,
-  stroke: PropTypes.int.isRequired
+  translation: PropTypes.number.isRequired,
+  map: PropTypes.array.isRequired,
+  stroke: PropTypes.number.isRequired
 };

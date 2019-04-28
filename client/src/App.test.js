@@ -1,9 +1,9 @@
 import React from 'react';
 import App from './App';
 import { mount } from 'enzyme';
-import Settings from './settings.js';
+import Settings from './menus/settings.js';
 import Statistics from './menus/Statistics.js';
-import GameEngine from './menus/GameEngine.js';
+import GameEngine from './GameEngine.js';
 
 describe('Main Menu rendering tests', () => {
   let app;

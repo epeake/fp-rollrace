@@ -48,5 +48,5 @@ export default function ChangeKeyMenu(props) {
 }
 
 ChangeKeyMenu.propTypes = {
-  jumpKey: PropTypes.string.isRequired
+  jumpKey: PropTypes.number.isRequired
 };

@@ -110,7 +110,7 @@ class Timer extends Component {
 
 Timer.propTypes = {
   guest: PropTypes.object,
-  mapName: PropTypes.string.isRequired,
+  mapName: PropTypes.string,
   multi: PropTypes.bool.isRequired,
   pause: PropTypes.bool.isRequired
 };

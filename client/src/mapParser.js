@@ -27,13 +27,6 @@ export const findMapSpan = allPaths => {
   return xMax;
 };
 
-// findMapSpan(['m 2340 100'])  // expect [2340]
-// findMapSpan(['m 0 0'])  // expect [0]
-// findMapSpan(['m 100 0 h 511 v -111 h 159 v 175 h 206 v -127'])  // expect [976]
-// findMapSpan(['m 100 0 h 511'])  // expect [611]
-// findMapSpan(['m 20 0 h 511', 'm 100 0 h 511'])  // expect [611]
-// findMapSpan(['m 100 0 h 511 2 3 0 v -111 -3 h 159 v 3 175 -1 7 h 206 v -127'])  // expect [983]
-
 // Bug is need last of map to be a V or else small cut off.  Does not affect performance though.  Need to make sure in alternating order
 export const buildMapHashtable = (xMax, strokeWidth, allPaths) => {
   const xRange = xMax;
@@ -87,13 +80,3 @@ export const buildMapHashtable = (xMax, strokeWidth, allPaths) => {
   });
   return hashedPaths;
 };
-
-// findMapSpan(['m 0 40 h 9 v 10 h 20', 'm 0 70 h 5 v 6 h 3 v 3'])
-// buildMapHashtable(29, 6, ['m 0 40 h 9 v 10 h 20 v 3', 'm 0 70 h 5 v 6 h 3 v 3']) // expect
-//
-// findMapSpan(['m 0, 442 h 159 v -79 h 159 v 79 h 95 v 95 h 143 v -95 h 381 v -95 h 159 v 95 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 79 254 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 238 159 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 175 0 143 h 127 333 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 222 190 v 3']) // expect
-//
-// buildMapHashtable(10205, 6, ['m 0, 442 h 159 v -79 h 159 v 79 h 95 v 95 h 143 v -95 h 381 v -95 h 159 v 95 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 79 254 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 238 159 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 175 0 143 h 127 333 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 222 190 v 3']) // expect
-//
-// // should not work
-// buildMapHashtable(10204, 6, ['m 0, 442 h 159 v -79 h 159 v 79 h 95 v 95 h 143 v -95 h 381 v -95 h 159 v 95 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 79 254 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 238 159 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 175 0 143 h 127 333 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 222 190 v 3']) // expect

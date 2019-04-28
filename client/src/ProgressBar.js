@@ -64,7 +64,7 @@ class ProgressBar extends Component {
 }
 
 ProgressBar.propTypes = {
-  y: PropTypes.int.isRequired
+  y: PropTypes.number.isRequired
 };
 
 export default ProgressBar;
