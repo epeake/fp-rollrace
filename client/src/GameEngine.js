@@ -32,12 +32,11 @@ const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
 const JUMP_POWER = 0.7; // jumping velocity
 const SCROLL_SPEED = 0.4;
-const SPRITE_SIDE = 100;
+const SPRITE_SIDE = 50;
 const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
 const INITIAL_STATE = {
-  dataSent: false,
   tutorial: false,
   paused: false,
   gameover: false,
@@ -45,7 +44,7 @@ const INITIAL_STATE = {
   startKey: 115, // s key
   changingKey: false,
 
-  y: 350,
+  y: 400,
   mapTranslation: 0,
 
   windowWidth: window.innerWidth,
@@ -284,11 +283,11 @@ class GameEngine extends Component {
         },
         json: true
       };
+      console.log('end');
       request
         .put(options)
         .then(resp => {
           console.log(resp); // for debugging
-          this.setState({ dataSent: true });
         })
         .catch(err => {
           throw Error(err);
@@ -298,15 +297,15 @@ class GameEngine extends Component {
         // TODOOOO MAKE THIS NOT HARDCODEEEEE
         this.setState({
           guest: Object.assign(this.state.guest, {
-            dataSent: true,
+            gameover: true,
             map_1: finishTime,
             total_games: this.state.guest.total_games + 1
           })
         });
       } else {
         this.setState({
-          dataSent: true,
           guest: Object.assign(this.state.guest, {
+            gameover: true,
             total_games: this.state.guest.total_games + 1
           })
         });
@@ -1050,7 +1049,7 @@ class GameEngine extends Component {
   }
 
   componentDidUpdate() {
-    if (this.state.gameover && !this.state.dataSent) {
+    if (this.state.gameover) {
       this.sendEndgameData();
     }
   }
@@ -1142,18 +1141,18 @@ class GameEngine extends Component {
       this.debounce(this.handleWindowResize, 500)
     );
 
-    let boxes, oneBox;
+    let boxes, oneBox, icon;
+
     if (this.state.multi) {
       // now we need to account for other players that should be rendered
       boxes = [
-        <rect
+        <circle
           key={this.socket.id}
-          rx={15}
-          ry={15}
-          x={this.variables.x}
-          y={this.state.y}
+          cx={this.variables.x}
+          cy={this.state.y}
           height={SPRITE_SIDE}
           width={SPRITE_SIDE}
+          r={SPRITE_SIDE}
           fill={this.state.color}
         />
       ];
@@ -1163,17 +1162,14 @@ class GameEngine extends Component {
         boxes.push(
           this.state.players.map(player => {
             return (
-              <rect
+              <circle
                 key={player.id}
-                rx={15}
-                ry={15}
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                x={this.state.mapTranslation - player.mapTrans}
-                y={player.y}
-                height={SPRITE_SIDE}
-                width={SPRITE_SIDE}
+                cx={this.state.mapTranslation - player.mapTrans}
+                cy={player.y}
+                r={SPRITE_SIDE}
                 fill={player.color}
               />
             );
@@ -1182,14 +1178,11 @@ class GameEngine extends Component {
       }
     } else {
       oneBox = (
-        <rect
-          rx={15}
-          ry={15}
-          x={this.variables.x}
-          y={this.state.y}
-          height={SPRITE_SIDE}
-          width={SPRITE_SIDE}
+        <circle
+          cx={this.variables.x}
+          cy={this.state.y}
           fill={this.state.color}
+          r={SPRITE_SIDE}
         />
       );
     }
@@ -1212,6 +1205,7 @@ class GameEngine extends Component {
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
             />
+            {icon}
             {this.state.multi && boxes}
             {!this.state.multi && oneBox}
             <g onClick={() => this.pauseGame()}>
@@ -1263,6 +1257,16 @@ class GameEngine extends Component {
                   ?
                 </text>
               </g>
+              <g>
+                <circle
+                  cx={40}
+                  cy={140}
+                  height={SPRITE_SIDE}
+                  width={SPRITE_SIDE}
+                  r={SPRITE_SIDE / 2}
+                  fill={this.state.color}
+                />
+              </g>
             </g>
           </SVGLayer>
           {this.state.paused ? (
@@ -1285,6 +1289,7 @@ class GameEngine extends Component {
                   changeKey={() => this.setState({ changingKey: true })}
                   exitToMenu={() => this.exitToMenu()}
                   multi={this.state.multi}
+                  color={this.state.color}
                 />
               )}
             </SVGLayer>
@@ -1302,7 +1307,6 @@ class GameEngine extends Component {
                 windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.exitToMenu()}
-                guest={this.state.guest}
               />
             </SVGLayer>
           ) : (
