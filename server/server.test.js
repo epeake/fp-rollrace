@@ -33,6 +33,10 @@ describe('Rollrace API', () => {
     return knex.migrate.rollback();
   });
 
+  afterAll(() => {
+    app.end();
+  });
+
   // SuperTest has several helpful methods for conveniently testing responses
   // that we can use to make the tests more concise
 
@@ -67,9 +71,10 @@ describe('Rollrace API', () => {
 
       request(app)
         .put('/api/users/')
-        .send(updatedUser);
-
-      return expect(app.request.user).toEqual(Object.assign(user, { time: 3 }));
+        .send(updatedUser)
+        .then(() =>
+          expect(app.request.user).toEqual(Object.assign(user, { time: 3 }))
+        );
     });
 
     test('PUT should update user if score === -1 (if they have not yet played)', () => {
@@ -83,9 +88,10 @@ describe('Rollrace API', () => {
 
       request(app)
         .put('/api/users/')
-        .send(updatedUser);
-
-      return expect(app.request.user).toEqual(Object.assign(user, { time: 3 }));
+        .send(updatedUser)
+        .then(() =>
+          expect(app.request.user).toEqual(Object.assign(user, { time: 3 }))
+        );
     });
 
     test('PUT should not update user if score is worse than current', () => {
@@ -97,9 +103,8 @@ describe('Rollrace API', () => {
       };
       request(app)
         .put('/api/users/')
-        .send(updatedUser);
-
-      return expect(app.request.user).toEqual(Object.assign(user));
+        .send(updatedUser)
+        .then(() => expect(app.request.user).toEqual(Object.assign(user)));
     });
 
     test('PUT should fail when unauthorized', () => {
