@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Time = styled.div`
@@ -106,5 +107,12 @@ class Timer extends Component {
     return <Time>{`${this.state.minutes}:${this.state.seconds}`}</Time>;
   }
 }
+
+Timer.propTypes = {
+  guest: PropTypes.object,
+  mapName: PropTypes.string.isRequired,
+  multi: PropTypes.bool.isRequired,
+  pause: PropTypes.bool.isRequired
+};
 
 export default Timer;
