@@ -55,7 +55,6 @@ describe('Rollrace API', () => {
   describe('PUT operations', () => {
     afterEach(() => {
       app.request.user = user;
-      return;
     });
 
     test('PUT should update user if score is better than current', () => {
