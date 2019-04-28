@@ -1,0 +1,20 @@
+[
+  {
+    "googleId": "111216980333337153369",
+    "givenName": "Jack",
+    "email": "jboi@google.edu",
+    "total_games": "10",
+    "total_multi_games": "9",
+    "total_multi_wins": "9",
+    "map_1": "120"
+  },
+  {
+    "googleId": "111216000333337153369",
+    "givenName": "Man",
+    "email": "bman@middelbury.edu",
+    "total_games": "10",
+    "total_multi_games": "2",
+    "total_multi_wins": "3",
+    "map_1": "12099"
+  }
+]

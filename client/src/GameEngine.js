@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
-import Map from './Map.js';
-import PauseMenu from './PauseMenu.js';
-import GameoverMenu from './GameoverMenu.js';
-import ChangeKeyMenu from './ChangeKeyMenu.js';
-import ProgressBar from './ProgressBar.js';
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
-import Timer from './Timer.js';
-import Tutorial from './Tutorial.js';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import request from 'request-promise-native';
-// for client socket
 import io from 'socket.io-client';
+import PauseMenu from './menus/PauseMenu.js';
+import GameoverMenu from './menus/GameoverMenu.js';
+import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
+import ProgressBar from './ProgressBar.js';
+import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import Map from './Map.js';
+import Timer from './Timer.js';
+import Tutorial from './Tutorial.js';
 
 const SVGLayer = styled.svg`
   position: absolute;
@@ -1319,5 +1319,12 @@ class GameEngine extends Component {
     }
   }
 }
+
+GameEngine.propTypes = {
+  guest: PropTypes.object,
+  mapProps: PropTypes.object.isRequired,
+  multi: PropTypes.bool.isRequired,
+  goToMenu: PropTypes.func.isRequired
+};
 
 export default GameEngine;

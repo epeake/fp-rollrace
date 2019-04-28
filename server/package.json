@@ -2,18 +2,22 @@
   "name": "project-server",
   "version": "0.1.0",
   "private": true,
-  "description": "Server for ...",
+  "description": "Server for Rollrace",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "lint": "eslint .",
     "start": "node index.js",
     "watch": "nodemon --ignore '*.test.js' index.js"
   },
   "keywords": [],
   "contributors": [
-    "Student1 <student1@middlebury.edu>",
-    "Student2 <student2@middlebury.edu>"
+    "Kibet Gad <glotiolo@middlebury.edu>",
+    "Kai DeLorenzo <kjdelorenzo@middlebury.edu>",
+    "Elijah Peake <epeake@middlebury.edu>",
+    "Anthony Turcios <aturcios@middlebury.edu>",
+    "Bryan Diaz <bddiaz@middlebury.edu>",
+    "Joshua Ravishankar <jravishankar@middlebury.edu>"
   ],
   "license": "Apache-2.0",
   "devDependencies": {
@@ -21,7 +25,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "jest": "^24.3.1",
+    "jest": "^24.7.1",
     "nodemon": "^1.18.10"
   },
   "dependencies": {
@@ -38,7 +42,8 @@
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.10.0",
     "socket.io": "^2.2.0",
-    "sqlite3": "^4.0.6"
+    "sqlite3": "^4.0.6",
+    "supertest": "^4.0.2"
   },
   "engines": {
     "node": "10.15.x"

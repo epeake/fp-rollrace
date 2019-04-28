@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const MENU_HEIGHT = 550;
 const MENU_WIDTH = 700;
@@ -45,3 +46,7 @@ export default function ChangeKeyMenu(props) {
     </g>
   );
 }
+
+ChangeKeyMenu.propTypes = {
+  jumpKey: PropTypes.number.isRequired
+};
