@@ -32,7 +32,7 @@ const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
 const JUMP_POWER = 0.7; // jumping velocity
 const SCROLL_SPEED = 0.4;
-const SPRITE_SIDE = 100;
+const SPRITE_SIDE = 50;
 const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
@@ -44,7 +44,7 @@ const INITIAL_STATE = {
   startKey: 115, // s key
   changingKey: false,
 
-  y: 350,
+  y: 400,
   mapTranslation: 0,
 
   windowWidth: window.innerWidth,
@@ -1145,14 +1145,13 @@ class GameEngine extends Component {
     if (this.state.multi) {
       // now we need to account for other players that should be rendered
       boxes = [
-        <rect
+        <circle
           key={this.socket.id}
-          rx={15}
-          ry={15}
-          x={this.variables.x}
-          y={this.state.y}
+          cx={this.variables.x}
+          cy={this.state.y}
           height={SPRITE_SIDE}
           width={SPRITE_SIDE}
+          r={SPRITE_SIDE}
           fill={this.state.color}
         />
       ];
@@ -1162,17 +1161,14 @@ class GameEngine extends Component {
         boxes.push(
           this.state.players.map(player => {
             return (
-              <rect
+              <circle
                 key={player.id}
-                rx={15}
-                ry={15}
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                x={this.state.mapTranslation - player.mapTrans}
-                y={player.y}
-                height={SPRITE_SIDE}
-                width={SPRITE_SIDE}
+                cx={this.state.mapTranslation - player.mapTrans}
+                cy={player.y}
+                r={SPRITE_SIDE}
                 fill={player.color}
               />
             );
@@ -1181,14 +1177,11 @@ class GameEngine extends Component {
       }
     } else {
       oneBox = (
-        <rect
-          rx={15}
-          ry={15}
-          x={this.variables.x}
-          y={this.state.y}
-          height={SPRITE_SIDE}
-          width={SPRITE_SIDE}
+        <circle
+          cx={this.variables.x}
+          cy={this.state.y}
           fill={this.state.color}
+          r={SPRITE_SIDE}
         />
       );
     }
