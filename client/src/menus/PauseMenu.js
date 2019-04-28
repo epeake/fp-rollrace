@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const MENU_HEIGHT = 700;
 const MENU_WIDTH = 550;
@@ -122,3 +123,11 @@ export default function PauseMenu(props) {
     </g>
   );
 }
+
+PauseMenu.propTypes = {
+  multi: PropTypes.bool.isRequired,
+  resume: PropTypes.func.isRequired,
+  restart: PropTypes.func.isRequired,
+  changeKey: PropTypes.func.isRequired,
+  exitToMenu: PropTypes.func.isRequired
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const MapPath = styled.path`
@@ -17,3 +18,9 @@ export default function Map(props) {
     </g>
   );
 }
+
+Map.propTypes = {
+  translation: PropTypes.number.isRequired,
+  map: PropTypes.array.isRequired,
+  stroke: PropTypes.number.isRequired
+};

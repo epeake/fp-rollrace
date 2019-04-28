@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import request from 'request-promise-native';
 
 const MENU_HEIGHT = 550;
@@ -120,5 +121,11 @@ class GameoverMenu extends Component {
     );
   }
 }
+
+GameoverMenu.propTypes = {
+  guest: PropTypes.object,
+  restart: PropTypes.func.isRequired,
+  exitToMenu: PropTypes.func.isRequired
+};
 
 export default GameoverMenu;

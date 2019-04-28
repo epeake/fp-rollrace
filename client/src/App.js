@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import GameEngine from './GameEngine.js';
 import styled from 'styled-components';
+import request from 'request-promise-native';
+import React, { Component } from 'react';
+import { ReactComponent as title } from './buttonSVGs/title.svg';
+import GameEngine from './GameEngine.js';
+import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import realbutton from './buttonSVGs/realPlaybutton.svg';
 import settingsbutton from './buttonSVGs/settingsbutton.svg';
 import statsbutton from './buttonSVGs/statsbutton.svg';
-import request from 'request-promise-native';
-import { ReactComponent as title } from './buttonSVGs/title.svg';
+import Settings from './menus/settings.js';
+import Statistics from './menus/Statistics.js';
 import './App.css';
-import Settings from './settings.js';
-import Statistics from './Statistics.js';
-import { GoogleLogin, GoogleLogout } from 'react-google-login';
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
@@ -127,73 +127,80 @@ class App extends Component {
       />
     );
 
-    const { mode } = this.state;
-    if (mode === 'menu') {
-      return (
-        <div>
-          <StyledTitle />
-          <div className="play-button">
-            <StyledButton
-              src={realbutton}
-              height="50"
-              alt="play"
-              onClick={() => this.setState({ mode: 'game', multi: false })}
-            />
-            <StyledButton
-              src={realbutton}
-              height="50"
-              alt="playmulti"
-              onClick={() => this.setState({ mode: 'game', multi: true })}
-            />
-            <StyledButton
-              src={settingsbutton}
-              height="50"
-              alt="settings"
-              onClick={() => this.setState({ mode: 'settings' })}
-            />
-            <StyledButton
-              src={statsbutton}
-              height="50"
-              alt="stats"
-              onClick={() => this.setState({ mode: 'stats' }, this.handleStats)}
-            />
-          </div>
+    switch (this.state.mode) {
+      case 'menu':
+        return (
           <div>
-            <h3>
-              Current User: {this.state.user ? this.state.user.email : 'Guest'}
-            </h3>
-            {!this.state.loggedIn && loginButton}
-            {this.state.loggedIn && logoutButton}
+            <StyledTitle />
+            <div className="play-button">
+              <StyledButton
+                src={realbutton}
+                height="50"
+                alt="play"
+                onClick={() => this.setState({ mode: 'game', multi: false })}
+              />
+              <StyledButton
+                src={realbutton}
+                height="50"
+                alt="playmulti"
+                onClick={() => this.setState({ mode: 'game', multi: true })}
+              />
+              <StyledButton
+                src={settingsbutton}
+                height="50"
+                alt="settings"
+                onClick={() => this.setState({ mode: 'settings' })}
+              />
+              <StyledButton
+                src={statsbutton}
+                height="50"
+                alt="stats"
+                onClick={() =>
+                  this.setState({ mode: 'stats' }, this.handleStats)
+                }
+              />
+            </div>
+            <div>
+              <h3>
+                Current User:{' '}
+                {this.state.user ? this.state.user.email : 'Guest'}
+              </h3>
+              {!this.state.loggedIn && loginButton}
+              {this.state.loggedIn && logoutButton}
+            </div>
           </div>
-        </div>
-      );
-    } else if (mode === 'game') {
-      return (
-        <GameEngine
-          mapProps={Object.assign(
-            {},
-            { map: this.state.map, strokeWidth: this.state.strokeWidth }
-          )}
-          goToMenu={this.handleGoToMenu}
-          guest={this.state.guest}
-          multi={this.state.multi}
-        />
-      );
-    }
+        );
 
-    if (mode === 'settings') {
-      return (
-        <div>
-          <Settings goToMenu={this.handleGoToMenu} />
-        </div>
-      );
-    }
-    if (mode === 'stats') {
-      return (
-        <div>
-          <Statistics goToMenu={this.handleGoToMenu} user={this.state.user} />
-        </div>
-      );
+      case 'game':
+        return (
+          <GameEngine
+            mapProps={Object.assign(
+              {},
+              { map: this.state.map, strokeWidth: this.state.strokeWidth }
+            )}
+            goToMenu={this.handleGoToMenu}
+            guest={this.state.guest}
+            multi={this.state.multi}
+          />
+        );
+
+      case 'settings':
+        return (
+          <div>
+            <Settings goToMenu={this.handleGoToMenu} />
+          </div>
+        );
+
+      case 'stats':
+        return (
+          <div>
+            <Statistics goToMenu={this.handleGoToMenu} user={this.state.user} />
+          </div>
+        );
+
+      // error
+      default:
+        break;
     }
   }
 }

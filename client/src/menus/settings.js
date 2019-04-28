@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import settings from './buttonSVGs/settings.svg';
-import return2menu from './buttonSVGs/return2menu.svg';
+import settings from '../buttonSVGs/settings.svg';
+import return2menu from '../buttonSVGs/return2menu.svg';
 
 class Settings extends Component {
   constructor(props) {
