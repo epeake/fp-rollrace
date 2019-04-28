@@ -37,6 +37,7 @@ const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
 const INITIAL_STATE = {
+  dataSent: false,
   tutorial: false,
   paused: false,
   gameover: false,
@@ -283,11 +284,11 @@ class GameEngine extends Component {
         },
         json: true
       };
-      console.log('end');
       request
         .put(options)
         .then(resp => {
           console.log(resp); // for debugging
+          this.setState({ dataSent: true });
         })
         .catch(err => {
           throw Error(err);
@@ -297,15 +298,15 @@ class GameEngine extends Component {
         // TODOOOO MAKE THIS NOT HARDCODEEEEE
         this.setState({
           guest: Object.assign(this.state.guest, {
-            gameover: true,
+            dataSent: true,
             map_1: finishTime,
             total_games: this.state.guest.total_games + 1
           })
         });
       } else {
         this.setState({
+          dataSent: true,
           guest: Object.assign(this.state.guest, {
-            gameover: true,
             total_games: this.state.guest.total_games + 1
           })
         });
@@ -1049,7 +1050,7 @@ class GameEngine extends Component {
   }
 
   componentDidUpdate() {
-    if (this.state.gameover) {
+    if (this.state.gameover && !this.state.dataSent) {
       this.sendEndgameData();
     }
   }
@@ -1301,6 +1302,7 @@ class GameEngine extends Component {
                 windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.exitToMenu()}
+                guest={this.state.guest}
               />
             </SVGLayer>
           ) : (
