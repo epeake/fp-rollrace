@@ -2,7 +2,7 @@
   "name": "project-server",
   "version": "0.1.0",
   "private": true,
-  "description": "Server for ...",
+  "description": "Server for Rollrace",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -12,8 +12,12 @@
   },
   "keywords": [],
   "contributors": [
-    "Student1 <student1@middlebury.edu>",
-    "Student2 <student2@middlebury.edu>"
+    "Kibet Gad <glotiolo@middlebury.edu>",
+    "Kai DeLorenzo <kjdelorenzo@middlebury.edu>",
+    "Elijah Peake <epeake@middlebury.edu>",
+    "Anthony Turcios <aturcios@middlebury.edu>",
+    "Bryan Diaz <bddiaz@middlebury.edu>",
+    "Joshua Ravishankar <jravishankar@middlebury.edu>"
   ],
   "license": "Apache-2.0",
   "devDependencies": {
@@ -38,7 +42,8 @@
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.10.0",
     "socket.io": "^2.2.0",
-    "sqlite3": "^4.0.6"
+    "sqlite3": "^4.0.6",
+    "supertest": "^4.0.2"
   },
   "engines": {
     "node": "10.15.x"

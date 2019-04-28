@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import GameEngine from './GameEngine.js';
 import styled from 'styled-components';
+import request from 'request-promise-native';
+import React, { Component } from 'react';
+import { ReactComponent as title } from './buttonSVGs/title.svg';
+import GameEngine from './GameEngine.js';
+import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import realbutton from './buttonSVGs/realPlaybutton.svg';
 import settingsbutton from './buttonSVGs/settingsbutton.svg';
 import statsbutton from './buttonSVGs/statsbutton.svg';
-import request from 'request-promise-native';
-import { ReactComponent as title } from './buttonSVGs/title.svg';
+import Settings from './menus/settings.js';
+import Statistics from './menus/Statistics.js';
 import './App.css';
-import Settings from './settings.js';
-import Statistics from './Statistics.js';
-import { GoogleLogin, GoogleLogout } from 'react-google-login';
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Map from './Map.js';
-import PauseMenu from './PauseMenu.js';
-import GameoverMenu from './GameoverMenu.js';
-import ChangeKeyMenu from './ChangeKeyMenu.js';
+import PauseMenu from './menus/PauseMenu.js';
+import GameoverMenu from './menus/GameoverMenu.js';
+import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
 import ProgressBar from './ProgressBar.js';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import Timer from './Timer.js';
