@@ -2,18 +2,19 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 
 import GameEngine from './GameEngine';
-import { mapProps } from './setupTests';
+import { gameEngineProps } from './setupTests';
 
 describe('GameEngine Tests', () => {
   /*  need these constants for these tests to apply
             const JUMP_POWER = 0.7; // jumping velocity
             const SCROLL_SPEED = 0.4;
-            const SPRITE_SIDE = 100;
+            const SPRITE_SIDE = 50;
             const PATH_THRESH = 5;
         that's where the random constants come from (a working configuration)
     */
   describe('Tests different scenarios findNextChange()', () => {
     let gameEngine;
+    let menuCallback;
     beforeAll(() => {
       // create mock new Date().getTime()
       const mockedDate = new Date(2017, 11, 10);
@@ -26,12 +27,18 @@ describe('GameEngine Tests', () => {
       // new Date().getTime() isn't permanently messed up
     });
     beforeEach(() => {
+      menuCallback = jest.fn();
       gameEngine = shallow(
         <GameEngine
           mapProps={Object.assign(
             {},
-            { map: mapProps.map, strokeWidth: mapProps.strokeWidth }
+            {
+              map: gameEngineProps.map,
+              strokeWidth: gameEngineProps.strokeWidth
+            }
           )}
+          goToMenu={menuCallback}
+          multi={gameEngineProps.multi}
         />
       );
       gameEngine.instance().variables.gameStartTime = new Date().getTime();
@@ -41,7 +48,7 @@ describe('GameEngine Tests', () => {
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 140,
+        time: new Date().getTime() + 265,
         event: 'block'
       });
     });
@@ -96,13 +103,13 @@ describe('GameEngine Tests', () => {
     test('blocks while falling', () => {
       gameEngine.instance().variables.jumpState = 2; // jump.DOWN
       gameEngine.instance().variables.yStart =
-        gameEngine.instance().state.y - 20;
+        gameEngine.instance().state.y - 50;
       gameEngine.instance().variables.descendStartTime = new Date().getTime();
       gameEngine.instance().setState({ y: gameEngine.instance().state.y - 20 });
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 140,
+        time: new Date().getTime() + 265,
         event: 'block'
       });
     });
@@ -116,7 +123,7 @@ describe('GameEngine Tests', () => {
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 140,
+        time: new Date().getTime() + 265,
         event: 'block'
       });
     });

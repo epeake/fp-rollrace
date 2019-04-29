@@ -1054,7 +1054,9 @@ class GameEngine extends Component {
     clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
-    this.socket.disconnect();
+    if (this.props.multi) {
+      this.socket.disconnect();
+    }
   }
 
   componentDidMount() {
