@@ -151,6 +151,8 @@ describe('GameEngine Tests', () => {
         event: 'fall'
       });
     });
+  });
+});
 
 describe('Game Engine Menu Rendering Tests', () => {
   let app, game;
