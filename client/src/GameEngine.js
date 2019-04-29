@@ -83,7 +83,8 @@ class GameEngine extends Component {
     this.state = Object.assign({}, INITIAL_STATE, {
       guest: this.props.guest,
       map: this.props.mapName,
-      multi: this.props.multi
+      multi: this.props.multi,
+      playercolor: this.props.playercolor
     });
 
     this.variables = Object.assign({}, INITIAL_VARIABLES);
@@ -1113,7 +1114,7 @@ class GameEngine extends Component {
         const player = {
           mapTrans: this.state.mapTranslation,
           y: this.state.y,
-          color: this.state.color,
+          color: 'black',
           key: this.socket.id
         };
 
@@ -1182,7 +1183,7 @@ class GameEngine extends Component {
         <circle
           cx={this.variables.x}
           cy={this.state.y}
-          fill={this.state.color}
+          fill={this.state.playercolor}
           r={SPRITE_SIDE}
         />
       );
@@ -1265,7 +1266,7 @@ class GameEngine extends Component {
                   height={SPRITE_SIDE}
                   width={SPRITE_SIDE}
                   r={SPRITE_SIDE / 2}
-                  fill={this.state.color}
+                  fill={this.state.playercolor}
                 />
               </g>
             </g>
@@ -1290,7 +1291,7 @@ class GameEngine extends Component {
                   changeKey={() => this.setState({ changingKey: true })}
                   exitToMenu={() => this.exitToMenu()}
                   multi={this.state.multi}
-                  color={this.state.color}
+                  color={this.state.playercolor}
                 />
               )}
             </SVGLayer>
