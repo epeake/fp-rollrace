@@ -10,6 +10,7 @@ describe('GameEngine Tests', () => {
             const SCROLL_SPEED = 0.4;
             const SPRITE_SIDE = 50;
             const PATH_THRESH = 5;
+            x: 200,
         that's where the random constants come from (a working configuration)
     */
   describe('Tests different scenarios findNextChange()', () => {
