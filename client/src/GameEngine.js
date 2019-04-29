@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Map from './Map.js';
-import PauseMenu from './PauseMenu.js';
 import ChangeKeyMenu from './ChangeKeyMenu.js';
 import ProgressBar from './ProgressBar.js';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
@@ -9,26 +8,10 @@ import Tutorial from './Tutorial.js';
 import styled from 'styled-components';
 // for client socket
 import io from 'socket.io-client';
-import PauseLauncher from './PauseMenuLauncher.js';
+import PauseMenu from './PauseMenu.js';
 
 const SVGLayer = styled.svg`
   position: absolute;
-`;
-const StyledButton = styled.div`
-  display: block;
-  padding: 15px 25px;
-  font-size: 10px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  outline: none;
-  color: #fff;
-  background-color: #4caf50;
-  border: none;
-  border-radius: 15px;
-  box-shadow: 0 9px #999;
-  margin: 15px;
-  width: 30px;
 `;
 
 // Jump state enum for clarity
@@ -57,9 +40,9 @@ const INITIAL_STATE = {
   jumpKey: 32, // space bar
   startKey: 115, // s key
   changingKey: false,
-  pausemenu: false,
   y: 350,
   mapTranslation: 0,
+  hideMenu:false,
 
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
@@ -153,7 +136,7 @@ class GameEngine extends Component {
 
   // Changes our current jump key
   handleChangeJumpKey(event) {
-    this.setState({ jumpKey: event.keyCode, changingKey: false });
+    this.setState({ jumpKey: event.keyCode}); 
   }
 
   /*
@@ -179,9 +162,7 @@ class GameEngine extends Component {
       void 0; // do nothing
     }
   }
-  handleToggle() {
-    this.setState({ pausemenu: !this.state.pausemenu });
-  }
+
 
   // Resets our current window dimentions
   handleWindowResize() {
@@ -1098,19 +1079,23 @@ class GameEngine extends Component {
           <div>
             <Timer />
           </div>
-
-          <div>
-            <StyledButton type="button" onClick={() => this.handleToggle()}>
-              Pause
-            </StyledButton>
-          </div>
-
           {/* conditional rendering when the pause button is toggled */}
-          {this.state.pausemenu && (
-            <PauseLauncher
-              onCloseRequest={() => this.handleToggle()}
+          {this.state.paused && this.state.hideMenu && this.state.changingKey && (
+            <ChangeKeyMenu
+              windowHeight={this.state.windowHeight}
+              windowWidth={this.state.windowWidth}
+              jumpKey={this.state.jumpKey}
+              showMenu = {()=> this.setState({ changingKey: false, hideMenu:false})}
+            />
+          )}
+          {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
+          {this.state.paused && !this.state.hideMenu &&(
+            <PauseMenu
+              resume={() => this.resumeGame()}
               restart={() => this.restartGame()}
-              changeKey={() => this.setState({ changingKey: true })}
+              changeKey={() =>this.setState({ changingKey: true, hideMenu:true})}
+              goToMenu={this.props.goToMenu}
+              gameOver = {this.state.gameover}
             />
           )}
 
@@ -1127,6 +1112,38 @@ class GameEngine extends Component {
               stroke={this.props.mapProps.strokeWidth}
             />
             {boxes}
+            <g onClick={() => this.pauseGame()}>
+              <rect
+                key={'pause-bkrnd'}
+                rx={15}
+                ry={15}
+                x={15}
+                y={15}
+                height={50}
+                width={50}
+                fill={'black'}
+              />
+              <rect
+                key={'lft-line'}
+                rx={5}
+                ry={5}
+                x={28}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
+              />
+              <rect
+                key={'rt-line'}
+                rx={5}
+                ry={5}
+                x={43}
+                y={28}
+                height={25}
+                width={10}
+                fill={'white'}
+              />
+            </g>
             <g onClick={() => this.pauseGame()}>
               <g onClick={() => this.setState({ tutorial: true })}>
                 {' '}
@@ -1147,31 +1164,7 @@ class GameEngine extends Component {
               </g>
             </g>
           </SVGLayer>
-          {this.state.paused ? (
-            <SVGLayer
-              viewBox={'0 0 2000 1000'}
-              preserveAspectRatio={'xMinYMin meet'}
-            >
-              {this.state.changingKey ? (
-                <ChangeKeyMenu
-                  windowHeight={this.state.windowHeight}
-                  windowWidth={this.state.windowWidth}
-                  jumpKey={this.state.jumpKey}
-                />
-              ) : (
-                <PauseMenu
-                  windowHeight={this.state.windowHeight}
-                  windowWidth={this.state.windowWidth}
-                  resume={() => this.resumeGame()}
-                  restart={() => this.restartGame()}
-                  changeKey={() => this.setState({ changingKey: true })}
-                  goToMenu={this.props.goToMenu}
-                />
-              )}
-            </SVGLayer>
-          ) : (
-            <></>
-          )}
+          
         </>
       );
     } else {
