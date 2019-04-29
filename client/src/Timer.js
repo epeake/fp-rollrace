@@ -100,7 +100,7 @@ class Timer extends Component {
 
   //Use this method to handle props that are being updated in the parent class
   componentWillReceiveProps(nextProps) {
-    let timerCanStart = nextProps.timerCanStart;
+    const { timerCanStart } = nextProps;
     this.setState({ timerCanStart });
     if (nextProps.pause !== this.props.pause && !this.props.multi) {
       //Perform some operation
@@ -110,6 +110,10 @@ class Timer extends Component {
       //Perform some operation
       this.setState({ restart: nextProps.restart });
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   componentDidMount() {

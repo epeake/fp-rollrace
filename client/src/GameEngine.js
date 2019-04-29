@@ -136,7 +136,6 @@ class GameEngine extends Component {
     this.spriteGoingDown = this.spriteGoingDown.bind(this);
     this.findNextChange = this.findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
-    this.exitToMenu = this.exitToMenu.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.timeOut = this.timeOut.bind(this);
   }
@@ -215,8 +214,10 @@ class GameEngine extends Component {
   restartGame() {
     // clear loops
     this.setState({ restart: true });
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
+    clearInterval(this.multiplayerInterval);
 
     /*
      * make sure window is correct size
@@ -261,12 +262,6 @@ class GameEngine extends Component {
     } else {
       void 0; // don't pause if we haven't started
     }
-  }
-
-  // I'm pretty sure this should just be in the componentDidUnmount lifecycle function
-  // exits to main menu
-  exitToMenu() {
-    this.props.goToMenu();
   }
 
   // send gameover data
@@ -442,8 +437,7 @@ class GameEngine extends Component {
           jumpStartTime: jumpStartTime,
           currentTime: currentTime
         }),
-        event: 'land',
-        y: highest
+        event: 'land'
       };
     } else {
       // no path found
@@ -1000,8 +994,7 @@ class GameEngine extends Component {
         adjustedTime - currentTime < TIME_THRESH &&
         !this.state.paused
       ) {
-        //console.log(adjustedTime - currentTime);
-        console.log(this.variables.motionChange.event);
+        //console.log(this.variables.motionChange.event);
 
         const y = this.getY({
           currentTime: adjustedTime,
@@ -1071,9 +1064,12 @@ class GameEngine extends Component {
 
   componentWillUnmount() {
     // prevent memory leak by clearing/stopping loops
-    clearInterval(this.renderInterval);
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
-    this.setState(null);
+    clearInterval(this.renderInterval);
+    if (this.props.multi) {
+      this.socket.disconnect();
+    }
   }
 
   componentDidMount() {
@@ -1311,7 +1307,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
-                  exitToMenu={() => this.exitToMenu()}
+                  exitToMenu={() => this.props.goToMenu()}
                   multi={this.state.multi}
                   color={this.state.color}
                 />
