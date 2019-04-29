@@ -52,7 +52,7 @@ io.on('connection', socket => {
     // eliminate the player from the container of players
     players.delete(socket.id);
     if (players.length === 0) {
-      players = new Map();
+      players.clear();
     }
     // broadcast the updated list to the rest of the players
     io.emit('BROADCAST', players);
