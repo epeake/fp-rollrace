@@ -1200,7 +1200,7 @@ class GameEngine extends Component {
             />
             {icon}
             {boxes}
-            <g onClick={() => this.pauseGame()}>
+            <g onClick={() => this.pauseGame()} className="pauseButton">
               <rect
                 key={'pause-bkrnd'}
                 rx={15}
@@ -1244,6 +1244,7 @@ class GameEngine extends Component {
                   height={50}
                   width={50}
                   fill={'pink'}
+                  className="tutorial"
                 />
                 <text x={135} y={45} height={50} width={50}>
                   ?

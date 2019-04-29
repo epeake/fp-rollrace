@@ -7,15 +7,16 @@ import Timer from './Timer.js';
 //import Map from './Map.js';
 //import Tutorial from './Tutorial.js';
 //import GameOverMenu from './menus/GameOverMenu.js';
-//import PauseMenu from './menus/PauseMenu.js';
+import PauseMenu from './menus/PauseMenu.js';
 
 describe('Game Engine Menu Rendering Tests', () => {
-  let app, game;
+  let app, game, start;
 
   beforeEach(async () => {
     app = mount(<App />);
     app.setState({ mode: 'game' });
     game = app.find(GameEngine);
+    start = game.simulate('keyDown', { keyCode: 83 });
   });
 
   test('Game exists', () => {
@@ -30,24 +31,35 @@ describe('Game Engine Menu Rendering Tests', () => {
 
   test('Pause button and resume works', () => {
     const pauseButton = game.find('.pauseButton');
+    console.log(pauseButton);
     expect(pauseButton).toExist();
-
-    /*
     //jest.useFakeTimers();
-    jest.runOnlyPendingTimers();
     //setTimeout(() => {
-      pauseButton.simulate('click');
-      expect(game).toContainExactlyOneMatchingElement(PauseMenu);
-      const menu = game.find(PauseMenu);
-      expect(menu).toContainMatchingElements(2, '.resume');
-      const resume = menu.find(".resume");
-      resume.simulate('click');
-      expect(game).not.toContainExactlyOneMatchingElement(PauseMenu);
-      done();
-    //}, 5000);
+    // function bull() {
+    //
+    // }
 
-    jest.runAllTimers(3001);
-    jest.useRealTimers();
-    */
+    async function cb() {
+      try {
+        const none = await pauseButton.simulate('click');
+        expect(game.state('paused')).toBe(true);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    cb();
+
+    // pauseButton.simulate('click');
+    // expect(game.state('paused')).resolves.toBe(true);
+    // const menu = game.find(PauseMenu);
+    // expect(menu).toContainMatchingElements(2, '.resume');
+    // const resume = menu.find(".resume");
+    // resume.simulate('click');
+    // expect(game).not.toContainExactlyOneMatchingElement(PauseMenu);
+    // //}, 5000);
+    //
+    // jest.runAllTimers(3001);
+    // jest.useRealTimers();
   });
 });
