@@ -26,7 +26,7 @@ describe('GameEngine Tests', () => {
       // new Date().getTime() isn't permanently messed up
     });
     beforeEach(() => {
-      gameEngine = mount(
+      gameEngine = shallow(
         <GameEngine
           mapProps={Object.assign(
             {},
@@ -51,11 +51,9 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.jumpState = 1; // jump.UP
       gameEngine.instance().variables.mapTranslationStart =
         gameEngine.instance().state.mapTranslation - 56;
-      gameEngine
-        .instance()
-        .setState({
-          mapTranslation: gameEngine.instance().state.mapTranslation - 56
-        });
+      gameEngine.instance().setState({
+        mapTranslation: gameEngine.instance().state.mapTranslation - 56
+      });
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
@@ -71,12 +69,10 @@ describe('GameEngine Tests', () => {
         gameEngine.instance().state.y - 10;
       gameEngine.instance().variables.mapTranslationStart =
         gameEngine.instance().state.mapTranslation - 56;
-      gameEngine
-        .instance()
-        .setState({
-          y: gameEngine.instance().state.y - 10,
-          mapTranslation: gameEngine.instance().state.mapTranslation - 56
-        });
+      gameEngine.instance().setState({
+        y: gameEngine.instance().state.y - 10,
+        mapTranslation: gameEngine.instance().state.mapTranslation - 56
+      });
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
@@ -114,11 +110,9 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.jumpState = 1; // jump.UP
       gameEngine.instance().variables.jumpStartTime = new Date().getTime();
       gameEngine.instance().variables.mapTranslationStart = gameEngine.instance().state.mapTranslation;
-      gameEngine
-        .instance()
-        .setState({
-          mapTranslation: gameEngine.instance().state.mapTranslation
-        });
+      gameEngine.instance().setState({
+        mapTranslation: gameEngine.instance().state.mapTranslation
+      });
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({
@@ -132,12 +126,10 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 100;
       gameEngine.instance().variables.mapTranslationStart = gameEngine.instance().state.mapTranslation;
-      gameEngine
-        .instance()
-        .setState({
-          y: gameEngine.instance().state.y - 100,
-          mapTranslation: gameEngine.instance().state.mapTranslation
-        });
+      gameEngine.instance().setState({
+        y: gameEngine.instance().state.y - 100,
+        mapTranslation: gameEngine.instance().state.mapTranslation
+      });
       gameEngine.update();
       const motionChange = gameEngine.instance().findNextChange();
       expect(motionChange).toEqual({

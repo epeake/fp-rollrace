@@ -83,6 +83,10 @@ class Timer extends Component {
     this.setState({ minutes: resMinutes, seconds: resSeconds });
   }
 
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
   componentDidMount() {
     this.timer = setInterval(this.tick, 1000); // update the timer once every second
   }

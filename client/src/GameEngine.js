@@ -128,7 +128,6 @@ class GameEngine extends Component {
     this.spriteGoingDown = this.spriteGoingDown.bind(this);
     this.findNextChange = this.findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
-    this.exitToMenu = this.exitToMenu.bind(this);
   }
 
   /*
@@ -203,8 +202,10 @@ class GameEngine extends Component {
   // restarts the game
   restartGame() {
     // clear loops
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
+    clearInterval(this.multiplayerInterval);
 
     /*
      * make sure window is correct size
@@ -250,36 +251,18 @@ class GameEngine extends Component {
     }
   }
 
-  // I'm pretty sure this should just be in the componentDidUnmount lifecycle function
-  // exits to main menu
-  exitToMenu() {
-    this.timeout = null;
-    clearInterval(this.updateInterval);
-    clearInterval(this.renderInterval);
-
-    // resetting temporary variables
-    this.mapTranslation = INITIAL_STATE.mapTranslation;
-    this.y = INITIAL_STATE.y;
-    const restartState = Object.assign({}, INITIAL_STATE, {
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
-    });
-    this.setState(restartState);
-
-    this.props.goToMenu();
-  }
   // set gameover flag
   endGame() {
-    const user = this.state.user;
+    const { user } = this.state;
     if (
       this.state.username !== 'guest' // exclusive to guest account
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') +
-          `/api/users/:${this.state.user.id}`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/:${this.state.user.id}`,
         body: {
           type: 'end',
           contents: {
@@ -297,7 +280,7 @@ class GameEngine extends Component {
       request
         .put(options)
         .then(resp => {
-          // console.log(resp)  // for debugging
+          //console.log(resp)  // for debugging
           this.pauseGame();
           this.setState({
             gameover: true,
@@ -979,8 +962,7 @@ class GameEngine extends Component {
         adjustedTime - currentTime < TIME_THRESH &&
         !this.state.paused
       ) {
-        //console.log(adjustedTime - currentTime);
-        console.log(this.variables.motionChange.event);
+        //console.log(this.variables.motionChange.event);
 
         const y = this.getY({
           currentTime: adjustedTime,
@@ -1040,8 +1022,10 @@ class GameEngine extends Component {
 
   componentWillUnmount() {
     // prevent memory leak by clearing/stopping loops
-    clearInterval(this.renderInterval);
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
+    clearInterval(this.renderInterval);
+    this.socket.disconnect();
   }
 
   componentDidMount() {
@@ -1074,7 +1058,6 @@ class GameEngine extends Component {
        */
 
       setInterval(() => {
-        // should probably be a assign to a variable so it can be cleared see componentWillUnmount()
         const updatePlayer = {
           mapTrans: this.state.mapTranslation,
           y: this.state.y,
@@ -1247,7 +1230,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
-                  exitToMenu={() => this.exitToMenu()}
+                  exitToMenu={() => this.props.goToMenu()}
                 />
               )}
             </SVGLayer>

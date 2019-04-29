@@ -52,10 +52,11 @@ class LoginWindow extends Component {
       this.state.username !== 'guest' // exclusive to guest account
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/`,
         body: {
           username: this.state.username,
           password: this.state.password,
@@ -93,11 +94,11 @@ class LoginWindow extends Component {
       this.state.password !== ''
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') +
-          `/api/users/:${this.state.username}&:${this.state.password}`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/:${this.state.username}&:${this.state.password}`,
         json: true
       };
 

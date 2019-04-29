@@ -19,17 +19,22 @@ const Bar = styled.rect`
 class ProgressBar extends Component {
   constructor(props) {
     super(props);
+    this.interval = null;
     this.state = {
       player_1_pos: X_POS,
       player_2_pos: X_POS
     };
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   //This is just a placeholder for the purpose of demonstartion
   //the two ellipses go beyond the viewbox but this won't be an issue once
   //we incoroporate it to the game.
   componentDidMount() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       const player1Pos = this.state.player_1_pos;
       const player2Pos = this.state.player_2_pos;
       this.setState({
