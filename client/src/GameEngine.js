@@ -267,10 +267,11 @@ class GameEngine extends Component {
       !this.state.guest // exclusive to members
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/`,
         body: {
           type: 'end',
           contents: {

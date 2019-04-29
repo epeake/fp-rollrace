@@ -58,10 +58,11 @@ class App extends Component {
   handleStats() {
     if (!this.state.guest) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/stats`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/stats`,
         json: true
       };
       request
