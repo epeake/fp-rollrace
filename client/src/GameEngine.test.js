@@ -31,7 +31,6 @@ describe('Game Engine Menu Rendering Tests', () => {
 
   test('Pause button and resume works', () => {
     const pauseButton = game.find('.pauseButton');
-    console.log(pauseButton);
     expect(pauseButton).toExist();
     //jest.useFakeTimers();
     //setTimeout(() => {
@@ -39,16 +38,16 @@ describe('Game Engine Menu Rendering Tests', () => {
     //
     // }
 
-    async function cb() {
-      try {
-        const none = await pauseButton.simulate('click');
-        expect(game.state('paused')).toBe(true);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    cb();
+    // async function cb() {
+    //   try {
+    //     const none = await pauseButton.simulate('click');
+    //     expect(game.state('paused')).toBe(true);
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // }
+    //
+    // cb();
 
     // pauseButton.simulate('click');
     // expect(game.state('paused')).resolves.toBe(true);

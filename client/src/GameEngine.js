@@ -37,12 +37,15 @@ const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
 const INITIAL_STATE = {
+  dataSent: false,
   tutorial: false,
   paused: false,
   gameover: false,
   jumpKey: 32, // space bar
   startKey: 115, // s key
   changingKey: false,
+
+  timerCanStart: false,
 
   y: 400,
   mapTranslation: 0,
@@ -83,9 +86,11 @@ class GameEngine extends Component {
     this.state = Object.assign({}, INITIAL_STATE, {
       guest: this.props.guest,
       map: this.props.mapName,
-      multi: this.props.multi
+      multi: this.props.multi,
+      restart: false
     });
 
+    this.restartMinutes = this.props.minutes;
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
     if (this.props.multi) {
@@ -132,6 +137,8 @@ class GameEngine extends Component {
     this.findNextChange = this.findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
     this.exitToMenu = this.exitToMenu.bind(this);
+    this.startCountdown = this.startCountdown.bind(this);
+    this.timeOut = this.timeOut.bind(this);
   }
 
   /*
@@ -184,13 +191,15 @@ class GameEngine extends Component {
       this.variables.gameStartTime
     ) {
       this.handleJumpKey();
-    } else if (
-      !this.variables.gameStartTime &&
-      event.keyCode === this.state.startKey
-    ) {
-      this.startLoops();
     } else {
       void 0; // do nothing
+    }
+  }
+  //startsgame after 3 seconds
+
+  startCountdown() {
+    if (!this.variables.gameStartTime) {
+      setTimeout(this.startLoops, 3000);
     }
   }
 
@@ -205,6 +214,7 @@ class GameEngine extends Component {
   // restarts the game
   restartGame() {
     // clear loops
+    this.setState({ restart: true });
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
 
@@ -218,6 +228,7 @@ class GameEngine extends Component {
     });
     this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
     this.setState(restartState);
+    this.startCountdown();
   }
 
   // resumes the game after being paused
@@ -271,10 +282,11 @@ class GameEngine extends Component {
       !this.state.guest // exclusive to members
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/`,
         body: {
           type: 'end',
           contents: {
@@ -971,6 +983,8 @@ class GameEngine extends Component {
 
   // sets gameStartTime and starts the necessary animation loops
   startLoops() {
+    this.setState({ timerCanStart: true });
+    this.setState({ restart: false });
     this.variables.gameStartTime = new Date().getTime();
     this.variables.mapTranslationStartTime = new Date().getTime();
     (async () => {
@@ -1063,8 +1077,7 @@ class GameEngine extends Component {
   }
 
   componentDidMount() {
-    const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
+    this.startCountdown();
 
     if (this.state.multi) {
       this.socket.on('connect', () => {
@@ -1136,13 +1149,21 @@ class GameEngine extends Component {
     }
   }
 
+  //Ends game when timer reaches zero
+  timeOut() {
+    this.setState({ gameover: true });
+  }
+
   render() {
+    const docBody = document.querySelector('body');
+    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
+
     window.addEventListener(
       'resize',
       this.debounce(this.handleWindowResize, 500)
     );
 
-    let boxes, oneBox, icon;
+    let boxes;
 
     boxes = [
       <circle
@@ -1162,7 +1183,6 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
-            console.log(this.getMapTranslation());
             return (
               <circle
                 key={player.id}
@@ -1173,18 +1193,27 @@ class GameEngine extends Component {
                 cy={player.y}
                 r={SPRITE_SIDE}
                 fill={player.color}
+                fill-opacity="0.4"
               />
             );
           })
         );
       }
     }
-
+    //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
         <>
           <div>
-            <Timer pause={this.state.paused} multi={this.state.multi} />
+            {!this.state.gameover && (
+              <Timer
+                pause={this.state.paused}
+                multi={this.state.multi}
+                timerCanStart={this.state.timerCanStart}
+                boot={bool => this.setState({ gameover: bool })}
+                restart={this.state.restart}
+              />
+            )}
           </div>
           <SVGLayer
             viewBox={'0 0 2000 5000'}
@@ -1197,8 +1226,8 @@ class GameEngine extends Component {
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
+              className="map"
             />
-            {icon}
             {boxes}
             <g onClick={() => this.pauseGame()} className="pauseButton">
               <rect
@@ -1251,6 +1280,7 @@ class GameEngine extends Component {
                 </text>
               </g>
               <g>
+                {/* player icon */}
                 <circle
                   cx={40}
                   cy={140}
@@ -1258,6 +1288,7 @@ class GameEngine extends Component {
                   width={SPRITE_SIDE}
                   r={SPRITE_SIDE / 2}
                   fill={this.state.color}
+                  className="icon"
                 />
               </g>
             </g>
@@ -1290,7 +1321,7 @@ class GameEngine extends Component {
             <></>
           )}
 
-          {this.state.gameover ? (
+          {this.state.dataSent ? (
             <SVGLayer
               viewBox={'0 0 2000 1000'}
               preserveAspectRatio={'xMinYMin meet'}
@@ -1300,6 +1331,7 @@ class GameEngine extends Component {
                 windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.exitToMenu()}
+                guest={this.props.guest}
               />
             </SVGLayer>
           ) : (

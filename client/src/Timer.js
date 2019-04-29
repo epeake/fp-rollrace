@@ -8,8 +8,8 @@ const Time = styled.div`
   width: 800px;
 `;
 
-const MINUTES = '05';
-const SECONDS = '00';
+const MINUTES = '00';
+const SECONDS = '45';
 
 const START_TIME = {
   minutes: MINUTES,
@@ -24,7 +24,9 @@ class Timer extends Component {
       guest: this.props.guest,
       map: this.props.mapName,
       multi: this.props.multi,
-      pause: this.props.pause
+      pause: this.props.pause,
+      timerCanStart: this.props.timerCanStart,
+      restart: this.props.restart
     });
 
     this.timer = undefined;
@@ -33,7 +35,11 @@ class Timer extends Component {
   }
 
   tick() {
-    if (!this.state.pause) {
+    console.log(this.state.restart);
+    if (this.state.restart === true) {
+      this.setState({ minutes: MINUTES, seconds: SECONDS });
+    }
+    if (!this.state.pause && this.state.timerCanStart === true) {
       /*
   			function: tick()
 
@@ -66,6 +72,7 @@ class Timer extends Component {
         // stop ticking when there is no more time left
         clearInterval(this.timer);
         this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
+        this.props.boot(true); //Let game know that time is up
         return;
       }
 
@@ -93,9 +100,15 @@ class Timer extends Component {
 
   //Use this method to handle props that are being updated in the parent class
   componentWillReceiveProps(nextProps) {
+    let timerCanStart = nextProps.timerCanStart;
+    this.setState({ timerCanStart });
     if (nextProps.pause !== this.props.pause && !this.props.multi) {
       //Perform some operation
       this.setState({ pause: nextProps.pause });
+    }
+    if (nextProps.restart !== this.props.restart) {
+      //Perform some operation
+      this.setState({ restart: nextProps.restart });
     }
   }
 
@@ -112,7 +125,8 @@ Timer.propTypes = {
   guest: PropTypes.object,
   mapName: PropTypes.string,
   multi: PropTypes.bool.isRequired,
-  pause: PropTypes.bool.isRequired
+  pause: PropTypes.bool.isRequired,
+  boot: PropTypes.func.isRequired
 };
 
 export default Timer;
