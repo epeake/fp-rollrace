@@ -181,6 +181,7 @@ class GameEngine extends Component {
       this.variables.gameStartTime
     ) {
       this.handleJumpKey();
+      // start game
     } else if (
       !this.variables.gameStartTime &&
       event.keyCode === this.state.startKey
@@ -423,8 +424,7 @@ class GameEngine extends Component {
           jumpStartTime: jumpStartTime,
           currentTime: currentTime
         }),
-        event: 'land',
-        y: highest
+        event: 'land'
       };
     } else {
       // no path found
