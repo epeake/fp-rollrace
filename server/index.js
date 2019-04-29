@@ -51,6 +51,9 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     // eliminate the player from the container of players
     players.delete(socket.id);
+    if (players.length === 0) {
+      players = new Map();
+    }
     // broadcast the updated list to the rest of the players
     io.emit('BROADCAST', players);
   });

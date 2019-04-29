@@ -24,7 +24,7 @@ const jump = {
 };
 
 // time between updates sent to the server
-const UPDATE_INTERVAL = 40; // milliseconds
+const UPDATE_INTERVAL = 20; // milliseconds
 
 const TOOLBAR_Y = 15;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
@@ -1063,6 +1063,9 @@ class GameEngine extends Component {
   }
 
   componentDidMount() {
+    const docBody = document.querySelector('body');
+    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
+
     if (this.state.multi) {
       this.socket.on('connect', () => {
         /*
@@ -1134,9 +1137,6 @@ class GameEngine extends Component {
   }
 
   render() {
-    const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => this.handleKeyPress(e));
-
     window.addEventListener(
       'resize',
       this.debounce(this.handleWindowResize, 500)
@@ -1144,31 +1144,32 @@ class GameEngine extends Component {
 
     let boxes, oneBox, icon;
 
+    boxes = [
+      <circle
+        key={this.socket ? this.socket.id : '1'}
+        cx={this.variables.x}
+        cy={this.state.y}
+        height={SPRITE_SIDE}
+        width={SPRITE_SIDE}
+        r={SPRITE_SIDE}
+        fill={this.state.color}
+      />
+    ];
+
     if (this.state.multi) {
       // now we need to account for other players that should be rendered
-      boxes = [
-        <circle
-          key={this.socket.id}
-          cx={this.variables.x}
-          cy={this.state.y}
-          height={SPRITE_SIDE}
-          width={SPRITE_SIDE}
-          r={SPRITE_SIDE}
-          fill={this.state.color}
-        />
-      ];
-
       if (this.state.players !== undefined) {
         // TODO: need unique key for players
-        boxes.push(
+        boxes.unshift(
           this.state.players.map(player => {
+            console.log(this.getMapTranslation());
             return (
               <circle
                 key={player.id}
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                cx={this.state.mapTranslation - player.mapTrans}
+                cx={this.getMapTranslation() - player.mapTrans + 200}
                 cy={player.y}
                 r={SPRITE_SIDE}
                 fill={player.color}
@@ -1177,15 +1178,6 @@ class GameEngine extends Component {
           })
         );
       }
-    } else {
-      oneBox = (
-        <circle
-          cx={this.variables.x}
-          cy={this.state.y}
-          fill={this.state.color}
-          r={SPRITE_SIDE}
-        />
-      );
     }
 
     if (!this.state.tutorial) {
@@ -1207,8 +1199,7 @@ class GameEngine extends Component {
               stroke={this.props.mapProps.strokeWidth}
             />
             {icon}
-            {this.state.multi && boxes}
-            {!this.state.multi && oneBox}
+            {boxes}
             <g onClick={() => this.pauseGame()}>
               <rect
                 key={'pause-bkrnd'}
