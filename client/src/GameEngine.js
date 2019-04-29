@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import io from 'socket.io-client';
 import PauseMenu from './PauseMenu.js';
 
+
 const SVGLayer = styled.svg`
   position: absolute;
 `;
@@ -940,6 +941,7 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange && this.state.paused === false) {
         // 666 is a bad constant and should be declared elsewhere!
+        console.log(this.mapLength);
         if (this.getX() >= this.mapLength - 666) {
           this.endGame();
         } else {
