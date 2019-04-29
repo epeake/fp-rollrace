@@ -7,16 +7,15 @@ import Timer from './Timer.js';
 //import Map from './Map.js';
 //import Tutorial from './Tutorial.js';
 //import GameOverMenu from './menus/GameOverMenu.js';
-import PauseMenu from './menus/PauseMenu.js';
+// import PauseMenu from './menus/PauseMenu.js';
 
 describe('Game Engine Menu Rendering Tests', () => {
-  let app, game, start;
+  let app, game;
 
   beforeEach(async () => {
     app = mount(<App />);
     app.setState({ mode: 'game' });
     game = app.find(GameEngine);
-    start = game.simulate('keyDown', { keyCode: 83 });
   });
 
   test('Game exists', () => {

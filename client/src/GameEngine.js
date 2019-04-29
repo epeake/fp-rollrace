@@ -1163,9 +1163,7 @@ class GameEngine extends Component {
       this.debounce(this.handleWindowResize, 500)
     );
 
-    let boxes;
-
-    boxes = [
+    const boxes = [
       <circle
         key={this.socket ? this.socket.id : '1'}
         cx={this.variables.x}
