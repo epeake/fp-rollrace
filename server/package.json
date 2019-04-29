@@ -2,18 +2,22 @@
   "name": "project-server",
   "version": "0.1.0",
   "private": true,
-  "description": "Server for ...",
+  "description": "Server for Rollrace",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "lint": "eslint .",
     "start": "node index.js",
     "watch": "nodemon --ignore '*.test.js' index.js"
   },
   "keywords": [],
   "contributors": [
-    "Student1 <student1@middlebury.edu>",
-    "Student2 <student2@middlebury.edu>"
+    "Kibet Gad <glotiolo@middlebury.edu>",
+    "Kai DeLorenzo <kjdelorenzo@middlebury.edu>",
+    "Elijah Peake <epeake@middlebury.edu>",
+    "Anthony Turcios <aturcios@middlebury.edu>",
+    "Bryan Diaz <bddiaz@middlebury.edu>",
+    "Joshua Ravishankar <jravishankar@middlebury.edu>"
   ],
   "license": "Apache-2.0",
   "devDependencies": {
@@ -21,19 +25,25 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "jest": "^24.3.1",
+    "jest": "^24.7.1",
     "nodemon": "^1.18.10"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "db-errors": "^0.2.2",
+    "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "google-auth-library": "^3.1.2",
     "knex": "^0.16.5",
     "objection": "^1.6.8",
+    "passport": "^0.4.0",
+    "passport-http-bearer": "^1.0.1",
     "pg": "^7.10.0",
     "socket.io": "^2.2.0",
-    "sqlite3": "^4.0.6"
+    "sqlite3": "^4.0.6",
+    "supertest": "^4.0.2"
   },
   "engines": {
     "node": "10.15.x"
@@ -41,5 +51,7 @@
   "cacheDirectories": [
     "node_modules"
   ],
-  "heroku-postbuild": "npm install"
+  "heroku-postbuild": "npm install",
+  "start": "node -r dotenv/config index.js",
+  "watch": "nodemon --exec 'node -r dotenv/config' --ignore '*.test.js' index.js"
 }

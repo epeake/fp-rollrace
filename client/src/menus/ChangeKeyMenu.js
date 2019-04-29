@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const MENU_HEIGHT = 550;
 const MENU_WIDTH = 700;
 
-export default function Map(props) {
+export default function ChangeKeyMenu(props) {
   // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
   return (
     <g>
@@ -45,3 +46,7 @@ export default function Map(props) {
     </g>
   );
 }
+
+ChangeKeyMenu.propTypes = {
+  jumpKey: PropTypes.number.isRequired
+};

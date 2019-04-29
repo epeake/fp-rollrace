@@ -12,13 +12,19 @@
   },
   "keywords": [],
   "contributors": [
-    "Student1 <student1@middlebury.edu>",
-    "Student2 <student2@middlebury.edu>"
+    "Kibet Gad <glotiolo@middlebury.edu>",
+    "Kai DeLorenzo <kjdelorenzo@middlebury.edu>",
+    "Elijah Peake <epeake@middlebury.edu>",
+    "Anthony Turcios <aturcios@middlebury.edu>",
+    "Bryan Diaz <bddiaz@middlebury.edu>",
+    "Joshua Ravishankar <jravishankar@middlebury.edu>"
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "dotenv": "^7.0.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
+    "react-google-login": "^5.0.4",
     "react-scripts": "^2.1.8",
     "reactstrap": "^7.1.0",
     "request-promise-native": "^1.0.7",
@@ -37,5 +43,7 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "start": "node -r dotenv/config index.js",
+  "watch": "nodemon --exec 'node -r dotenv/config' --ignore '*.test.js' index.js"
 }

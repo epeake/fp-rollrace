@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import statistics from './buttonSVGs/statistics.svg';
-import return2menu from './buttonSVGs/return2menu.svg';
-class Statistics extends Component {
+import settings from '../buttonSVGs/settings.svg';
+import return2menu from '../buttonSVGs/return2menu.svg';
+
+class Settings extends Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
@@ -13,7 +14,7 @@ class Statistics extends Component {
   render() {
     return (
       <div>
-        <img src={statistics} className="statslogo" alt="stats" />
+        <img src={settings} className="settingslogo" alt="settings" />
         <div>
           <img
             src={return2menu}
@@ -28,8 +29,8 @@ class Statistics extends Component {
   }
 }
 
-Statistics.propTypes = {
+Settings.propTypes = {
   goToMenu: PropTypes.func.isRequired
 };
 
-export default Statistics;
+export default Settings;

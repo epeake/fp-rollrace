@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 //specifies the x coordinate of the rectangle and starting point
@@ -66,4 +67,9 @@ class ProgressBar extends Component {
     );
   }
 }
+
+ProgressBar.propTypes = {
+  y: PropTypes.number.isRequired
+};
+
 export default ProgressBar;

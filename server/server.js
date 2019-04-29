@@ -3,8 +3,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
-const { Model, ValidationError } = require('objection'); // ValidationError
-const Accounts = require('./models/Accounts');
+const { Model } = require('objection'); // ValidationError
+const Users = require('./models/Users');
+const session = require('express-session');
+const passport = require('passport');
+const BearerStrategy = require('passport-http-bearer').Strategy;
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
 Model.knex(knex);
@@ -38,50 +44,100 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret:
+      process.env.NODE_ENV !== 'production'
+        ? 'asfdasfdasf123412'
+        : process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Make new user
-app.post('/api/users', (request, response, next) => {
-  Accounts.query()
-    .insertAndFetch(request.body)
-    .then(rows => {
-      response.send(rows);
-    }, next);
+passport.serializeUser((user, done) => {
+  done(null, user.id);
 });
 
-// TODOOOOOO GET RID OF 1 WITH MIDDLEWARE?
-// Fetch specific user
-app.get('/api/users/:username&:password', (request, response, next) => {
-  const username = request.params.username.substring(1);
-  const password = request.params.password.substring(1);
-  Accounts.query()
-    .where('username', username)
-    .where('password', password)
-    .then(rows => {
-      response.send(rows);
-    }, next);
-});
-
-app.put('/api/users/:id', (request, response, next) => {
-  const { id } = request.body.contents.id;
-  const { time } = request.body.contents.time;
-  const { type } = request.body.type;
-
-  // make sure correct user
-  if (id !== parseInt(request.params.id.substring(1), 10)) {
-    throw new ValidationError({
-      statusCode: 400,
-      message: 'URL id and request id do not match'
+passport.deserializeUser((id, done) => {
+  Users.query()
+    .findOne('id', id)
+    .then(user => {
+      done(null, user);
     });
+});
+
+const authenticationMiddleware = (request, response, next) => {
+  if (request.isAuthenticated()) {
+    return next(); // we are good, proceed to the next handler
   }
-  if (type === 'end') {
+  return response.sendStatus(403); // forbidden
+};
+
+passport.use(
+  new BearerStrategy((token, done) => {
+    googleClient
+      .verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      })
+      .then(async ticket => {
+        const payload = ticket.getPayload();
+        let user = await Users.query().findOne('googleId', payload.sub);
+        if (!user) {
+          user = await Users.query().insertAndFetch({
+            googleId: payload.sub,
+            givenName: payload.given_name,
+            email: payload.email,
+            total_games: 0,
+            total_multi_games: 0,
+            total_multi_wins: 0,
+            map_1: -1
+          });
+        }
+        done(null, user);
+      })
+      .catch(error => {
+        done(error);
+      });
+  })
+);
+
+// Google login
+app.post(
+  '/login',
+  passport.authenticate('bearer', { session: true }),
+  (request, response) => {
+    // console.log(request.user);  for debugging
+    response.sendStatus(200);
+  }
+);
+
+// update player's stats
+app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
+  if (request.body.type === 'end') {
     (async () => {
-      const user = await Accounts.query().findById(id);
-      if (user.map_1 === -1 || user.map_1 > time) {
+      const user = await Users.query().findById(request.user.id);
+      if (user.map_1 === -1 || user.map_1 > request.body.contents.time) {
+        // TODOOO MAKE THIS NOT HARDCODEEE
         // REPLACE WITH GENERICCC
         user
           .$query()
-          .patchAndFetch({ map_1: time, total_games: user.total_games + 1 })
+          .patchAndFetch({
+            map_1: request.body.contents.time,
+            total_games: user.total_games + 1
+          })
+          .then(rows => {
+            response.send(rows);
+          }, next);
+      } else {
+        user
+          .$query()
+          .patchAndFetch({
+            total_games: user.total_games + 1
+          })
           .then(rows => {
             response.send(rows);
           }, next);
@@ -89,6 +145,19 @@ app.put('/api/users/:id', (request, response, next) => {
     })();
   }
 });
+
+// get player's stats
+app.get(
+  '/api/users/stats',
+  authenticationMiddleware,
+  (request, response, next) => {
+    Users.query()
+      .findById(request.user.id)
+      .then(rows => {
+        response.send(rows);
+      }, next);
+  }
+);
 
 // Simple error handler.
 app.use((error, request, response, next) => {

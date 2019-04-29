@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import Map from './Map.js';
-import PauseMenu from './PauseMenu.js';
-import ChangeKeyMenu from './ChangeKeyMenu.js';
-import ProgressBar from './ProgressBar.js';
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
-import Timer from './Timer.js';
-import Tutorial from './Tutorial.js';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import request from 'request-promise-native';
-// for client socket
 import io from 'socket.io-client';
+import PauseMenu from './menus/PauseMenu.js';
+import GameoverMenu from './menus/GameoverMenu.js';
+import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
+import ProgressBar from './ProgressBar.js';
+import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import Map from './Map.js';
+import Timer from './Timer.js';
+import Tutorial from './Tutorial.js';
 
 const SVGLayer = styled.svg`
   position: absolute;
@@ -31,7 +32,7 @@ const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
 const JUMP_POWER = 0.7; // jumping velocity
 const SCROLL_SPEED = 0.4;
-const SPRITE_SIDE = 100;
+const SPRITE_SIDE = 50;
 const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
@@ -43,7 +44,7 @@ const INITIAL_STATE = {
   startKey: 115, // s key
   changingKey: false,
 
-  y: 350,
+  y: 400,
   mapTranslation: 0,
 
   windowWidth: window.innerWidth,
@@ -79,19 +80,21 @@ class GameEngine extends Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign(
-      {},
-      INITIAL_STATE,
-      { user: this.props.user },
-      { map: this.props.mapName }
-    );
+    this.state = Object.assign({}, INITIAL_STATE, {
+      guest: this.props.guest,
+      map: this.props.mapName,
+      multi: this.props.multi
+    });
+
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
-    /*
-     * each game will have a socket to connect back to the server
-     * store the other players as a member for THIS player
-     */
-    this.socket = io.connect();
+    if (this.props.multi) {
+      /*
+       * each game will have a socket to connect back to the server
+       * store the other players as a member for THIS player
+       */
+      this.socket = io.connect();
+    }
 
     this.timeout = null;
     this.renderInterval = null;
@@ -112,7 +115,7 @@ class GameEngine extends Component {
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
-    this.endGame = this.endGame.bind(this);
+    this.sendEndgameData = this.sendEndgameData.bind(this);
     this.findWall = this.findWall.bind(this);
     this.findPath = this.findPath.bind(this);
     this.findEndOfPath = this.findEndOfPath.bind(this);
@@ -215,8 +218,8 @@ class GameEngine extends Component {
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     });
-    this.setState(restartState);
     this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
+    this.setState(restartState);
   }
 
   // resumes the game after being paused
@@ -251,43 +254,59 @@ class GameEngine extends Component {
     }
   }
 
-  // set gameover flag
-  endGame() {
-    const { user } = this.state;
+  // send gameover data
+  sendEndgameData() {
+    const finishTime = parseInt(
+      (new Date().getTime() -
+        this.variables.gameStartTime +
+        this.variables.timePaused) /
+        1000
+    );
+
     if (
-      this.state.username !== 'guest' // exclusive to guest account
+      !this.state.guest // exclusive to members
     ) {
       const options = {
-        url: `${
-          process.env.NODE_ENV === 'development'
+        url:
+          (process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com'
-        }/api/users/:${this.state.user.id}`,
+            : 'https://rollrace.herokuapp.com') + `/api/users/`,
         body: {
           type: 'end',
           contents: {
-            id: user.id,
-            time: parseInt(
-              (new Date().getTime() -
-                this.variables.gameStartTime +
-                this.variables.timePaused) /
-                1000
-            )
+            time: finishTime
           }
         },
         json: true
       };
+
       request
         .put(options)
         .then(resp => {
-          //console.log(resp)  // for debugging
-          this.pauseGame();
-          this.setState({
-            gameover: true,
-            user: resp
-          });
+          console.log(resp); // for debugging
+          this.setState({ dataSent: true });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          throw Error(err);
+        });
+    } else {
+      if (finishTime < this.state.guest.map_1) {
+        // TODOOOO MAKE THIS NOT HARDCODEEEEE
+        this.setState({
+          dataSent: true,
+          guest: Object.assign(this.state.guest, {
+            map_1: finishTime,
+            total_games: this.state.guest.total_games + 1
+          })
+        });
+      } else {
+        this.setState({
+          dataSent: true,
+          guest: Object.assign(this.state.guest, {
+            total_games: this.state.guest.total_games + 1
+          })
+        });
+      }
     }
   }
 
@@ -1008,8 +1027,12 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - 666) {
-          this.endGame();
+        if (this.getX() >= this.mapLength - 667) {
+          clearInterval(this.renderInterval);
+          clearInterval(this.updateInterval);
+          this.setState({
+            gameover: true
+          });
         } else {
           this.setState({
             mapTranslation: this.getMapTranslation(),
@@ -1018,6 +1041,12 @@ class GameEngine extends Component {
         }
       }
     }, RENDER_TIMEOUT);
+  }
+
+  componentDidUpdate() {
+    if (this.state.gameover && !this.state.dataSent) {
+      this.sendEndgameData();
+    }
   }
 
   componentWillUnmount() {
@@ -1029,71 +1058,74 @@ class GameEngine extends Component {
   }
 
   componentDidMount() {
-    this.socket.on('connect', () => {
-      /*
-        Pass the player and a call back that will give back
-        the a list of players.
+    if (this.state.multi) {
+      this.socket.on('connect', () => {
+        /*
+          Pass the player and a call back that will give back
+          the a list of players.
 
-        Each player contains the (x, y) coordinates of THAT player
-        the list will include THIS player
+          Each player contains the (x, y) coordinates of THAT player
+          the list will include THIS player
 
-        The call back is used in order to make sure that the players
-        are set after the emit call
-      */
+          The call back is used in order to make sure that the players
+          are set after the emit call
+        */
 
-      /*
-        this will occur when another player has joined
-        the game (not when THIS player has joined)
-      */
-      this.socket.on('PLAYER', data => {
-        this.setState({ players: data });
-      });
+        /*
+          this will occur when another player has joined
+          the game (not when THIS player has joined)
+        */
+        this.socket.on('PLAYER', data => {
+          this.setState({ players: data });
+        });
 
-      /*
-        Update the server with location of the
-        players map ever UPDATE_INTERVAL milliseconds.
+        /*
+          Update the server with location of the
+          players map ever UPDATE_INTERVAL milliseconds.
 
-        Also emit a CHANGE_POS event that allows
-        server to update all other players on position of this player
-       */
+          Also emit a CHANGE_POS event that allows
+          server to update all other players on position of this player
+         */
 
-      setInterval(() => {
-        const updatePlayer = {
+        setInterval(() => {
+          // should probably be a assign to a variable so it can be cleared see componentWillUnmount()
+          const updatePlayer = {
+            mapTrans: this.state.mapTranslation,
+            y: this.state.y,
+            color: this.state.color,
+            key: this.socket.id
+          };
+          // use a callback
+          this.socket.emit('CHANGE_POS', updatePlayer, data => {
+            this.setState({ players: data });
+          });
+        }, UPDATE_INTERVAL);
+
+        /*
+          Using the mapTranslation allows THIS player to keep track of where OTHER
+          players are in the game.
+        */
+        const player = {
           mapTrans: this.state.mapTranslation,
           y: this.state.y,
           color: this.state.color,
           key: this.socket.id
         };
-        // use a callback
-        this.socket.emit('CHANGE_POS', updatePlayer, data => {
-          this.setState({ players: data });
+
+        /*
+          When a new player connects send the player
+          to the server. The call back will have data about other players.
+
+          To avoid having empty `rect' elements only set the state of
+          the players when there is data sent from the server
+        */
+        this.socket.emit('NEW_PLAYER', player, data => {
+          if (data !== undefined && data.length > 0) {
+            this.setState({ players: data });
+          }
         });
-      }, UPDATE_INTERVAL);
-
-      /*
-        Using the mapTranslation allows THIS player to keep track of where OTHER
-        players are in the game.
-      */
-      const player = {
-        mapTrans: this.state.mapTranslation,
-        y: this.state.y,
-        color: this.state.color,
-        key: this.socket.id
-      };
-
-      /*
-        When a new player connects send the player
-        to the server. The call back will have data about other players.
-
-        To avoid having empty `rect' elements only set the state of
-        the players when there is data sent from the server
-      */
-      this.socket.emit('NEW_PLAYER', player, data => {
-        if (data !== undefined && data.length > 0) {
-          this.setState({ players: data });
-        }
       });
-    });
+    }
   }
 
   render() {
@@ -1105,40 +1137,49 @@ class GameEngine extends Component {
       this.debounce(this.handleWindowResize, 500)
     );
 
-    // now we need to account for other players that should be rendered
-    const boxes = [
-      <rect
-        key={this.socket.id}
-        rx={15}
-        ry={15}
-        x={this.variables.x}
-        y={this.state.y}
-        height={SPRITE_SIDE}
-        width={SPRITE_SIDE}
-        fill={this.state.color}
-      />
-    ];
+    let boxes, oneBox, icon;
 
-    if (this.state.players !== undefined) {
-      // TODO: need unique key for players
-      boxes.push(
-        this.state.players.map(player => {
-          return (
-            <rect
-              key={player.id}
-              rx={15}
-              ry={15}
-              // this difference allows for other players
-              // to be rendered at different places in the map
-              // based on their x coordinate
-              x={this.state.mapTranslation - player.mapTrans}
-              y={player.y}
-              height={SPRITE_SIDE}
-              width={SPRITE_SIDE}
-              fill={player.color}
-            />
-          );
-        })
+    if (this.state.multi) {
+      // now we need to account for other players that should be rendered
+      boxes = [
+        <circle
+          key={this.socket.id}
+          cx={this.variables.x}
+          cy={this.state.y}
+          height={SPRITE_SIDE}
+          width={SPRITE_SIDE}
+          r={SPRITE_SIDE}
+          fill={this.state.color}
+        />
+      ];
+
+      if (this.state.players !== undefined) {
+        // TODO: need unique key for players
+        boxes.push(
+          this.state.players.map(player => {
+            return (
+              <circle
+                key={player.id}
+                // this difference allows for other players
+                // to be rendered at different places in the map
+                // based on their x coordinate
+                cx={this.state.mapTranslation - player.mapTrans}
+                cy={player.y}
+                r={SPRITE_SIDE}
+                fill={player.color}
+              />
+            );
+          })
+        );
+      }
+    } else {
+      oneBox = (
+        <circle
+          cx={this.variables.x}
+          cy={this.state.y}
+          fill={this.state.color}
+          r={SPRITE_SIDE}
+        />
       );
     }
 
@@ -1146,7 +1187,7 @@ class GameEngine extends Component {
       return (
         <>
           <div>
-            <Timer />
+            <Timer pause={this.state.paused} multi={this.state.multi} />
           </div>
           <SVGLayer
             viewBox={'0 0 2000 5000'}
@@ -1160,7 +1201,9 @@ class GameEngine extends Component {
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
             />
-            {boxes}
+            {icon}
+            {this.state.multi && boxes}
+            {!this.state.multi && oneBox}
             <g onClick={() => this.pauseGame()}>
               <rect
                 key={'pause-bkrnd'}
@@ -1210,6 +1253,16 @@ class GameEngine extends Component {
                   ?
                 </text>
               </g>
+              <g>
+                <circle
+                  cx={40}
+                  cy={140}
+                  height={SPRITE_SIDE}
+                  width={SPRITE_SIDE}
+                  r={SPRITE_SIDE / 2}
+                  fill={this.state.color}
+                />
+              </g>
             </g>
           </SVGLayer>
           {this.state.paused ? (
@@ -1231,8 +1284,26 @@ class GameEngine extends Component {
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
                   exitToMenu={() => this.props.goToMenu()}
+                  multi={this.state.multi}
+                  color={this.state.color}
                 />
               )}
+            </SVGLayer>
+          ) : (
+            <></>
+          )}
+
+          {this.state.gameover ? (
+            <SVGLayer
+              viewBox={'0 0 2000 1000'}
+              preserveAspectRatio={'xMinYMin meet'}
+            >
+              <GameoverMenu
+                windowHeight={this.state.windowHeight}
+                windowWidth={this.state.windowWidth}
+                restart={() => this.restartGame()}
+                exitToMenu={() => this.exitToMenu()}
+              />
             </SVGLayer>
           ) : (
             <></>
@@ -1244,5 +1315,12 @@ class GameEngine extends Component {
     }
   }
 }
+
+GameEngine.propTypes = {
+  guest: PropTypes.object,
+  mapProps: PropTypes.object.isRequired,
+  multi: PropTypes.bool.isRequired,
+  goToMenu: PropTypes.func.isRequired
+};
 
 export default GameEngine;
