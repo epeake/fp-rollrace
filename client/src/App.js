@@ -45,7 +45,9 @@ class App extends Component {
       user: GUEST_ACCOUNT,
       mode: 'menu',
       multi: false,
-      loggedIn: false
+      loggedIn: false,
+      playercolor: `rgb(${Math.random() * 255},${Math.random() *
+        255},${Math.random() * 255})`
     };
 
     this.handleGoToMenu = this.handleGoToMenu.bind(this);
@@ -53,6 +55,11 @@ class App extends Component {
     this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
     this.handleGoogleLogout = this.handleGoogleLogout.bind(this);
     this.handleStats = this.handleStats.bind(this);
+    this.selectColor = this.selectColor.bind(this);
+  }
+
+  selectColor(selectedColor) {
+    this.setState({ playercolor: selectedColor });
   }
 
   // username and password both strings
@@ -187,13 +194,17 @@ class App extends Component {
             goToMenu={this.handleGoToMenu}
             guest={this.state.guest}
             multi={this.state.multi}
+            playercolor={this.state.playercolor}
           />
         );
 
       case 'settings':
         return (
           <div>
-            <Settings goToMenu={this.handleGoToMenu} />
+            <Settings
+              goToMenu={this.handleGoToMenu}
+              selectedColor={this.selectColor}
+            />
           </div>
         );
 

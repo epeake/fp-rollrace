@@ -88,6 +88,7 @@ class GameEngine extends Component {
       guest: this.props.guest,
       map: this.props.mapName,
       multi: this.props.multi,
+      playercolor: this.props.playercolor,
       restart: false
     });
 
@@ -1126,7 +1127,7 @@ class GameEngine extends Component {
         const player = {
           mapTrans: this.state.mapTranslation,
           y: this.state.y,
-          color: this.state.color,
+          color: 'black',
           key: this.socket.id
         };
 
@@ -1168,7 +1169,7 @@ class GameEngine extends Component {
         height={SPRITE_SIDE}
         width={SPRITE_SIDE}
         r={SPRITE_SIDE}
-        fill={this.state.color}
+        fill={this.state.playercolor}
       />
     ];
 
@@ -1195,6 +1196,7 @@ class GameEngine extends Component {
         );
       }
     }
+
     //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
@@ -1309,7 +1311,7 @@ class GameEngine extends Component {
                   height={SPRITE_SIDE}
                   width={SPRITE_SIDE}
                   r={SPRITE_SIDE / 2}
-                  fill={this.state.color}
+                  fill={this.state.playercolor}
                   className="icon"
                 />
               </g>
