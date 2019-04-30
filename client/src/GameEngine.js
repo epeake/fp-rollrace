@@ -49,6 +49,7 @@ const INITIAL_STATE = {
 
   y: 400,
   mapTranslation: 0,
+  hideMenu: false,
 
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
@@ -174,7 +175,7 @@ class GameEngine extends Component {
 
   // Changes our current jump key
   handleChangeJumpKey(event) {
-    this.setState({ jumpKey: event.keyCode, changingKey: false });
+    this.setState({ jumpKey: event.keyCode });
   }
 
   /*
@@ -1211,6 +1212,32 @@ class GameEngine extends Component {
               />
             )}
           </div>
+          {/* conditional rendering when the pause button is toggled */}
+          {this.state.paused &&
+            this.state.hideMenu &&
+            this.state.changingKey && (
+              <ChangeKeyMenu
+                windowHeight={this.state.windowHeight}
+                windowWidth={this.state.windowWidth}
+                jumpKey={this.state.jumpKey}
+                showMenu={() =>
+                  this.setState({ changingKey: false, hideMenu: false })
+                }
+              />
+            )}
+          {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
+          {this.state.paused && !this.state.hideMenu && (
+            <PauseMenu
+              resume={() => this.resumeGame()}
+              restart={() => this.restartGame()}
+              changeKey={() =>
+                this.setState({ changingKey: true, hideMenu: true })
+              }
+              goToMenu={this.props.goToMenu}
+              gameOver={this.state.gameover}
+            />
+          )}
+
           <SVGLayer
             viewBox={'0 0 2000 5000'}
             preserveAspectRatio={'xMaxYMin slice'}
@@ -1256,7 +1283,8 @@ class GameEngine extends Component {
                 width={10}
                 fill={'white'}
               />
-
+            </g>
+            <g onClick={() => this.pauseGame()}>
               <g onClick={() => this.setState({ tutorial: true })}>
                 {' '}
                 {/* pauses game because within pausing div*/}
@@ -1289,33 +1317,6 @@ class GameEngine extends Component {
               </g>
             </g>
           </SVGLayer>
-          {this.state.paused ? (
-            <SVGLayer
-              viewBox={'0 0 2000 1000'}
-              preserveAspectRatio={'xMinYMin meet'}
-            >
-              {this.state.changingKey ? (
-                <ChangeKeyMenu
-                  windowHeight={this.state.windowHeight}
-                  windowWidth={this.state.windowWidth}
-                  jumpKey={this.state.jumpKey}
-                />
-              ) : (
-                <PauseMenu
-                  windowHeight={this.state.windowHeight}
-                  windowWidth={this.state.windowWidth}
-                  resume={() => this.resumeGame()}
-                  restart={() => this.restartGame()}
-                  changeKey={() => this.setState({ changingKey: true })}
-                  exitToMenu={() => this.props.goToMenu()}
-                  multi={this.state.multi}
-                  color={this.state.playercolor}
-                />
-              )}
-            </SVGLayer>
-          ) : (
-            <></>
-          )}
 
           {this.state.dataSent ? (
             <SVGLayer
