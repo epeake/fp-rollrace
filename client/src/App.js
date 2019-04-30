@@ -9,6 +9,7 @@ import settingsbutton from './buttonSVGs/settingsbutton.svg';
 import statsbutton from './buttonSVGs/statsbutton.svg';
 import Settings from './menus/settings.js';
 import Statistics from './menus/Statistics.js';
+import MapChoice from './MapChoice.js';
 import './App.css';
 
 const GOOGLE_CLIENT_ID =
@@ -65,10 +66,11 @@ class App extends Component {
   handleStats() {
     if (!this.state.guest) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/stats`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/stats`,
         json: true
       };
       request
@@ -138,7 +140,7 @@ class App extends Component {
       case 'menu':
         return (
           <div>
-            <StyledTitle />
+            <StyledTitle height="120" width="100%" />
             <div className="play-button">
               <StyledButton
                 src={realbutton}
@@ -167,6 +169,10 @@ class App extends Component {
                 }
               />
             </div>
+            <MapChoice
+              key={'mapchoice'}
+              func={() => console.log('func called')}
+            />
             <div>
               <h3>
                 Current User:{' '}

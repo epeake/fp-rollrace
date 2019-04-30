@@ -24,7 +24,7 @@ const jump = {
 };
 
 // time between updates sent to the server
-const UPDATE_INTERVAL = 40; // milliseconds
+const UPDATE_INTERVAL = 20; // milliseconds
 
 const TOOLBAR_Y = 15;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
@@ -37,12 +37,15 @@ const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
 
 const INITIAL_STATE = {
+  dataSent: false,
   tutorial: false,
   paused: false,
   gameover: false,
   jumpKey: 32, // space bar
   startKey: 115, // s key
   changingKey: false,
+
+  timerCanStart: false,
 
   y: 400,
   mapTranslation: 0,
@@ -85,8 +88,10 @@ class GameEngine extends Component {
       map: this.props.mapName,
       multi: this.props.multi,
       playercolor: this.props.playercolor
+      restart: false
     });
 
+    this.restartMinutes = this.props.minutes;
     this.variables = Object.assign({}, INITIAL_VARIABLES);
 
     if (this.props.multi) {
@@ -132,7 +137,8 @@ class GameEngine extends Component {
     this.spriteGoingDown = this.spriteGoingDown.bind(this);
     this.findNextChange = this.findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
-    this.exitToMenu = this.exitToMenu.bind(this);
+    this.startCountdown = this.startCountdown.bind(this);
+    this.timeOut = this.timeOut.bind(this);
   }
 
   /*
@@ -185,13 +191,15 @@ class GameEngine extends Component {
       this.variables.gameStartTime
     ) {
       this.handleJumpKey();
-    } else if (
-      !this.variables.gameStartTime &&
-      event.keyCode === this.state.startKey
-    ) {
-      this.startLoops();
     } else {
       void 0; // do nothing
+    }
+  }
+  //startsgame after 3 seconds
+
+  startCountdown() {
+    if (!this.variables.gameStartTime) {
+      setTimeout(this.startLoops, 3000);
     }
   }
 
@@ -206,8 +214,10 @@ class GameEngine extends Component {
   // restarts the game
   restartGame() {
     // clear loops
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
+    clearInterval(this.multiplayerInterval);
 
     /*
      * make sure window is correct size
@@ -215,10 +225,12 @@ class GameEngine extends Component {
      */
     const restartState = Object.assign({}, INITIAL_STATE, {
       windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight
+      windowHeight: window.innerHeight,
+      restart: true
     });
     this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
     this.setState(restartState);
+    this.startCountdown();
   }
 
   // resumes the game after being paused
@@ -253,12 +265,6 @@ class GameEngine extends Component {
     }
   }
 
-  // I'm pretty sure this should just be in the componentDidUnmount lifecycle function
-  // exits to main menu
-  exitToMenu() {
-    this.props.goToMenu();
-  }
-
   // send gameover data
   sendEndgameData() {
     const finishTime = parseInt(
@@ -272,10 +278,11 @@ class GameEngine extends Component {
       !this.state.guest // exclusive to members
     ) {
       const options = {
-        url:
-          (process.env.NODE_ENV === 'development'
+        url: `${
+          process.env.NODE_ENV === 'development'
             ? 'http://localhost:3000'
-            : 'https://rollrace.herokuapp.com') + `/api/users/`,
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/`,
         body: {
           type: 'end',
           contents: {
@@ -431,8 +438,7 @@ class GameEngine extends Component {
           jumpStartTime: jumpStartTime,
           currentTime: currentTime
         }),
-        event: 'land',
-        y: highest
+        event: 'land'
       };
     } else {
       // no path found
@@ -972,6 +978,8 @@ class GameEngine extends Component {
 
   // sets gameStartTime and starts the necessary animation loops
   startLoops() {
+    this.setState({ timerCanStart: true });
+    this.setState({ restart: false });
     this.variables.gameStartTime = new Date().getTime();
     this.variables.mapTranslationStartTime = new Date().getTime();
     (async () => {
@@ -987,8 +995,7 @@ class GameEngine extends Component {
         adjustedTime - currentTime < TIME_THRESH &&
         !this.state.paused
       ) {
-        //console.log(adjustedTime - currentTime);
-        console.log(this.variables.motionChange.event);
+        //console.log(this.variables.motionChange.event);
 
         const y = this.getY({
           currentTime: adjustedTime,
@@ -1058,12 +1065,17 @@ class GameEngine extends Component {
 
   componentWillUnmount() {
     // prevent memory leak by clearing/stopping loops
-    clearInterval(this.renderInterval);
+    clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
-    this.setState(null);
+    clearInterval(this.renderInterval);
+    if (this.props.multi) {
+      this.socket.disconnect();
+    }
   }
 
   componentDidMount() {
+    this.startCountdown();
+
     if (this.state.multi) {
       this.socket.on('connect', () => {
         /*
@@ -1134,6 +1146,11 @@ class GameEngine extends Component {
     }
   }
 
+  //Ends game when timer reaches zero
+  timeOut() {
+    this.setState({ gameover: true });
+  }
+
   render() {
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
@@ -1143,25 +1160,23 @@ class GameEngine extends Component {
       this.debounce(this.handleWindowResize, 500)
     );
 
-    let boxes, oneBox, icon;
+    const boxes = [
+      <circle
+        key={this.socket ? this.socket.id : '1'}
+        cx={this.variables.x}
+        cy={this.state.y}
+        height={SPRITE_SIDE}
+        width={SPRITE_SIDE}
+        r={SPRITE_SIDE}
+        fill={this.state.color}
+      />
+    ];
 
     if (this.state.multi) {
       // now we need to account for other players that should be rendered
-      boxes = [
-        <circle
-          key={this.socket.id}
-          cx={this.variables.x}
-          cy={this.state.y}
-          height={SPRITE_SIDE}
-          width={SPRITE_SIDE}
-          r={SPRITE_SIDE}
-          fill={this.state.color}
-        />
-      ];
-
       if (this.state.players !== undefined) {
         // TODO: need unique key for players
-        boxes.push(
+        boxes.unshift(
           this.state.players.map(player => {
             return (
               <circle
@@ -1169,10 +1184,11 @@ class GameEngine extends Component {
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                cx={this.state.mapTranslation - player.mapTrans}
+                cx={this.getMapTranslation() - player.mapTrans + 200}
                 cy={player.y}
                 r={SPRITE_SIDE}
                 fill={player.color}
+                fill-opacity="0.4"
               />
             );
           })
@@ -1188,12 +1204,20 @@ class GameEngine extends Component {
         />
       );
     }
-
+    //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
         <>
           <div>
-            <Timer pause={this.state.paused} multi={this.state.multi} />
+            {!this.state.gameover && (
+              <Timer
+                pause={this.state.paused}
+                multi={this.state.multi}
+                timerCanStart={this.state.timerCanStart}
+                boot={bool => this.setState({ gameover: bool })}
+                restart={this.state.restart}
+              />
+            )}
           </div>
           <SVGLayer
             viewBox={'0 0 2000 5000'}
@@ -1206,11 +1230,10 @@ class GameEngine extends Component {
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
+              className="map"
             />
-            {icon}
-            {this.state.multi && boxes}
-            {!this.state.multi && oneBox}
-            <g onClick={() => this.pauseGame()}>
+            {boxes}
+            <g onClick={() => this.pauseGame()} className="pauseButton">
               <rect
                 key={'pause-bkrnd'}
                 rx={15}
@@ -1254,12 +1277,14 @@ class GameEngine extends Component {
                   height={50}
                   width={50}
                   fill={'pink'}
+                  className="tutorial"
                 />
                 <text x={135} y={45} height={50} width={50}>
                   ?
                 </text>
               </g>
               <g>
+                {/* player icon */}
                 <circle
                   cx={40}
                   cy={140}
@@ -1267,6 +1292,7 @@ class GameEngine extends Component {
                   width={SPRITE_SIDE}
                   r={SPRITE_SIDE / 2}
                   fill={this.state.playercolor}
+                  className="icon"
                 />
               </g>
             </g>
@@ -1289,7 +1315,7 @@ class GameEngine extends Component {
                   resume={() => this.resumeGame()}
                   restart={() => this.restartGame()}
                   changeKey={() => this.setState({ changingKey: true })}
-                  exitToMenu={() => this.exitToMenu()}
+                  exitToMenu={() => this.props.goToMenu()}
                   multi={this.state.multi}
                   color={this.state.playercolor}
                 />
@@ -1299,7 +1325,7 @@ class GameEngine extends Component {
             <></>
           )}
 
-          {this.state.gameover ? (
+          {this.state.dataSent ? (
             <SVGLayer
               viewBox={'0 0 2000 1000'}
               preserveAspectRatio={'xMinYMin meet'}
@@ -1308,7 +1334,8 @@ class GameEngine extends Component {
                 windowHeight={this.state.windowHeight}
                 windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
-                exitToMenu={() => this.exitToMenu()}
+                exitToMenu={() => this.props.goToMenu()}
+                guest={this.props.guest}
               />
             </SVGLayer>
           ) : (
