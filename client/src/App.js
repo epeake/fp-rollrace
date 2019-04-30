@@ -133,7 +133,7 @@ class App extends Component {
       case 'menu':
         return (
           <div>
-            <StyledTitle />
+            <StyledTitle height="120" width="100%" />
             <div className="play-button">
               <StyledButton
                 src={realbutton}

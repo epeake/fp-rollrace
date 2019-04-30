@@ -8,8 +8,8 @@ const Time = styled.div`
   width: 800px;
 `;
 
-const MINUTES = '05';
-const SECONDS = '00';
+const MINUTES = '00';
+const SECONDS = '45';
 
 const START_TIME = {
   minutes: MINUTES,
@@ -25,7 +25,8 @@ class Timer extends Component {
       map: this.props.mapName,
       multi: this.props.multi,
       pause: this.props.pause,
-      timerCanStart: this.props.timerCanStart
+      timerCanStart: this.props.timerCanStart,
+      restart: this.props.restart
     });
 
     this.timer = undefined;
@@ -34,6 +35,10 @@ class Timer extends Component {
   }
 
   tick() {
+    //console.log(this.state.restart);
+    if (this.state.restart === true) {
+      this.setState({ minutes: MINUTES, seconds: SECONDS });
+    }
     if (!this.state.pause && this.state.timerCanStart === true) {
       /*
   			function: tick()
@@ -100,6 +105,10 @@ class Timer extends Component {
     if (nextProps.pause !== this.props.pause && !this.props.multi) {
       //Perform some operation
       this.setState({ pause: nextProps.pause });
+    }
+    if (nextProps.restart !== this.props.restart) {
+      //Perform some operation
+      this.setState({ restart: nextProps.restart });
     }
   }
 
