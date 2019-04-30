@@ -87,7 +87,7 @@ class GameEngine extends Component {
       guest: this.props.guest,
       map: this.props.mapName,
       multi: this.props.multi,
-      playercolor: this.props.playercolor
+      playercolor: this.props.playercolor,
       restart: false
     });
 
@@ -1168,7 +1168,7 @@ class GameEngine extends Component {
         height={SPRITE_SIDE}
         width={SPRITE_SIDE}
         r={SPRITE_SIDE}
-        fill={this.state.color}
+        fill={this.state.playercolor}
       />
     ];
 
@@ -1194,16 +1194,8 @@ class GameEngine extends Component {
           })
         );
       }
-    } else {
-      oneBox = (
-        <circle
-          cx={this.variables.x}
-          cy={this.state.y}
-          fill={this.state.playercolor}
-          r={SPRITE_SIDE}
-        />
-      );
     }
+
     //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
