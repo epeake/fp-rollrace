@@ -1,135 +1,71 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import injectSheet from 'react-jss';
+import styles from './PauseMenuStyles';
+import styled from 'styled-components';
 
-const MENU_HEIGHT = 700;
-const MENU_WIDTH = 550;
-const BUTTON_HEIGHT = 50;
-const BUTTON_WIDTH = 300;
+// adapted css styling from w3schools buttons
+const StyledButton = styled.button`
+  display: block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 9px #999;
+  margin: 15px;
+  width:80%;
 
-export default function PauseMenu(props) {
-  const restart = (
-    <g onClick={() => props.restart()}>
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 160}
-        height={BUTTON_HEIGHT}
-        width={BUTTON_WIDTH}
-        fill={'red'}
-        opacity={1}
-      />
-      <text
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 200}
-        fontFamily="Verdana"
-        fontSize="35"
-        fill="#FFFF00"
-      >
-        Restart
-      </text>
-    </g>
-  );
-  // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
+ :hover {background-color: #3e8e41}
+ :active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+`;
 
-  return (
-    <g>
-      <rect
-        x={0}
-        y={0}
-        height={4000}
-        width={4000}
-        fill={'black'}
-        opacity={0.5}
-      />
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - MENU_WIDTH / 2) / 2}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4}
-        height={MENU_HEIGHT}
-        width={MENU_WIDTH}
-        fill={'white'}
-        opacity={1}
-      />
+const RestartButton = styled(StyledButton)`
+  background-color: #d10808;
+`;
 
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 80}
-        height={BUTTON_HEIGHT}
-        width={BUTTON_WIDTH}
-        fill={'black'}
-        opacity={1}
-        onClick={() => props.resume()}
-        className="resume"
-      />
-      <text
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 140}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 120}
-        fontFamily="Verdana"
-        fontSize="35"
-        fill="#FFFF00"
-        onClick={() => props.resume()}
-        className="resume"
-      >
-        Resume
-      </text>
+class PauseMenu extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { gameDone: this.props.gameOver };
+  }
 
-      {!props.multi && restart}
+  //update child component through setState when parent props changes
+  componentWillReceiveProps(nextProps) {
+    this.setState({ gameDone: nextProps.gameOver });
+  }
 
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 240}
-        height={BUTTON_HEIGHT}
-        width={BUTTON_WIDTH}
-        fill={'green'}
-        opacity={1}
-        onClick={() => props.changeKey()}
-      />
-      <text
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 275}
-        fontFamily="Verdana"
-        fontSize="35"
-        fill="#FFFF00"
-        onClick={() => props.changeKey()}
-      >
-        Change Key
-      </text>
+  render() {
+    const { resume, classes, restart, changeKey, goToMenu } = this.props;
+    const { gameDone } = this.state;
 
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 55}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 320}
-        height={BUTTON_HEIGHT}
-        width={BUTTON_WIDTH}
-        fill={'blue'}
-        opacity={1}
-        onClick={() => props.exitToMenu()}
-      />
-      <text
-        x={(window.innerWidth - BUTTON_WIDTH / 2) / 2 + 100}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 360}
-        fontFamily="Verdana"
-        fontSize="35"
-        fill="#FFFF00"
-        onClick={() => props.exitToMenu()}
-      >
-        Go To Menu
-      </text>
-    </g>
-  );
+    // This is ensures that the resume button and changeKey are not rendered when the
+    // game is done
+    const resumeButton = !gameDone && (
+      <StyledButton onClick={resume}>Resume</StyledButton>
+    );
+    const changekeyButton = !gameDone && (
+      <StyledButton onClick={changeKey}> Change Key</StyledButton>
+    );
+    return (
+      <div className={classes.modalOverlay}>
+        <div className={classes.modal}>
+          <div className={classes.modalContent}>
+            {resumeButton}
+            <RestartButton onClick={restart}>Restart</RestartButton>
+            {changekeyButton}
+            <StyledButton onClick={goToMenu}>Main Menu</StyledButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
-
-PauseMenu.propTypes = {
-  multi: PropTypes.bool.isRequired,
-  resume: PropTypes.func.isRequired,
-  restart: PropTypes.func.isRequired,
-  changeKey: PropTypes.func.isRequired,
-  exitToMenu: PropTypes.func.isRequired
-};
+export default injectSheet(styles)(PauseMenu);

@@ -46,7 +46,8 @@
     "body-parser": "^1.18.3",
     "dotenv": "^7.0.0",
     "pg": "^7.10.0",
-    "pg-promise": "^8.6.5"
+    "pg-promise": "^8.6.5",
+    "react-jss": "^8.6.1"
   },
   "start": "node -r dotenv/config index.js",
   "watch": "nodemon --exec 'node -r dotenv/config' --ignore '*.test.js' index.js"

@@ -1,52 +1,66 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import injectSheet from 'react-jss';
+import styles from './PauseMenuStyles';
+import styled from 'styled-components';
 
-const MENU_HEIGHT = 550;
-const MENU_WIDTH = 700;
+const StyledButton = styled.button`
+  display: block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 9px #999;
+  margin: 15px;
+  width:80%;
 
-export default function ChangeKeyMenu(props) {
-  // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
-  return (
-    <g>
-      <rect
-        x={0}
-        y={0}
-        height={4000}
-        width={4000}
-        fill={'black'}
-        opacity={0.5}
-      />
-      <rect
-        rx={30}
-        ry={30}
-        x={(window.innerWidth - MENU_WIDTH / 2) / 2}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4}
-        height={MENU_HEIGHT}
-        width={MENU_WIDTH}
-        fill={'white'}
-        opacity={1}
-      />
-      <text
-        x={(window.innerWidth - MENU_WIDTH / 2) / 2 + 300}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 300}
-      >
-        Press New Jump Key
-      </text>
-      <text
-        x={(window.innerWidth - MENU_WIDTH / 2) / 2 + 300}
-        y={(window.innerHeight - MENU_HEIGHT / 2) / 4 + 360}
-      >
-        {`Current Key: ${
-          props.jumpKey === 32
-            ? 'SPACE'
-            : String.fromCharCode(props.jumpKey).toUpperCase()
-        }`}
-      </text>
-      />
-    </g>
-  );
+ :hover {background-color: #3e8e41}
+ :active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+`;
+
+const StyledP = styled.p`
+  text-align: center;
+`;
+
+class ChangeKeyMenu extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { currentKey: this.props.jumpKey };
+  }
+
+  // Give an update if the props change so that the user can see
+  // which key they chose before going back to pause menu.
+  componentWillReceiveProps(nextProps) {
+    this.setState({ currentKey: nextProps.jumpKey });
+  }
+
+  render() {
+    const { classes, showMenu, jumpKey } = this.props;
+    return (
+      <div className={classes.modalOverlay}>
+        <div className={classes.modal}>
+          <div className={classes.modalContent}>
+            <StyledP>Press New jumpKey</StyledP>
+            <StyledP>
+              {`Current Key: ${
+                jumpKey === 32
+                  ? 'SPACE'
+                  : String.fromCharCode(this.state.currentKey).toUpperCase()
+              }`}
+            </StyledP>
+            <StyledButton onClick={showMenu}>Previous Menu</StyledButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
-
-ChangeKeyMenu.propTypes = {
-  jumpKey: PropTypes.number.isRequired
-};
+export default injectSheet(styles)(ChangeKeyMenu);
