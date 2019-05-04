@@ -12,38 +12,36 @@ class GameoverMenu extends Component {
     super(props);
 
     this.state = {
-      score: null,
-      scoreSwitched: false
+      score: null
     };
+  }
+
+  componentDidMount() {
+    if (!this.props.guest) {
+      const options = {
+        url: `${
+          process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/stats`,
+        json: true
+      };
+      request
+        .get(options)
+        .then(resp => {
+          this.setState({ score: resp.map_1 });
+        })
+        .catch(err => {
+          //console.log('run');
+          throw Error(err);
+        });
+    } else {
+      this.setState({ score: this.props.guest.map_1 });
+    }
   }
 
   // TODO: THIS LOOKS UGLY SO WE NEED TO RETHINK WITH ASPECT RATIO
   render() {
-    if (!this.state.scoreSwitched) {
-      if (!this.props.guest) {
-        const options = {
-          url: `${
-            process.env.NODE_ENV === 'development'
-              ? 'http://localhost:3000'
-              : 'https://rollrace.herokuapp.com'
-          }/api/users/stats`,
-          json: true
-        };
-        request
-          .get(options)
-          .then(resp => {
-            this.setState({ score: resp.map_1, scoreSwitched: true });
-          })
-          .catch(err => {
-            //console.log('run');
-            throw Error(err);
-          });
-      } else {
-        console.log(this.props.guest);
-        this.setState({ score: this.props.guest.map_1, scoreSwitched: true });
-      }
-    }
-
     return (
       <g>
         <rect

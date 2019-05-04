@@ -45,8 +45,6 @@ class App extends Component {
       mode: 'menu',
       multi: false,
       loggedIn: false,
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`
     };

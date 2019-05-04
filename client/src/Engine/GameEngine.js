@@ -11,6 +11,7 @@ import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
 import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
+import CurrBestTime from './CurrBestTime.js';
 import Tutorial from './Tutorial.js';
 
 const SVGLayer = styled.svg`
@@ -27,7 +28,7 @@ const jump = {
 // time between updates sent to the server
 const UPDATE_INTERVAL = 20; // milliseconds
 const TOOLBAR_Y = 15;
-const TOOLBAR_X = 900;
+const TOOLBAR_X = 800;
 const ICON_X = 40;
 const GAMEOVER_X = 667;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
@@ -265,7 +266,6 @@ class GameEngine extends Component {
         this.variables.timePaused) /
         1000
     );
-    console.log(finishTime);
 
     if (
       !this.state.guest // exclusive to members
@@ -287,8 +287,7 @@ class GameEngine extends Component {
 
       request
         .put(options)
-        .then(resp => {
-          console.log(resp); // for debugging
+        .then(() => {
           this.setState({ dataSent: true });
         })
         .catch(err => {
@@ -1235,6 +1234,11 @@ class GameEngine extends Component {
                 restart={this.state.restart}
               />
             )}
+            <CurrBestTime
+              y={TOOLBAR_Y}
+              x={TOOLBAR_X}
+              guest={this.props.guest}
+            />
 
             <ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
             <Map
