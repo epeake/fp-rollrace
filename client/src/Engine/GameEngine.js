@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import io from 'socket.io-client';
-import PauseMenu from './menus/PauseMenu.js';
-import GameoverMenu from './menus/GameoverMenu.js';
-import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
-import ProgressBar from './ProgressBar.js';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import PauseMenu from './Menus/PauseMenu.js';
+import PauseButton from './PauseButton.js';
+import GameoverMenu from './Menus/GameoverMenu.js';
+import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
+import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
 import Tutorial from './Tutorial.js';
@@ -25,7 +26,6 @@ const jump = {
 
 // time between updates sent to the server
 const UPDATE_INTERVAL = 20; // milliseconds
-
 const TOOLBAR_Y = 15;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
@@ -44,13 +44,10 @@ const INITIAL_STATE = {
   jumpKey: 32, // space bar
   startKey: 115, // s key
   changingKey: false,
-
   timerCanStart: false,
-
   y: 400,
   mapTranslation: 0,
   hideMenu: false,
-
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
   players: undefined,
@@ -60,22 +57,17 @@ const INITIAL_STATE = {
 
 const INITIAL_VARIABLES = {
   gameStartTime: undefined,
-
   x: 200,
   minY: 1000, // should loop over all of map or whatever to find this.
-
   // will take an object of the following form {time: , event: } options for event are block, go, land, and fall
   motionChange: undefined,
-
   yStart: INITIAL_STATE.y,
   jumpState: jump.STOP,
   jumpStartTime: undefined,
   descendStartTime: undefined,
-
   mapTranslationStart: 0,
   atWall: false,
   mapTranslationStartTime: undefined,
-
   pauseOffsetStart: undefined,
   timePaused: 0
 };
@@ -1217,8 +1209,6 @@ class GameEngine extends Component {
             this.state.hideMenu &&
             this.state.changingKey && (
               <ChangeKeyMenu
-                windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
                 jumpKey={this.state.jumpKey}
                 showMenu={() =>
                   this.setState({ changingKey: false, hideMenu: false })
@@ -1249,72 +1239,20 @@ class GameEngine extends Component {
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
-              className="map"
             />
             {boxes}
-            <g onClick={() => this.pauseGame()} className="pauseButton">
-              <rect
-                key={'pause-bkrnd'}
-                rx={15}
-                ry={15}
-                x={15}
-                y={15}
-                height={50}
-                width={50}
-                fill={'black'}
+            <PauseButton handleClick={() => this.pauseGame()} />
+            {/* tutorial used to be here */}
+            <g>
+              {/* player icon */}
+              <circle
+                cx={40}
+                cy={140}
+                height={SPRITE_SIDE}
+                width={SPRITE_SIDE}
+                r={SPRITE_SIDE / 2}
+                fill={this.state.playercolor}
               />
-              <rect
-                key={'lft-line'}
-                rx={5}
-                ry={5}
-                x={28}
-                y={28}
-                height={25}
-                width={10}
-                fill={'white'}
-              />
-              <rect
-                key={'rt-line'}
-                rx={5}
-                ry={5}
-                x={43}
-                y={28}
-                height={25}
-                width={10}
-                fill={'white'}
-              />
-            </g>
-            <g onClick={() => this.pauseGame()}>
-              <g onClick={() => this.setState({ tutorial: true })}>
-                {' '}
-                {/* pauses game because within pausing div*/}
-                <rect
-                  key={'help-me'}
-                  rx={15}
-                  ry={15}
-                  x={115}
-                  y={15}
-                  height={50}
-                  width={50}
-                  fill={'pink'}
-                  className="tutorial"
-                />
-                <text x={135} y={45} height={50} width={50}>
-                  ?
-                </text>
-              </g>
-              <g>
-                {/* player icon */}
-                <circle
-                  cx={40}
-                  cy={140}
-                  height={SPRITE_SIDE}
-                  width={SPRITE_SIDE}
-                  r={SPRITE_SIDE / 2}
-                  fill={this.state.playercolor}
-                  className="icon"
-                />
-              </g>
             </g>
           </SVGLayer>
 
@@ -1341,6 +1279,28 @@ class GameEngine extends Component {
     }
   }
 }
+
+/* tutorial:
+ *<g onClick={() => this.pauseGame()}>
+ *  <g onClick={() => this.setState({ tutorial: true })}>
+ *    {' '}
+ *    {/ pauses game because within pausing div/}
+ *    <rect
+ *      key={'help-me'}
+ *      rx={15}
+ *      ry={15}
+ *      x={115}
+ *      y={15}
+ *      height={50}
+ *      width={50}
+ *      fill={'pink'}
+ *    />
+ *    <text x={135} y={45} height={50} width={50}>
+ *      ?
+ *    </text>
+ *  </g>
+ *</g>
+ */
 
 GameEngine.propTypes = {
   guest: PropTypes.object,
