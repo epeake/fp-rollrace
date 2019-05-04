@@ -8,7 +8,7 @@ export default function PauseButton(props) {
         key={'pause-bkrnd'}
         rx={15}
         ry={15}
-        x={15}
+        x={props.x - 25}
         y={15}
         height={50}
         width={50}
@@ -18,7 +18,7 @@ export default function PauseButton(props) {
         key={'lft-line'}
         rx={5}
         ry={5}
-        x={28}
+        x={props.x - 12}
         y={28}
         height={25}
         width={10}
@@ -28,7 +28,7 @@ export default function PauseButton(props) {
         key={'rt-line'}
         rx={5}
         ry={5}
-        x={43}
+        x={props.x + 3}
         y={28}
         height={25}
         width={10}

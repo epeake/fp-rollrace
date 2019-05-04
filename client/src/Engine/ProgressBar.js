@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-//specifies the x coordinate of the rectangle and starting point
-const X_POS = 900;
-
 const SpriteOne = styled.ellipse`
   fill: #ff0000;
 `;
@@ -22,8 +19,8 @@ class ProgressBar extends Component {
     super(props);
     this.interval = null;
     this.state = {
-      player_1_pos: X_POS,
-      player_2_pos: X_POS
+      player_1_pos: this.props.x,
+      player_2_pos: this.props.x
     };
   }
 
@@ -48,7 +45,7 @@ class ProgressBar extends Component {
   render() {
     return (
       <g>
-        <Bar width={200} height={20} x={X_POS} y={this.props.y} />
+        <Bar width={200} height={20} x={this.props.x} y={this.props.y} />
 
         <SpriteOne
           cx={this.state.player_1_pos} /*update player one position*/
