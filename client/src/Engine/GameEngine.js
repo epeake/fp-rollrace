@@ -27,6 +27,9 @@ const jump = {
 // time between updates sent to the server
 const UPDATE_INTERVAL = 20; // milliseconds
 const TOOLBAR_Y = 15;
+const TOOLBAR_X = 900;
+const ICON_X = 40;
+const GAMEOVER_X = 667;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
@@ -45,10 +48,9 @@ const INITIAL_STATE = {
   startKey: 115, // s key
   changingKey: false,
   timerCanStart: false,
-  y: 400,
+  y: 600,
   mapTranslation: 0,
   hideMenu: false,
-  windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
   players: undefined,
   color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
@@ -159,7 +161,6 @@ class GameEngine extends Component {
     this.variables.yStart = this.getY();
     this.variables.jumpState = jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
-    this.variables.motionChange = undefined;
     (async () => {
       this.variables.motionChange = this.findNextChange();
     })();
@@ -199,7 +200,6 @@ class GameEngine extends Component {
   // Resets our current window dimentions
   handleWindowResize() {
     this.setState({
-      windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     });
   }
@@ -217,7 +217,6 @@ class GameEngine extends Component {
      * (person may have changes window while playing so can't really make a default for it)
      */
     const restartState = Object.assign({}, INITIAL_STATE, {
-      windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
       restart: true
     });
@@ -1035,7 +1034,7 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - 9067) {
+        if (this.getX() >= this.mapLength - GAMEOVER_X) {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
@@ -1138,6 +1137,7 @@ class GameEngine extends Component {
         });
       });
     }
+    this.handleWindowResize();
   }
 
   //Ends game when timer reaches zero
@@ -1227,6 +1227,7 @@ class GameEngine extends Component {
             {!this.state.gameover && (
               <Timer
                 y={TOOLBAR_Y}
+                x={TOOLBAR_X}
                 pause={this.state.paused}
                 multi={this.state.multi}
                 timerCanStart={this.state.timerCanStart}
@@ -1235,7 +1236,7 @@ class GameEngine extends Component {
               />
             )}
 
-            <ProgressBar y={TOOLBAR_Y} />
+            <ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
             <Map
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
@@ -1244,6 +1245,7 @@ class GameEngine extends Component {
             />
             {boxes}
             <PauseButton
+              x={ICON_X}
               handleClick={() => this.pauseGame()}
               className="pauseButton"
             />
@@ -1251,8 +1253,8 @@ class GameEngine extends Component {
             <g>
               {/* player icon */}
               <circle
-                cx={40}
-                cy={140}
+                cx={ICON_X}
+                cy={TOOLBAR_Y + 100}
                 height={SPRITE_SIDE}
                 width={SPRITE_SIDE}
                 r={SPRITE_SIDE / 2}
@@ -1269,7 +1271,6 @@ class GameEngine extends Component {
             >
               <GameoverMenu
                 windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.props.goToMenu()}
                 guest={this.props.guest}

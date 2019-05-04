@@ -20,8 +20,6 @@ class Timer extends Component {
     super(props);
 
     this.state = Object.assign({}, START_TIME, {
-      guest: this.props.guest,
-      map: this.props.mapName,
       multi: this.props.multi,
       pause: this.props.pause,
       timerCanStart: this.props.timerCanStart,
@@ -121,16 +119,16 @@ class Timer extends Component {
 
   render() {
     return (
-      <Text x={1250} y={this.props.y + 25}>{`Time: ${this.state.minutes}:${
-        this.state.seconds
-      }`}</Text>
+      <Text x={this.props.x + 60} y={this.props.y + 25}>{`${
+        this.state.minutes
+      }:${this.state.seconds}`}</Text>
     );
   }
 }
 
 Timer.propTypes = {
-  guest: PropTypes.object,
-  mapName: PropTypes.string,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
   multi: PropTypes.bool.isRequired,
   pause: PropTypes.bool.isRequired,
   boot: PropTypes.func.isRequired
