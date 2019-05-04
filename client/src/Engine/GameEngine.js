@@ -51,7 +51,6 @@ const INITIAL_STATE = {
   y: 600,
   mapTranslation: 0,
   hideMenu: false,
-  windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
   players: undefined,
   color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
@@ -201,7 +200,6 @@ class GameEngine extends Component {
   // Resets our current window dimentions
   handleWindowResize() {
     this.setState({
-      windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     });
   }
@@ -219,7 +217,6 @@ class GameEngine extends Component {
      * (person may have changes window while playing so can't really make a default for it)
      */
     const restartState = Object.assign({}, INITIAL_STATE, {
-      windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
       restart: true
     });
@@ -1272,7 +1269,6 @@ class GameEngine extends Component {
             >
               <GameoverMenu
                 windowHeight={this.state.windowHeight}
-                windowWidth={this.state.windowWidth}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.props.goToMenu()}
                 guest={this.props.guest}
