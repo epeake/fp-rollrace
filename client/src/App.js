@@ -22,13 +22,6 @@ const GUEST_ACCOUNT = {
   map_1: Infinity
 };
 
-const Body = styled.div`
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  /* prevent page scrolling */
-  overflow: hidden;
-`;
 const StyledTitle = styled(title)`
   height: 100;
 `;
@@ -147,7 +140,7 @@ class App extends Component {
     switch (this.state.mode) {
       case 'menu':
         return (
-          <Body>
+          <div>
             <StyledTitle height="120" width="100%" />
             <div className="play-button">
               <StyledButton
@@ -189,40 +182,38 @@ class App extends Component {
               {!this.state.loggedIn && loginButton}
               {this.state.loggedIn && logoutButton}
             </div>
-          </Body>
+          </div>
         );
 
       case 'game':
         return (
-          <Body>
-            <GameEngine
-              mapProps={Object.assign(
-                {},
-                { map: this.state.map, strokeWidth: this.state.strokeWidth }
-              )}
-              goToMenu={this.handleGoToMenu}
-              guest={this.state.guest}
-              multi={this.state.multi}
-              playercolor={this.state.playercolor}
-            />
-          </Body>
+          <GameEngine
+            mapProps={Object.assign(
+              {},
+              { map: this.state.map, strokeWidth: this.state.strokeWidth }
+            )}
+            goToMenu={this.handleGoToMenu}
+            guest={this.state.guest}
+            multi={this.state.multi}
+            playercolor={this.state.playercolor}
+          />
         );
 
       case 'settings':
         return (
-          <Body>
+          <div>
             <Settings
               goToMenu={this.handleGoToMenu}
               selectedColor={this.selectColor}
             />
-          </Body>
+          </div>
         );
 
       case 'stats':
         return (
-          <Body>
+          <div>
             <Statistics goToMenu={this.handleGoToMenu} user={this.state.user} />
-          </Body>
+          </div>
         );
 
       // error
