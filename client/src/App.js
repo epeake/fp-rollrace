@@ -1,15 +1,15 @@
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import request from 'request-promise-native';
-import React, { Component } from 'react';
-import { ReactComponent as title } from './buttonSVGs/title.svg';
-import GameEngine from './GameEngine.js';
+import GameEngine from './Engine/GameEngine.js';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
-import realbutton from './buttonSVGs/realPlaybutton.svg';
-import settingsbutton from './buttonSVGs/settingsbutton.svg';
-import statsbutton from './buttonSVGs/statsbutton.svg';
-import Settings from './menus/settings.js';
-import Statistics from './menus/Statistics.js';
-import MapChoice from './MapChoice.js';
+import { ReactComponent as title } from './MainMenu/buttonSVGs/title.svg';
+import realbutton from './MainMenu/buttonSVGs/realPlaybutton.svg';
+import settingsbutton from './MainMenu/buttonSVGs/settingsbutton.svg';
+import statsbutton from './MainMenu/buttonSVGs/statsbutton.svg';
+import Settings from './MainMenu/Settings.js';
+import Statistics from './MainMenu/Statistics.js';
+import MapChoice from './MainMenu/MapChoice.js';
 import './App.css';
 
 const GOOGLE_CLIENT_ID =
@@ -46,6 +46,8 @@ class App extends Component {
       mode: 'menu',
       multi: false,
       loggedIn: false,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`
     };
