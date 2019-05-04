@@ -3,12 +3,12 @@ import { shallow, mount } from 'enzyme';
 import GameEngine from './GameEngine';
 import App from '../App.js';
 //import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
-import Timer from './Timer.js';
+// import Timer from './Timer.js';
 //import Map from './Map.js';
 //import Tutorial from './Tutorial.js';
 //import GameOverMenu from './menus/GameOverMenu.js';
 //import PauseMenu from './menus/PauseMenu.js';
-import { gameEngineProps } from '../setupTests';
+// import { gameEngineProps } from '../setupTests';
 
 // describe('GameEngine Tests', () => {
 //   /*  need these constants for these tests to apply
