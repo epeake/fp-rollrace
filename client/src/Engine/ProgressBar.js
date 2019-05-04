@@ -45,18 +45,18 @@ class ProgressBar extends Component {
   render() {
     return (
       <g>
-        <Bar width={200} height={20} x={this.props.x} y={this.props.y} />
+        <Bar width={200} height={20} x={this.props.x} y={this.props.y + 35} />
 
         <SpriteOne
           cx={this.state.player_1_pos} /*update player one position*/
-          cy={this.props.y + 10} /* offset */
+          cy={this.props.y + 45} /* offset */
           rx={2.0}
           ry={9.0}
         />
 
         <SpriteTwo
           cx={this.state.player_2_pos} /*update player two position*/
-          cy={this.props.y + 10}
+          cy={this.props.y + 45}
           rx={2.0}
           ry={9.0}
         />

@@ -1137,6 +1137,7 @@ class GameEngine extends Component {
         });
       });
     }
+    this.handleWindowResize();
   }
 
   //Ends game when timer reaches zero
@@ -1226,6 +1227,7 @@ class GameEngine extends Component {
             {!this.state.gameover && (
               <Timer
                 y={TOOLBAR_Y}
+                x={TOOLBAR_X}
                 pause={this.state.paused}
                 multi={this.state.multi}
                 timerCanStart={this.state.timerCanStart}
