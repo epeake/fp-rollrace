@@ -1201,17 +1201,6 @@ class GameEngine extends Component {
     if (!this.state.tutorial) {
       return (
         <>
-          <div>
-            {!this.state.gameover && (
-              <Timer
-                pause={this.state.paused}
-                multi={this.state.multi}
-                timerCanStart={this.state.timerCanStart}
-                boot={bool => this.setState({ gameover: bool })}
-                restart={this.state.restart}
-              />
-            )}
-          </div>
           {/* conditional rendering when the pause button is toggled */}
           {this.state.paused &&
             this.state.hideMenu &&
@@ -1244,6 +1233,17 @@ class GameEngine extends Component {
             height={this.state.windowHeight}
             width={this.state.windowWidth}
           >
+            {!this.state.gameover && (
+              <Timer
+                y={TOOLBAR_Y}
+                pause={this.state.paused}
+                multi={this.state.multi}
+                timerCanStart={this.state.timerCanStart}
+                boot={bool => this.setState({ gameover: bool })}
+                restart={this.state.restart}
+              />
+            )}
+
             <ProgressBar y={TOOLBAR_Y} />
             <Map
               translation={this.state.mapTranslation}
