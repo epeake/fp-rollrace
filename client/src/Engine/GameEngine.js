@@ -1240,9 +1240,13 @@ class GameEngine extends Component {
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
               stroke={this.props.mapProps.strokeWidth}
+              className="map"
             />
             {boxes}
-            <PauseButton handleClick={() => this.pauseGame()} />
+            <PauseButton
+              handleClick={() => this.pauseGame()}
+              className="pauseButton"
+            />
             {/* tutorial used to be here */}
             <g>
               {/* player icon */}
@@ -1253,6 +1257,7 @@ class GameEngine extends Component {
                 width={SPRITE_SIDE}
                 r={SPRITE_SIDE / 2}
                 fill={this.state.playercolor}
+                className="icon"
               />
             </g>
           </SVGLayer>

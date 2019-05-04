@@ -8,7 +8,7 @@ import Timer from './Timer.js';
 //import Tutorial from './Tutorial.js';
 //import GameOverMenu from './menus/GameOverMenu.js';
 //import PauseMenu from './menus/PauseMenu.js';
-import { gameEngineProps } from './setupTests';
+import { gameEngineProps } from '../setupTests';
 
 describe('GameEngine Tests', () => {
   /*  need these constants for these tests to apply
@@ -167,9 +167,9 @@ describe('Game Engine Menu Rendering Tests', () => {
     expect(app).toContainExactlyOneMatchingElement(GameEngine);
   });
 
-  test('Pause, tutorial, and icon exist', () => {
+  test('Pause and icon exist', () => {
     expect(game).toContainExactlyOneMatchingElement(Timer);
-    expect(game).toContainExactlyOneMatchingElement('.tutorial');
+    // expect(game).toContainExactlyOneMatchingElement('.tutorial');
     expect(game).toContainExactlyOneMatchingElement('.pauseButton');
   });
 
