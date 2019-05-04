@@ -262,10 +262,11 @@ class GameEngine extends Component {
   sendEndgameData() {
     const finishTime = parseInt(
       (new Date().getTime() -
-        this.variables.gameStartTime +
+        this.variables.gameStartTime -
         this.variables.timePaused) /
         1000
     );
+    console.log(finishTime);
 
     if (
       !this.state.guest // exclusive to members
@@ -1034,7 +1035,7 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - 667) {
+        if (this.getX() >= this.mapLength - 9067) {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
@@ -1232,7 +1233,7 @@ class GameEngine extends Component {
             viewBox={'0 0 2000 5000'}
             preserveAspectRatio={'xMaxYMin slice'}
             height={this.state.windowHeight}
-            width={this.state.windowWidth}
+            width={this.state.windowHeight * 2}
           >
             <ProgressBar y={TOOLBAR_Y} />
             <Map
