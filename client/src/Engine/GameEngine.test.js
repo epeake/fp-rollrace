@@ -1,9 +1,9 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import GameEngine from './GameEngine';
 import App from '../App.js';
 //import ChangeKeyMenu from './menus/ChangeKeyMenu.js';
-// import Timer from './Timer.js';
+import Timer from './Timer.js';
 //import Map from './Map.js';
 //import Tutorial from './Tutorial.js';
 //import GameOverMenu from './menus/GameOverMenu.js';

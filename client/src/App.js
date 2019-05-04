@@ -10,7 +10,6 @@ import statsbutton from './MainMenu/buttonSVGs/statsbutton.svg';
 import Settings from './MainMenu/Settings.js';
 import Statistics from './MainMenu/Statistics.js';
 import MapChoice from './MainMenu/MapChoice.js';
-import './App.css';
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
@@ -23,6 +22,13 @@ const GUEST_ACCOUNT = {
   map_1: Infinity
 };
 
+const Body = styled.div`
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  /* prevent page scrolling */
+  overflow: hidden;
+`;
 const StyledTitle = styled(title)`
   height: 100;
 `;
@@ -141,7 +147,7 @@ class App extends Component {
     switch (this.state.mode) {
       case 'menu':
         return (
-          <div>
+          <Body>
             <StyledTitle height="120" width="100%" />
             <div className="play-button">
               <StyledButton
@@ -183,38 +189,40 @@ class App extends Component {
               {!this.state.loggedIn && loginButton}
               {this.state.loggedIn && logoutButton}
             </div>
-          </div>
+          </Body>
         );
 
       case 'game':
         return (
-          <GameEngine
-            mapProps={Object.assign(
-              {},
-              { map: this.state.map, strokeWidth: this.state.strokeWidth }
-            )}
-            goToMenu={this.handleGoToMenu}
-            guest={this.state.guest}
-            multi={this.state.multi}
-            playercolor={this.state.playercolor}
-          />
+          <Body>
+            <GameEngine
+              mapProps={Object.assign(
+                {},
+                { map: this.state.map, strokeWidth: this.state.strokeWidth }
+              )}
+              goToMenu={this.handleGoToMenu}
+              guest={this.state.guest}
+              multi={this.state.multi}
+              playercolor={this.state.playercolor}
+            />
+          </Body>
         );
 
       case 'settings':
         return (
-          <div>
+          <Body>
             <Settings
               goToMenu={this.handleGoToMenu}
               selectedColor={this.selectColor}
             />
-          </div>
+          </Body>
         );
 
       case 'stats':
         return (
-          <div>
+          <Body>
             <Statistics goToMenu={this.handleGoToMenu} user={this.state.user} />
-          </div>
+          </Body>
         );
 
       // error
