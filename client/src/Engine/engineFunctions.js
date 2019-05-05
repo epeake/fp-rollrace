@@ -432,17 +432,6 @@ const spriteOnFlat = props => {
     mapLength: mapLength,
     map: map
   });
-  console.log({
-    mapTranslation: mapTranslation,
-    y: y,
-    mapTranslationStart: mapTranslationStart,
-    mapTranslationStartTime: mapTranslationStartTime,
-    atWall: atWall,
-    x: x,
-    mapLength: mapLength,
-    map: map
-  });
-  console.log(endOfPath);
   const pathEnd = getX({
     currentTime: endOfPath.time,
     mapTranslationStart: mapTranslationStart,
@@ -468,7 +457,6 @@ const spriteOnFlat = props => {
     map: map,
     paused: paused
   });
-  console.log(wall);
 
   if (!wall || endOfPath.time < wall.time) {
     return endOfPath;

@@ -316,10 +316,10 @@ class GameEngine extends Component {
         adjustedTime - currentTime < CONSTANTS.TIME_THRESH &&
         !this.state.paused
       ) {
-        console.log(this.variables.motionChange.event);
+        //console.log(this.variables.motionChange.event);
 
         const y = this.getY({
-          currentTime: new Date().getTime(),
+          currentTime: adjustedTime,
           descendStartTime: this.variables.descendStartTime,
           jumpStartTime: this.variables.jumpStartTime,
           jumpState: this.variables.jumpState,
@@ -350,7 +350,6 @@ class GameEngine extends Component {
           });
           this.variables.jumpState = CONSTANTS.jump.STOP;
         } else if (this.variables.motionChange.event === 'fall') {
-          console.log('ok?');
           this.variables.descendStartTime = currentTime;
           this.variables.yStart = y;
           this.variables.jumpState = CONSTANTS.jump.DOWN;
@@ -629,7 +628,7 @@ class GameEngine extends Component {
               <circle
                 cx={CONSTANTS.ICON_X}
                 cy={CONSTANTS.TOOLBAR_Y + 100}
-                r={CONSTANTS.SPRITE_SIDE / 2}
+                r={CONSTANTS.SPRITE_SIDE / 4}
                 fill={this.state.playercolor}
                 className="icon"
               />

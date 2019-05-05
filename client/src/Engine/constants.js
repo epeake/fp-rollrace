@@ -1,6 +1,6 @@
 // Jump state enum for clarity
 const RENDER_TIMEOUT = 20;
-const STARTING_Y = 550;
+const STARTING_Y = 547;
 
 export const CONSTANTS = {
   jump: { STOP: 0, UP: 1, DOWN: 2 },
@@ -15,7 +15,7 @@ export const CONSTANTS = {
   JUMP_POWER: 0.7,
   SCROLL_SPEED: 0.4,
   SPRITE_SIDE: 100,
-  PATH_THRESH: 10,
+  PATH_THRESH: 4,
   TIME_THRESH: RENDER_TIMEOUT,
   INITIAL_STATE: {
     dataSent: false,
