@@ -47,8 +47,14 @@ class ChangeKeyMenu extends Component {
 
   // Give an update if the props change so that the user can see
   // which key they chose before going back to pause menu.
-  componentWillReceiveProps(nextProps) {
-    this.setState({ currentKey: nextProps.jumpKey });
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.jumpKey !== state.currentKey) {
+      return {
+        currentKey: props.jumpKey
+      };
+    }
+    return null;
   }
 
   render() {
