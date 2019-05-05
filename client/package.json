@@ -31,7 +31,8 @@
     "reactstrap": "^7.1.0",
     "request-promise-native": "^1.0.7",
     "socket.io-client": "^2.2.0",
-    "styled-components": "^4.2.0"
+    "styled-components": "^4.2.0",
+    "styled-react-modal": "^1.2.1"
   },
   "devDependencies": {
     "enzyme": "^3.8.0",
