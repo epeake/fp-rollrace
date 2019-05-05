@@ -3,11 +3,30 @@ import PropTypes from 'prop-types';
 import { Row } from 'reactstrap';
 import styled from 'styled-components';
 
-const ColorLabel = styled.div`
-  display: inline-block;
-  width: 30%;
-  text-align: left;
+const Background = styled.div`
+  background-color: #323232;
+  height: 100vh;
+`;
+
+// CSS for title changes whther or not user is on chrome.  Condition checks for chrome
+const Title = styled.h1`
+  font-family: 'Gugi', cursive;
+  font-size: 600%;
   color: white;
+`;
+
+const OptionText = styled.h3`
+  font-family: 'Gugi', cursive;
+  font-size: 200%;
+  color: white;
+`;
+
+const SettingsOption = styled.div`
+  padding-top: 5%;
+  padding-bottom: 5%;
+  background-color: #323232;
+  margin-left: 2%;
+  margin-right: 2%;
 `;
 
 const StyledButton = styled.button`
@@ -21,29 +40,10 @@ const StyledButton = styled.button`
   }
 `;
 
-const Background = styled.div`
-  background-color: #323232;
-  height: 100vh;
-`;
-
-const SettingsOption = styled.div`
-  padding-top: 5%;
-  padding-bottom: 5%;
-  background-color: #323232;
-  margin-left: 2%;
-  margin-right: 2%;
-`;
-
-// CSS for title changes whther or not user is on chrome.  Condition checks for chrome
-const Title = styled.h1`
-  font-family: 'Gugi', cursive;
-  font-size: 600%;
-  color: white;
-`;
-
-const OptionText = styled.h3`
-  font-family: 'Gugi', cursive;
-  font-size: 200%;
+const ColorLabel = styled.div`
+  display: inline-block;
+  width: 30%;
+  text-align: left;
   color: white;
 `;
 
@@ -97,10 +97,7 @@ class Settings extends Component {
     return (
       <Background>
         <Title> Settings </Title>
-        <StyledButton onClick={this.handleClick}>
-          {' '}
-          {'<-'} Main Menu{' '}
-        </StyledButton>
+        <StyledButton onClick={this.handleClick}>{'<-'} Main Menu</StyledButton>
         <Row>
           <SettingsOption>
             <OptionText> Choose Your Color </OptionText>
