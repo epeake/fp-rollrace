@@ -1,5 +1,7 @@
+const { CONSTANTS } = require('./constants.js');
+
 // detects a future wall and returns the time of collision
-export const findWall = props => {
+const findWall = props => {
   // define local variables
   const {
     mapTranslation,
@@ -16,7 +18,7 @@ export const findWall = props => {
 
   let currentX = Math.round(
     this.variables.x +
-      SPRITE_SIDE -
+      CONSTANTS.SPRITE_SIDE -
       this.props.mapProps.strokeWidth -
       mapTranslation
   );
@@ -29,7 +31,7 @@ export const findWall = props => {
           mapTranslationStart: mapTranslationStart,
           mapTranslationStartTime: mapTranslationStartTime,
           atWall: atWall,
-          x: currentX - SPRITE_SIDE
+          x: currentX - CONSTANTS.SPRITE_SIDE
         }),
         descendStartTime: descendStartTime,
         jumpStartTime: jumpStartTime,
@@ -44,7 +46,7 @@ export const findWall = props => {
             mapTranslationStart: mapTranslationStart,
             mapTranslationStartTime: mapTranslationStartTime,
             atWall: atWall,
-            x: currentX - SPRITE_SIDE
+            x: currentX - CONSTANTS.SPRITE_SIDE
           }),
           event: 'block'
         };
@@ -55,7 +57,7 @@ export const findWall = props => {
 };
 
 // detects a future path and returns the time of landing
-export const findPath = props => {
+const findPath = props => {
   // declare local variables
   const {
     currentTime,
@@ -76,10 +78,13 @@ export const findPath = props => {
   for (currentX; currentX <= maxX; currentX++) {
     const locations = this.map[currentX];
     for (let j = 0; j < locations.length; j++) {
-      if (locations[j][0] === 'h' && locations[j][1] - SPRITE_SIDE < highest) {
+      if (
+        locations[j][0] === 'h' &&
+        locations[j][1] - CONSTANTS.SPRITE_SIDE < highest
+      ) {
         const time = this.getTimeForGivenY({
           yStart: yStart,
-          y: locations[j][1] - SPRITE_SIDE,
+          y: locations[j][1] - CONSTANTS.SPRITE_SIDE,
           descendStartTime: descendStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
@@ -92,9 +97,9 @@ export const findPath = props => {
           mapTranslation: mapTranslation,
           atWall: atWall
         });
-        const xFront = xBack + SPRITE_SIDE;
+        const xFront = xBack + CONSTANTS.SPRITE_SIDE;
         if (xBack <= currentX && currentX <= xFront) {
-          highest = locations[j][1] - SPRITE_SIDE;
+          highest = locations[j][1] - CONSTANTS.SPRITE_SIDE;
         }
       }
     }
@@ -120,7 +125,7 @@ export const findPath = props => {
 };
 
 // detects the end of the current path and returns the time of arrival
-export const findEndOfPath = props => {
+const findEndOfPath = props => {
   // declare local variables
   const {
     mapTranslation,
@@ -139,14 +144,16 @@ export const findEndOfPath = props => {
     for (let j = 0; j < locations.length; j++) {
       if (
         !foundPath &&
-        Math.abs(locations[j][1] - (y + SPRITE_SIDE)) < PATH_THRESH
+        Math.abs(locations[j][1] - (y + CONSTANTS.SPRITE_SIDE)) <
+          CONSTANTS.PATH_THRESH
       ) {
         foundPath = true;
       }
       if (
         locations[j][0] === 'b' ||
         (locations[j][0] === 'h' &&
-          Math.abs(locations[j][1] - (y + SPRITE_SIDE)) < PATH_THRESH) ||
+          Math.abs(locations[j][1] - (y + CONSTANTS.SPRITE_SIDE)) <
+            CONSTANTS.PATH_THRESH) ||
         !foundPath
       ) {
         found = true;
@@ -168,11 +175,12 @@ export const findEndOfPath = props => {
 };
 
 // checks to see if a given y value matches a wall
-export const checkAtWall = (location, y) => {
+const checkAtWall = (location, y) => {
   if (
     location[0] === 'b' &&
     ((location[1] <= y && y <= location[2]) ||
-      (location[1] <= y + SPRITE_SIDE && y + SPRITE_SIDE <= location[2]))
+      (location[1] <= y + CONSTANTS.SPRITE_SIDE &&
+        y + CONSTANTS.SPRITE_SIDE <= location[2]))
   ) {
     return true;
   }
@@ -184,22 +192,22 @@ export const checkAtWall = (location, y) => {
  * comes from solving the distance function in getY for time
  */
 
-export const getTimeForGivenY = props => {
-  if (props.jumpState === jump.DOWN) {
+const getTimeForGivenY = props => {
+  if (props.jumpState === CONSTANTS.jump.DOWN) {
     return (
-      Math.sqrt((-props.yStart + props.y) / (0.5 * JUMP_SPEED)) +
+      Math.sqrt((-props.yStart + props.y) / (0.5 * CONSTANTS.JUMP_SPEED)) +
       props.descendStartTime
     );
-  } else if (props.jumpState === jump.UP) {
+  } else if (props.jumpState === CONSTANTS.jump.UP) {
     return (
       (-Math.sqrt(
-        JUMP_POWER ** 2 +
-          2 * props.y * JUMP_SPEED -
-          2 * JUMP_SPEED * props.yStart
+        CONSTANTS.JUMP_POWER ** 2 +
+          2 * props.y * CONSTANTS.JUMP_SPEED -
+          2 * CONSTANTS.JUMP_SPEED * props.yStart
       ) +
-        JUMP_POWER +
-        props.jumpStartTime * JUMP_SPEED) /
-      JUMP_SPEED
+        CONSTANTS.JUMP_POWER +
+        props.jumpStartTime * CONSTANTS.JUMP_SPEED) /
+      CONSTANTS.JUMP_SPEED
     );
   } else {
     console.log('returning undefined');
@@ -211,21 +219,21 @@ export const getTimeForGivenY = props => {
  * return the time when the sprite will reach the given x value also given the state of the game
  * comes from solving the distance function in getX for time
  */
-export const getTimeForGivenX = props => {
+const getTimeForGivenX = props => {
   if (props.atWall) {
     console.log('return undefined');
     return undefined;
   } else {
     return (
       (props.mapTranslationStart - (this.variables.x - props.x)) /
-        SCROLL_SPEED +
+        CONSTANTS.SCROLL_SPEED +
       props.mapTranslationStartTime
     );
   }
 };
 
 // return the x value of the sprite given current state of the game
-export const getX = (
+const getX = (
   props = {
     currentTime: new Date().getTime(),
     mapTranslationStart: this.variables.mapTranslationStart,
@@ -247,7 +255,7 @@ export const getX = (
 };
 
 // return the mapTranslation value given current state of the game
-export const getMapTranslation = (
+const getMapTranslation = (
   props = {
     currentTime: new Date().getTime(),
     mapTranslationStart: this.variables.mapTranslationStart,
@@ -261,7 +269,8 @@ export const getMapTranslation = (
   } else {
     return (
       props.mapTranslationStart -
-      (props.currentTime - props.mapTranslationStartTime) * SCROLL_SPEED
+      (props.currentTime - props.mapTranslationStartTime) *
+        CONSTANTS.SCROLL_SPEED
     );
   }
 };
@@ -277,24 +286,28 @@ export const getY = (
     y: this.state.y
   }
 ) => {
-  if (props.jumpState === jump.STOP || this.state.paused) {
+  if (props.jumpState === CONSTANTS.jump.STOP || this.state.paused) {
     return props.y;
-  } else if (props.jumpState === jump.DOWN) {
+  } else if (props.jumpState === CONSTANTS.jump.DOWN) {
     return (
       props.yStart +
-      0.5 * (props.currentTime - props.descendStartTime) ** 2 * JUMP_SPEED
+      0.5 *
+        (props.currentTime - props.descendStartTime) ** 2 *
+        CONSTANTS.JUMP_SPEED
     );
-  } else if (props.jumpState === jump.UP) {
+  } else if (props.jumpState === CONSTANTS.jump.UP) {
     return (
       props.yStart -
-      ((props.currentTime - props.jumpStartTime) * JUMP_POWER -
-        0.5 * (props.currentTime - props.jumpStartTime) ** 2 * JUMP_SPEED)
+      ((props.currentTime - props.jumpStartTime) * CONSTANTS.JUMP_POWER -
+        0.5 *
+          (props.currentTime - props.jumpStartTime) ** 2 *
+          CONSTANTS.JUMP_SPEED)
     );
   }
 };
 
 // determines what should happen when the sprite is stuck at a wall
-export const spriteAtWall = props => {
+const spriteAtWall = props => {
   // declare local variables
   const {
     currentTime,
@@ -324,8 +337,9 @@ export const spriteAtWall = props => {
     currentX++;
   }
 
-  if (jumpState === jump.UP) {
-    const peakTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
+  if (jumpState === CONSTANTS.jump.UP) {
+    const peakTime =
+      CONSTANTS.JUMP_POWER / CONSTANTS.JUMP_SPEED + jumpStartTime;
     if (
       this.getY({
         currentTime: peakTime,
@@ -335,14 +349,14 @@ export const spriteAtWall = props => {
         yStart: yStart,
         y: y
       }) >
-      wall[1] - SPRITE_SIDE
+      wall[1] - CONSTANTS.SPRITE_SIDE
     ) {
       return { time: peakTime, event: 'fall' };
     } else {
       return {
         time: this.getTimeForGivenY({
           yStart: yStart,
-          y: wall[1] - SPRITE_SIDE,
+          y: wall[1] - CONSTANTS.SPRITE_SIDE,
           descendStartTime: descendStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
@@ -375,7 +389,7 @@ export const spriteAtWall = props => {
       descendStartTime: descendStartTime,
       jumpState: jumpState,
       jumpStartTime: jumpStartTime,
-      maxX: currentX + SPRITE_SIDE
+      maxX: currentX + CONSTANTS.SPRITE_SIDE
     });
     if (!timeToLand || timeToLand.time > timeToEscape.time) {
       return timeToEscape;
@@ -386,7 +400,7 @@ export const spriteAtWall = props => {
 };
 
 // determines what should happen when the sprite is moving along a path
-export const spriteOnFlat = props => {
+const spriteOnFlat = props => {
   // declare local variables
   const {
     y,
@@ -417,7 +431,7 @@ export const spriteOnFlat = props => {
     mapTranslation: mapTranslation,
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
-    maxX: pathEnd + SPRITE_SIDE,
+    maxX: pathEnd + CONSTANTS.SPRITE_SIDE,
     descendStartTime: descendStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
@@ -434,7 +448,7 @@ export const spriteOnFlat = props => {
 };
 
 // determines what should happen when the sprite is moving up
-export const spriteGoingUp = props => {
+const spriteGoingUp = props => {
   // declare local variables
   const {
     y,
@@ -447,7 +461,8 @@ export const spriteGoingUp = props => {
     mapTranslationStart,
     mapTranslationStartTime
   } = props;
-  const jumpEndTime = JUMP_POWER / JUMP_SPEED + jumpStartTime;
+  const jumpEndTime =
+    CONSTANTS.JUMP_POWER / CONSTANTS.JUMP_SPEED + jumpStartTime;
 
   const jumpEndX = this.getX({
     currentTime: jumpEndTime,
@@ -477,7 +492,7 @@ export const spriteGoingUp = props => {
 };
 
 // determines what should happen when the sprite is moving down
-export const spriteGoingDown = props => {
+const spriteGoingDown = props => {
   // declare local variables
   const {
     currentTime,
@@ -506,7 +521,7 @@ export const spriteGoingDown = props => {
       mapTranslationStartTime: mapTranslationStartTime,
       mapTranslation: mapTranslation,
       atWall: atWall
-    }) + SPRITE_SIDE;
+    }) + CONSTANTS.SPRITE_SIDE;
 
   const wall = this.findWall({
     mapTranslation: mapTranslation,
@@ -548,7 +563,7 @@ export const spriteGoingDown = props => {
     console.log('panic'); // this shouldn't happen
   }
 };
-export const findNextChange = () => {
+const findNextChange = () => {
   // declare local variables
   const currentTime = new Date().getTime();
   const y = this.getY();
@@ -566,7 +581,7 @@ export const findNextChange = () => {
   } = this.variables;
 
   // don't do anything if the character isn't moving
-  if (jumpState !== jump.STOP || !atWall) {
+  if (jumpState !== CONSTANTS.jump.STOP || !atWall) {
     if (atWall) {
       /*
        * 3 options:
@@ -588,7 +603,7 @@ export const findNextChange = () => {
       });
     }
     // (!this.AtWall)
-    else if (jumpState === jump.STOP) {
+    else if (jumpState === CONSTANTS.jump.STOP) {
       /*
        * 2 options:
        *  1. the sprite hits a wall
@@ -605,7 +620,7 @@ export const findNextChange = () => {
         mapTranslationStart: mapTranslationStart,
         mapTranslationStartTime: mapTranslationStartTime
       });
-    } else if (jumpState === jump.UP) {
+    } else if (jumpState === CONSTANTS.jump.UP) {
       /*
        * 2 options:
        *  1. the sprite reaches max height and starts to fall down
@@ -647,4 +662,21 @@ export const findNextChange = () => {
   } else {
     return { time: undefined, event: 'nothing' };
   }
+};
+
+module.exports = {
+  findWall,
+  findPath,
+  findEndOfPath,
+  checkAtWall,
+  getTimeForGivenX,
+  getTimeForGivenY,
+  getX,
+  getY,
+  getMapTranslation,
+  spriteAtWall,
+  spriteOnFlat,
+  spriteGoingUp,
+  spriteGoingDown,
+  findNextChange
 };

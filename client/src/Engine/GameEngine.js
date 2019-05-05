@@ -1,84 +1,46 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import request from 'request-promise-native';
-import io from 'socket.io-client';
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
-import PauseMenu from './Menus/PauseMenu.js';
-import PauseButton from './PauseButton.js';
-import GameoverMenu from './Menus/GameoverMenu.js';
-import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
-import ProgressBar from './ProgressBar.js';
-import Map from './Map.js';
-import Timer from './Timer.js';
-import Tutorial from './Tutorial.js';
+const React = require('react');
+const { Component } = require('react');
+const PropTypes = require('prop-types');
+const styled = require('styled-components');
+const request = require('request-promise-native');
+const io = require('socket.io-client');
+const { findMapSpan, buildMapHashtable } = require('./mapParser.js');
+const PauseMenu = require('./Menus/PauseMenu.js');
+const PauseButton = require('./PauseButton.js');
+const GameoverMenu = require('./Menus/GameoverMenu.js');
+const ChangeKeyMenu = require('./Menus/ChangeKeyMenu.js');
+const ProgressBar = require('./ProgressBar.js');
+const Map = require('./Map.js');
+const Timer = require('./Timer.js');
+const Tutorial = require('./Tutorial.js');
+const { CONSTANTS } = require('./constants.js');
+
+const {
+  findWall,
+  findPath,
+  findEndOfPath,
+  checkAtWall,
+  getTimeForGivenX,
+  getTimeForGivenY,
+  getX,
+  getY,
+  getMapTranslation,
+  spriteAtWall,
+  spriteOnFlat,
+  spriteGoingUp,
+  spriteGoingDown,
+  findNextChange
+} = require('./engineFunctions.js');
 
 const SVGLayer = styled.svg`
   position: absolute;
 `;
 
-// Jump state enum for clarity
-const jump = {
-  STOP: 0,
-  UP: 1,
-  DOWN: 2
-};
-
-// time between updates sent to the server
-const UPDATE_INTERVAL = 20; // milliseconds
-const TOOLBAR_Y = 15;
-const TOOLBAR_X = 900;
-const ICON_X = 40;
-const GAMEOVER_X = 667;
-const UPDATE_TIMEOUT = 20; // time between motionChange updates
-const RENDER_TIMEOUT = 20; // time between rerenders
-const JUMP_SPEED = 0.0013; // acceleration
-const JUMP_POWER = 0.7; // jumping velocity
-const SCROLL_SPEED = 0.4;
-const SPRITE_SIDE = 50;
-const PATH_THRESH = 5;
-const TIME_THRESH = RENDER_TIMEOUT;
-
-const INITIAL_STATE = {
-  dataSent: false,
-  tutorial: false,
-  paused: false,
-  gameover: false,
-  jumpKey: 32, // space bar
-  startKey: 115, // s key
-  changingKey: false,
-  timerCanStart: false,
-  y: 600,
-  mapTranslation: 0,
-  hideMenu: false,
-  windowHeight: window.innerHeight,
-  players: undefined,
-  color: `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() *
-    255})`
-};
-
-const INITIAL_VARIABLES = {
-  gameStartTime: undefined,
-  x: 200,
-  minY: 1000, // should loop over all of map or whatever to find this.
-  // will take an object of the following form {time: , event: } options for event are block, go, land, and fall
-  motionChange: undefined,
-  yStart: INITIAL_STATE.y,
-  jumpState: jump.STOP,
-  jumpStartTime: undefined,
-  descendStartTime: undefined,
-  mapTranslationStart: 0,
-  atWall: false,
-  mapTranslationStartTime: undefined,
-  pauseOffsetStart: undefined,
-  timePaused: 0
-};
-
 class GameEngine extends Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign({}, INITIAL_STATE, {
+    this.state = Object.assign({}, CONSTANTS.INITIAL_STATE, {
       guest: this.props.guest,
       map: this.props.mapName,
       multi: this.props.multi,
@@ -87,7 +49,7 @@ class GameEngine extends Component {
     });
 
     this.restartMinutes = this.props.minutes;
-    this.variables = Object.assign({}, INITIAL_VARIABLES);
+    this.variables = Object.assign({}, CONSTANTS.INITIAL_VARIABLES);
 
     if (this.props.multi) {
       /*
@@ -117,20 +79,20 @@ class GameEngine extends Component {
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
     this.sendEndgameData = this.sendEndgameData.bind(this);
-    this.findWall = this.findWall.bind(this);
-    this.findPath = this.findPath.bind(this);
-    this.findEndOfPath = this.findEndOfPath.bind(this);
-    this.checkAtWall = this.checkAtWall.bind(this);
-    this.getTimeForGivenY = this.getTimeForGivenY.bind(this);
-    this.getTimeForGivenX = this.getTimeForGivenX.bind(this);
-    this.getX = this.getX.bind(this);
-    this.getMapTranslation = this.getMapTranslation.bind(this);
-    this.getY = this.getY.bind(this);
-    this.spriteAtWall = this.spriteAtWall.bind(this);
-    this.spriteOnFlat = this.spriteOnFlat.bind(this);
-    this.spriteGoingUp = this.spriteGoingUp.bind(this);
-    this.spriteGoingDown = this.spriteGoingDown.bind(this);
-    this.findNextChange = this.findNextChange.bind(this);
+    this.findWall = findWall.bind(this);
+    this.findPath = findPath.bind(this);
+    this.findEndOfPath = findEndOfPath.bind(this);
+    this.checkAtWall = checkAtWall.bind(this);
+    this.getTimeForGivenY = getTimeForGivenY.bind(this);
+    this.getTimeForGivenX = getTimeForGivenX.bind(this);
+    this.getX = getX.bind(this);
+    this.getMapTranslation = getMapTranslation.bind(this);
+    this.getY = getY.bind(this);
+    this.spriteAtWall = spriteAtWall.bind(this);
+    this.spriteOnFlat = spriteOnFlat.bind(this);
+    this.spriteGoingUp = spriteGoingUp.bind(this);
+    this.spriteGoingDown = spriteGoingDown.bind(this);
+    this.findNextChange = findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.timeOut = this.timeOut.bind(this);
@@ -159,7 +121,7 @@ class GameEngine extends Component {
   // Initiates jump
   handleJumpKey() {
     this.variables.yStart = this.getY();
-    this.variables.jumpState = jump.UP;
+    this.variables.jumpState = CONSTANTS.jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
     (async () => {
       this.variables.motionChange = this.findNextChange();
@@ -180,7 +142,7 @@ class GameEngine extends Component {
       this.handleChangeJumpKey(event);
     } else if (
       event.keyCode === this.state.jumpKey &&
-      this.variables.jumpState === jump.STOP &&
+      this.variables.jumpState === CONSTANTS.jump.STOP &&
       !this.state.paused &&
       this.variables.gameStartTime
     ) {
@@ -216,11 +178,11 @@ class GameEngine extends Component {
      * make sure window is correct size
      * (person may have changes window while playing so can't really make a default for it)
      */
-    const restartState = Object.assign({}, INITIAL_STATE, {
+    const restartState = Object.assign({}, CONSTANTS.INITIAL_STATE, {
       windowHeight: window.innerHeight,
       restart: true
     });
-    this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
+    this.variables = Object.assign(this.variables, CONSTANTS.INITIAL_VARIABLES);
     this.setState(restartState);
     this.startCountdown();
   }
@@ -331,7 +293,7 @@ class GameEngine extends Component {
       if (
         this.variables.motionChange &&
         this.variables.motionChange.event !== 'nothing' &&
-        adjustedTime - currentTime < TIME_THRESH &&
+        adjustedTime - currentTime < CONSTANTS.TIME_THRESH &&
         !this.state.paused
       ) {
         //console.log(this.variables.motionChange.event);
@@ -364,23 +326,23 @@ class GameEngine extends Component {
           this.setState({
             y: y - this.props.mapProps.strokeWidth / 2
           });
-          this.variables.jumpState = jump.STOP;
+          this.variables.jumpState = CONSTANTS.jump.STOP;
         } else if (this.variables.motionChange.event === 'fall') {
           this.variables.descendStartTime = currentTime;
           this.variables.yStart = y;
-          this.variables.jumpState = jump.DOWN;
+          this.variables.jumpState = CONSTANTS.jump.DOWN;
         }
         this.variables.motionChange = undefined;
         (async () => {
           this.variables.motionChange = this.findNextChange();
         })();
       }
-    }, UPDATE_TIMEOUT);
+    }, CONSTANTS.UPDATE_TIMEOUT);
 
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - GAMEOVER_X) {
+        if (this.getX() >= this.mapLength - CONSTANTS.GAMEOVER_X) {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
@@ -393,7 +355,7 @@ class GameEngine extends Component {
           });
         }
       }
-    }, RENDER_TIMEOUT);
+    }, CONSTANTS.RENDER_TIMEOUT);
   }
 
   componentDidUpdate() {
@@ -456,7 +418,7 @@ class GameEngine extends Component {
           this.socket.emit('CHANGE_POS', updatePlayer, data => {
             this.setState({ players: data });
           });
-        }, UPDATE_INTERVAL);
+        }, CONSTANTS.UPDATE_INTERVAL);
 
         /*
           Using the mapTranslation allows THIS player to keep track of where OTHER
@@ -505,9 +467,9 @@ class GameEngine extends Component {
         key={this.socket ? this.socket.id : '1'}
         cx={this.variables.x}
         cy={this.state.y}
-        height={SPRITE_SIDE}
-        width={SPRITE_SIDE}
-        r={SPRITE_SIDE}
+        height={CONSTANTS.SPRITE_SIDE}
+        width={CONSTANTS.SPRITE_SIDE}
+        r={CONSTANTS.SPRITE_SIDE}
         fill={this.state.playercolor}
       />
     ];
@@ -526,7 +488,7 @@ class GameEngine extends Component {
                 // based on their x coordinate
                 cx={this.getMapTranslation() - player.mapTrans + 200}
                 cy={player.y}
-                r={SPRITE_SIDE}
+                r={CONSTANTS.SPRITE_SIDE}
                 fill={player.color}
                 fill-opacity="0.4"
               />
@@ -572,8 +534,8 @@ class GameEngine extends Component {
           >
             {!this.state.gameover && (
               <Timer
-                y={TOOLBAR_Y}
-                x={TOOLBAR_X}
+                y={CONSTANTS.TOOLBAR_Y}
+                x={CONSTANTS.TOOLBAR_X}
                 pause={this.state.paused}
                 multi={this.state.multi}
                 timerCanStart={this.state.timerCanStart}
@@ -582,7 +544,7 @@ class GameEngine extends Component {
               />
             )}
 
-            <ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
+            <ProgressBar y={CONSTANTS.TOOLBAR_Y} x={CONSTANTS.TOOLBAR_X} />
             <Map
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
@@ -591,7 +553,7 @@ class GameEngine extends Component {
             />
             {boxes}
             <PauseButton
-              x={ICON_X}
+              x={CONSTANTS.ICON_X}
               handleClick={() => this.pauseGame()}
               className="pauseButton"
             />
@@ -599,11 +561,11 @@ class GameEngine extends Component {
             <g>
               {/* player icon */}
               <circle
-                cx={ICON_X}
-                cy={TOOLBAR_Y + 100}
-                height={SPRITE_SIDE}
-                width={SPRITE_SIDE}
-                r={SPRITE_SIDE / 2}
+                cx={CONSTANTS.ICON_X}
+                cy={CONSTANTS.TOOLBAR_Y + 100}
+                height={CONSTANTS.SPRITE_SIDE}
+                width={CONSTANTS.SPRITE_SIDE}
+                r={CONSTANTS.SPRITE_SIDE / 2}
                 fill={this.state.playercolor}
                 className="icon"
               />
