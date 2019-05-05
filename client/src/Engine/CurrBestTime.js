@@ -18,5 +18,5 @@ export default function CurrBestTime(props) {
 CurrBestTime.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  score: PropTypes.number.isRequired
+  score: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };

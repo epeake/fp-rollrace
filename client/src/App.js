@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
+// import { Button, ButtonGroup } from 'reactstrap';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import GameEngine from './Engine/GameEngine.js';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
-import { ReactComponent as title } from './MainMenu/buttonSVGs/title.svg';
-import realbutton from './MainMenu/buttonSVGs/realPlaybutton.svg';
-import settingsbutton from './MainMenu/buttonSVGs/settingsbutton.svg';
-import statsbutton from './MainMenu/buttonSVGs/statsbutton.svg';
 import Settings from './MainMenu/Settings.js';
 import Statistics from './MainMenu/Statistics.js';
-import MapChoice from './MainMenu/MapChoice.js';
+// import MapChoice from './MainMenu/MapChoice.js';
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
@@ -22,13 +19,37 @@ const GUEST_ACCOUNT = {
   map_1: Infinity
 };
 
-const StyledTitle = styled(title)`
-  height: 100;
+const CenteredDiv = styled.div`
+  text-align: center;
+  padding: 0px;
 `;
 
-const StyledButton = styled.img`
-  display: block;
-  margin: auto;
+const Background = styled.div`
+  background-color: black;
+  margin: 0px;
+  height: 100vh;
+`;
+
+const Title = styled.h1`
+  background: linear-gradient(
+    52deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(255, 255, 255, 1) 59%,
+    rgba(254, 253, 252, 1) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-top: 10%;
+  padding-bottom: 10%;
+  font-family: 'Gugi', cursive;
+  font-size: 1200%;
+`;
+
+const CurrentUser = styled.h3`
+  background: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 100%;
 `;
 
 /* eslint-disable react/prefer-stateless-function */
@@ -138,49 +159,65 @@ class App extends Component {
     switch (this.state.mode) {
       case 'menu':
         return (
-          <div>
-            <StyledTitle height="120" width="100%" />
-            <div className="play-button">
-              <StyledButton
-                src={realbutton}
-                height="50"
-                alt="play"
-                onClick={() => this.setState({ mode: 'game', multi: false })}
-              />
-              <StyledButton
-                src={realbutton}
-                height="50"
-                alt="playmulti"
-                onClick={() => this.setState({ mode: 'game', multi: true })}
-              />
-              <StyledButton
-                src={settingsbutton}
-                height="50"
-                alt="settings"
-                onClick={() => this.setState({ mode: 'settings' })}
-              />
-              <StyledButton
-                src={statsbutton}
-                height="50"
-                alt="stats"
-                onClick={() =>
-                  this.setState({ mode: 'stats' }, this.handleStats)
-                }
-              />
-            </div>
-            <MapChoice
-              key={'mapchoice'}
-              func={() => console.log('func called')}
-            />
+          <Background>
+            <CenteredDiv>
+              <Title>
+                Rollrace
+                <p className="lead">Press space to jump!</p>
+              </Title>
+            </CenteredDiv>
+            <CenteredDiv>
+              <div>
+                <button
+                  size="lg"
+                  color="success"
+                  className="single"
+                  onClick={() => this.setState({ mode: 'game', multi: false })}
+                >
+                  PLAY
+                </button>
+                &nbsp;&nbsp;&nbsp;
+                <button
+                  size="lg"
+                  color="success"
+                  className="multi"
+                  onClick={() => this.setState({ mode: 'game', multi: true })}
+                >
+                  Play Multi
+                </button>
+                &nbsp;&nbsp;&nbsp;
+                <button
+                  size="lg"
+                  color="success"
+                  className="settings"
+                  onClick={() => this.setState({ mode: 'settings' })}
+                >
+                  Settings
+                </button>{' '}
+                &nbsp;&nbsp;&nbsp;
+                <button
+                  size="lg"
+                  color="success"
+                  className="stats"
+                  onClick={() =>
+                    this.setState({ mode: 'stats' }, this.handleStats)
+                  }
+                >
+                  Statistics
+                </button>
+                {'  '}
+              </div>
+            </CenteredDiv>
+
             <div>
-              <h3>
+              <CurrentUser>
                 Current User:{' '}
                 {this.state.user ? this.state.user.email : 'Guest'}
-              </h3>
+              </CurrentUser>
               {!this.state.loggedIn && loginButton}
               {this.state.loggedIn && logoutButton}
             </div>
-          </div>
+          </Background>
         );
 
       case 'game':
@@ -221,4 +258,8 @@ class App extends Component {
   }
 }
 
+// <MapChoice
+//   key={'mapchoice'}
+//   func={() => console.log('func called')}
+// />
 export default App;
