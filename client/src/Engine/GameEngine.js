@@ -18,6 +18,13 @@ const SVGLayer = styled.svg`
   position: absolute;
 `;
 
+// so is still black past the SVG boundary
+const Background = styled.div`
+  background-color: #000000;
+  margin: 0px;
+  height: 100vh;
+`;
+
 // Jump state enum for clarity
 const jump = {
   STOP: 0,
@@ -30,7 +37,7 @@ const UPDATE_INTERVAL = 20; // milliseconds
 const TOOLBAR_Y = 15;
 const TOOLBAR_X = 800;
 const ICON_X = 40;
-const GAMEOVER_X = 9067;
+const GAMEOVER_X = 667;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
 const JUMP_SPEED = 0.0013; // acceleration
@@ -1181,8 +1188,8 @@ class GameEngine extends Component {
         key={this.socket ? this.socket.id : '1'}
         cx={this.variables.x}
         cy={this.state.y}
-        height={SPRITE_SIDE}
-        width={SPRITE_SIDE}
+        stroke="white"
+        strokeWidth="1"
         r={SPRITE_SIDE}
         fill={this.state.playercolor}
       />
@@ -1202,6 +1209,8 @@ class GameEngine extends Component {
                 // based on their x coordinate
                 cx={this.getMapTranslation() - player.mapTrans + 200}
                 cy={player.y}
+                stroke="white"
+                strokeWidth="1"
                 r={SPRITE_SIDE}
                 fill={player.color}
                 fill-opacity="0.4"
@@ -1215,7 +1224,7 @@ class GameEngine extends Component {
     //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
-        <>
+        <Background>
           {/* conditional rendering when the pause button is toggled */}
           {this.state.paused &&
             this.state.hideMenu &&
@@ -1248,6 +1257,8 @@ class GameEngine extends Component {
             height={this.state.windowHeight}
             width={this.state.windowHeight * 2}
           >
+            {/* black background */}
+            <rect x={0} y={0} height={100000} width={100000} fill={'black'} />
             {!this.state.gameover && (
               <Timer
                 y={TOOLBAR_Y}
@@ -1284,9 +1295,9 @@ class GameEngine extends Component {
               <circle
                 cx={ICON_X}
                 cy={TOOLBAR_Y + 100}
-                height={SPRITE_SIDE}
-                width={SPRITE_SIDE}
                 r={SPRITE_SIDE / 2}
+                stroke="white"
+                strokeWidth="1"
                 fill={this.state.playercolor}
                 className="icon"
               />
@@ -1308,7 +1319,7 @@ class GameEngine extends Component {
           ) : (
             <></>
           )}
-        </>
+        </Background>
       );
     } else {
       return <Tutorial handlePlay={() => this.setState({ tutorial: false })} />;
