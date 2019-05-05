@@ -13,16 +13,16 @@ const StyledButton = styled.button`
   text-decoration: none;
   outline: none;
   color: #fff;
-  background-color: #4caf50;
+  background-color: #008cba;
   border: none;
   border-radius: 20px;
   box-shadow: 0 9px #999;
   margin: 15px;
   width:80%;
 
- :hover {background-color: #3e8e41}
+ :hover {background-color: #02a8de}
  :active {
-  background-color: #3e8e41;
+  background-color: #02a8de;
   box-shadow: 0 5px #666;
   transform: translateY(4px);
 `;

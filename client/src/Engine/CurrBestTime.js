@@ -9,7 +9,7 @@ const Text = styled.text`
 
 export default function CurrBestTime(props) {
   return (
-    <Text x={props.x + 700} y={props.y + 25}>{`Current Best: ${
+    <Text fill={'white'} x={props.x + 700} y={props.y + 25}>{`Current Best: ${
       props.score
     } sec`}</Text>
   );
