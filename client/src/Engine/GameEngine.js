@@ -1234,6 +1234,7 @@ class GameEngine extends Component {
                 showMenu={() =>
                   this.setState({ changingKey: false, hideMenu: false })
                 }
+                showModal={this.state.changingKey}
               />
             )}
           {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
@@ -1246,6 +1247,7 @@ class GameEngine extends Component {
               }
               goToMenu={this.props.goToMenu}
               gameOver={this.state.gameover}
+              showModal={this.state.paused}
             />
           )}
 
