@@ -77,7 +77,8 @@ const findPath = props => {
     x,
     minY,
     map,
-    paused
+    paused,
+    strokeWidth
   } = props;
 
   let currentX = Math.round(x - mapTranslation);
@@ -86,10 +87,7 @@ const findPath = props => {
   for (currentX; currentX <= maxX; currentX++) {
     const locations = map[currentX];
     for (let j = 0; j < locations.length; j++) {
-      if (
-        locations[j][0] === 'h' &&
-        locations[j][1] - CONSTANTS.SPRITE_SIDE < highest
-      ) {
+      if (locations[j][1] - CONSTANTS.SPRITE_SIDE < highest) {
         const time = getTimeForGivenY({
           yStart: yStart,
           y: locations[j][1] - CONSTANTS.SPRITE_SIDE,
@@ -107,14 +105,16 @@ const findPath = props => {
           x: x,
           paused: paused
         });
-        const xFront = xBack + CONSTANTS.SPRITE_SIDE;
+        let xFront = xBack + CONSTANTS.SPRITE_SIDE;
+        if (atWall) {
+          xFront = xFront - strokeWidth;
+        }
         if (xBack <= currentX && currentX <= xFront) {
           highest = locations[j][1] - CONSTANTS.SPRITE_SIDE;
         }
       }
     }
   }
-
   if (highest !== minY) {
     // if path found
     return {
@@ -317,10 +317,11 @@ const spriteAtWall = props => {
     x,
     map,
     minY,
-    paused
+    paused,
+    strokeWidth
   } = props;
 
-  let currentX = Math.round(x - mapTranslation);
+  let currentX = Math.round(x - mapTranslation) + CONSTANTS.SPRITE_SIDE;
   let found = false;
   let wall;
   while (!found) {
@@ -348,14 +349,14 @@ const spriteAtWall = props => {
         y: y,
         paused: paused
       }) >
-      wall[1] - CONSTANTS.SPRITE_SIDE
+      wall[1] - CONSTANTS.SPRITE_SIDE - strokeWidth
     ) {
       return { time: peakTime, event: 'fall' };
     } else {
       return {
         time: getTimeForGivenY({
           yStart: yStart,
-          y: wall[1] - CONSTANTS.SPRITE_SIDE,
+          y: wall[1] - CONSTANTS.SPRITE_SIDE - strokeWidth,
           descendStartTime: descendStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
@@ -388,11 +389,12 @@ const spriteAtWall = props => {
       descendStartTime: descendStartTime,
       jumpState: jumpState,
       jumpStartTime: jumpStartTime,
-      maxX: currentX + CONSTANTS.SPRITE_SIDE,
+      maxX: currentX + CONSTANTS.SPRITE_SIDE, // - strokeWidth
       x: x,
       minY: minY,
       map: map,
-      paused: paused
+      paused: paused,
+      strokeWidth: strokeWidth
     });
     if (!timeToLand || timeToLand.time > timeToEscape.time) {
       return timeToEscape;
@@ -588,7 +590,8 @@ const spriteGoingDown = props => {
     x: x,
     minY: minY,
     map: map,
-    paused: paused
+    paused: paused,
+    strokeWidth: strokeWidth
   });
 
   if (wall && path) {
@@ -662,7 +665,8 @@ const findNextChange = props => {
         x: x,
         map: props.map,
         minY: minY,
-        paused: props.state.paused
+        paused: props.state.paused,
+        strokeWidth: props.strokeWidth
       });
     }
     // (!atWall)
