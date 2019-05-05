@@ -1,21 +1,10 @@
-const React = require('react');
-const { Component } = require('react');
-const PropTypes = require('prop-types');
-const styled = require('styled-components');
-const request = require('request-promise-native');
-const io = require('socket.io-client');
-const { findMapSpan, buildMapHashtable } = require('./mapParser.js');
-const PauseMenu = require('./Menus/PauseMenu.js');
-const PauseButton = require('./PauseButton.js');
-const GameoverMenu = require('./Menus/GameoverMenu.js');
-const ChangeKeyMenu = require('./Menus/ChangeKeyMenu.js');
-const ProgressBar = require('./ProgressBar.js');
-const Map = require('./Map.js');
-const Timer = require('./Timer.js');
-const Tutorial = require('./Tutorial.js');
-const { CONSTANTS } = require('./constants.js');
-
-const {
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import request from 'request-promise-native';
+import io from 'socket.io-client';
+import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import {
   findWall,
   findPath,
   findEndOfPath,
@@ -30,7 +19,17 @@ const {
   spriteGoingUp,
   spriteGoingDown,
   findNextChange
-} = require('./engineFunctions.js');
+} from './engineFunctions.js';
+import PauseMenu from './Menus/PauseMenu.js';
+import PauseButton from './PauseButton.js';
+import GameoverMenu from './Menus/GameoverMenu.js';
+import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
+import ProgressBar from './ProgressBar.js';
+import Map from './Map.js';
+import Timer from './Timer.js';
+import Tutorial from './Tutorial.js';
+
+import { CONSTANTS } from './constants.js';
 
 const SVGLayer = styled.svg`
   position: absolute;
@@ -120,11 +119,25 @@ class GameEngine extends Component {
 
   // Initiates jump
   handleJumpKey() {
-    this.variables.yStart = this.getY();
+    this.variables.yStart = this.getY({
+      currentTime: new Date().getTime(),
+      descendStartTime: this.variables.descendStartTime,
+      jumpStartTime: this.variables.jumpStartTime,
+      jumpState: this.variables.jumpState,
+      yStart: this.variables.yStart,
+      y: this.state.y,
+      paused: this.state.paused
+    });
     this.variables.jumpState = CONSTANTS.jump.UP;
     this.variables.jumpStartTime = new Date().getTime();
     (async () => {
-      this.variables.motionChange = this.findNextChange();
+      this.variables.motionChange = this.findNextChange({
+        variables: this.variables,
+        state: this.state,
+        strokeWidth: this.props.mapProps.strokeWidth,
+        map: this.map,
+        mapLength: this.mapLength
+      });
     })();
   }
 
@@ -283,8 +296,15 @@ class GameEngine extends Component {
     this.setState({ restart: false });
     this.variables.gameStartTime = new Date().getTime();
     this.variables.mapTranslationStartTime = new Date().getTime();
+
     (async () => {
-      this.variables.motionChange = this.findNextChange();
+      this.variables.motionChange = this.findNextChange({
+        variables: this.variables,
+        state: this.state,
+        strokeWidth: this.props.mapProps.strokeWidth,
+        map: this.map,
+        mapLength: this.mapLength
+      });
     })();
 
     this.updateInterval = setInterval(() => {
@@ -296,22 +316,24 @@ class GameEngine extends Component {
         adjustedTime - currentTime < CONSTANTS.TIME_THRESH &&
         !this.state.paused
       ) {
-        //console.log(this.variables.motionChange.event);
+        console.log(this.variables.motionChange.event);
 
         const y = this.getY({
-          currentTime: adjustedTime,
+          currentTime: new Date().getTime(),
           descendStartTime: this.variables.descendStartTime,
           jumpStartTime: this.variables.jumpStartTime,
           jumpState: this.variables.jumpState,
           yStart: this.variables.yStart,
-          y: this.state.y
+          y: this.state.y,
+          paused: this.state.paused
         });
         const mapTranslation = this.getMapTranslation({
           currentTime: adjustedTime,
           mapTranslationStart: this.variables.mapTranslationStart,
           mapTranslationStartTime: this.variables.mapTranslationStartTime,
           mapTranslation: this.state.mapTranslation,
-          atWall: this.variables.atWall
+          atWall: this.variables.atWall,
+          paused: this.state.paused
         });
         if (this.variables.motionChange.event === 'block') {
           this.setState({
@@ -328,13 +350,20 @@ class GameEngine extends Component {
           });
           this.variables.jumpState = CONSTANTS.jump.STOP;
         } else if (this.variables.motionChange.event === 'fall') {
+          console.log('ok?');
           this.variables.descendStartTime = currentTime;
           this.variables.yStart = y;
           this.variables.jumpState = CONSTANTS.jump.DOWN;
         }
         this.variables.motionChange = undefined;
         (async () => {
-          this.variables.motionChange = this.findNextChange();
+          this.variables.motionChange = this.findNextChange({
+            variables: this.variables,
+            state: this.state,
+            strokeWidth: this.props.mapProps.strokeWidth,
+            map: this.map,
+            mapLength: this.mapLength
+          });
         })();
       }
     }, CONSTANTS.UPDATE_TIMEOUT);
@@ -342,7 +371,18 @@ class GameEngine extends Component {
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
         // 666 is a bad constant and should be declared elsewhere!
-        if (this.getX() >= this.mapLength - CONSTANTS.GAMEOVER_X) {
+        if (
+          this.getX({
+            currentTime: new Date().getTime(),
+            mapTranslationStart: this.variables.mapTranslationStart,
+            mapTranslationStartTime: this.variables.mapTranslationStartTime,
+            mapTranslation: this.state.mapTranslation,
+            atWall: this.variables.atWall,
+            x: this.variables.x,
+            paused: this.state.paused
+          }) >=
+          this.mapLength - CONSTANTS.GAMEOVER_X
+        ) {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
@@ -350,8 +390,23 @@ class GameEngine extends Component {
           });
         } else {
           this.setState({
-            mapTranslation: this.getMapTranslation(),
-            y: this.getY()
+            mapTranslation: this.getMapTranslation({
+              currentTime: new Date().getTime(),
+              mapTranslationStart: this.variables.mapTranslationStart,
+              mapTranslationStartTime: this.variables.mapTranslationStartTime,
+              mapTranslation: this.state.mapTranslation,
+              atWall: this.variables.atWall,
+              paused: this.state.paused
+            }),
+            y: this.getY({
+              currentTime: new Date().getTime(),
+              descendStartTime: this.variables.descendStartTime,
+              jumpStartTime: this.variables.jumpStartTime,
+              jumpState: this.variables.jumpState,
+              yStart: this.variables.yStart,
+              y: this.state.y,
+              paused: this.state.paused
+            })
           });
         }
       }
@@ -465,11 +520,9 @@ class GameEngine extends Component {
     const boxes = [
       <circle
         key={this.socket ? this.socket.id : '1'}
-        cx={this.variables.x}
-        cy={this.state.y}
-        height={CONSTANTS.SPRITE_SIDE}
-        width={CONSTANTS.SPRITE_SIDE}
-        r={CONSTANTS.SPRITE_SIDE}
+        cx={this.variables.x + CONSTANTS.SPRITE_SIDE / 2}
+        cy={this.state.y + CONSTANTS.SPRITE_SIDE / 2}
+        r={CONSTANTS.SPRITE_SIDE / 2}
         fill={this.state.playercolor}
       />
     ];
@@ -486,9 +539,22 @@ class GameEngine extends Component {
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                cx={this.getMapTranslation() - player.mapTrans + 200}
-                cy={player.y}
-                r={CONSTANTS.SPRITE_SIDE}
+                cx={
+                  this.getMapTranslation({
+                    currentTime: new Date().getTime(),
+                    mapTranslationStart: this.variables.mapTranslationStart,
+                    mapTranslationStartTime: this.variables
+                      .mapTranslationStartTime,
+                    mapTranslation: this.state.mapTranslation,
+                    atWall: this.variables.atWall,
+                    paused: this.state.paused
+                  }) -
+                  player.mapTrans +
+                  200 +
+                  CONSTANTS.SPRITE_SIDE / 2
+                }
+                cy={player.y + CONSTANTS.SPRITE_SIDE / 2}
+                r={CONSTANTS.SPRITE_SIDE / 2}
                 fill={player.color}
                 fill-opacity="0.4"
               />
@@ -563,8 +629,6 @@ class GameEngine extends Component {
               <circle
                 cx={CONSTANTS.ICON_X}
                 cy={CONSTANTS.TOOLBAR_Y + 100}
-                height={CONSTANTS.SPRITE_SIDE}
-                width={CONSTANTS.SPRITE_SIDE}
                 r={CONSTANTS.SPRITE_SIDE / 2}
                 fill={this.state.playercolor}
                 className="icon"
