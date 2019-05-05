@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup } from 'reactstrap';
+// import { Button, ButtonGroup } from 'reactstrap';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import GameEngine from './Engine/GameEngine.js';
@@ -21,10 +21,13 @@ const GUEST_ACCOUNT = {
 
 const CenteredDiv = styled.div`
   text-align: center;
+  padding: 0px;
 `;
 
 const Background = styled.div`
   background-color: black;
+  margin: 0px;
+  height: 100vh;
 `;
 
 const Title = styled.h1`
@@ -40,6 +43,13 @@ const Title = styled.h1`
   padding-bottom: 10%;
   font-family: 'Gugi', cursive;
   font-size: 1200%;
+`;
+
+const CurrentUser = styled.h3`
+  background: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 100%;
 `;
 
 /* eslint-disable react/prefer-stateless-function */
@@ -157,49 +167,53 @@ class App extends Component {
               </Title>
             </CenteredDiv>
             <CenteredDiv>
-              <ButtonGroup>
-                <Button
+              <div>
+                <button
                   size="lg"
                   color="success"
+                  className="single"
                   onClick={() => this.setState({ mode: 'game', multi: false })}
                 >
                   PLAY
-                </Button>
+                </button>
                 &nbsp;&nbsp;&nbsp;
-                <Button
+                <button
                   size="lg"
                   color="success"
+                  className="multi"
                   onClick={() => this.setState({ mode: 'game', multi: true })}
                 >
                   Play Multi
-                </Button>
+                </button>
                 &nbsp;&nbsp;&nbsp;
-                <Button
+                <button
                   size="lg"
                   color="success"
+                  className="settings"
                   onClick={() => this.setState({ mode: 'settings' })}
                 >
                   Settings
-                </Button>{' '}
+                </button>{' '}
                 &nbsp;&nbsp;&nbsp;
-                <Button
+                <button
                   size="lg"
                   color="success"
+                  className="stats"
                   onClick={() =>
                     this.setState({ mode: 'stats' }, this.handleStats)
                   }
                 >
                   Statistics
-                </Button>
+                </button>
                 {'  '}
-              </ButtonGroup>
+              </div>
             </CenteredDiv>
 
             <div>
-              <h3>
+              <CurrentUser>
                 Current User:{' '}
                 {this.state.user ? this.state.user.email : 'Guest'}
-              </h3>
+              </CurrentUser>
               {!this.state.loggedIn && loginButton}
               {this.state.loggedIn && logoutButton}
             </div>
