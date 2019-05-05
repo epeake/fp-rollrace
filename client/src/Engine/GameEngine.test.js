@@ -137,9 +137,6 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.jumpState = 2; // jump.DOWN
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 191;
-      console.log(
-        gameEngine.instance().state.y - gameEngine.instance().variables.yStart
-      );
       gameEngine.instance().variables.descendStartTime = new Date().getTime();
       gameEngine
         .instance()

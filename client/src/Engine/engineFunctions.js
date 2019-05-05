@@ -1,5 +1,113 @@
 import { CONSTANTS } from './constants.js';
 
+/*
+ * return the time when the sprite will reach the given y value also given the state of the game
+ * comes from solving the distance function in getY for time
+ */
+
+const getTimeForGivenY = props => {
+  if (props.jumpState === CONSTANTS.jump.DOWN) {
+    return (
+      Math.sqrt((-props.yStart + props.y) / (0.5 * CONSTANTS.JUMP_SPEED)) +
+      props.descendStartTime
+    );
+  } else if (props.jumpState === CONSTANTS.jump.UP) {
+    return (
+      (-Math.sqrt(
+        CONSTANTS.JUMP_POWER ** 2 +
+          2 * props.y * CONSTANTS.JUMP_SPEED -
+          2 * CONSTANTS.JUMP_SPEED * props.yStart
+      ) +
+        CONSTANTS.JUMP_POWER +
+        props.jumpStartTime * CONSTANTS.JUMP_SPEED) /
+      CONSTANTS.JUMP_SPEED
+    );
+  } else {
+    console.log('returning undefined');
+    return undefined;
+  }
+};
+
+/*
+ * return the time when the sprite will reach the given x value also given the state of the game
+ * comes from solving the distance function in getX for time
+ */
+const getTimeForGivenX = props => {
+  if (props.atWall) {
+    console.log('return undefined');
+    return undefined;
+  } else {
+    return (
+      (props.mapTranslationStart - props.xOffset + props.x) /
+        CONSTANTS.SCROLL_SPEED +
+      props.mapTranslationStartTime
+    );
+  }
+};
+
+// return the mapTranslation value given current state of the game
+const getMapTranslation = props => {
+  if (props.atWall || props.paused) {
+    return props.mapTranslation;
+  } else {
+    return (
+      props.mapTranslationStart -
+      (props.currentTime - props.mapTranslationStartTime) *
+        CONSTANTS.SCROLL_SPEED
+    );
+  }
+};
+
+// return the x value of the sprite given current state of the game
+const getX = props => {
+  return (
+    props.x -
+    getMapTranslation({
+      currentTime: props.currentTime,
+      mapTranslationStart: props.mapTranslationStart,
+      mapTranslationStartTime: props.mapTranslationStartTime,
+      mapTranslation: props.mapTranslation,
+      atWall: props.atWall,
+      paused: props.paused
+    })
+  );
+};
+
+// return the y value of the sprite given current state of the game
+const getY = props => {
+  if (props.jumpState === CONSTANTS.jump.STOP || props.paused) {
+    return props.y;
+  } else if (props.jumpState === CONSTANTS.jump.DOWN) {
+    return (
+      props.yStart +
+      0.5 *
+        (props.currentTime - props.descendStartTime) ** 2 *
+        CONSTANTS.JUMP_SPEED
+    );
+  } else if (props.jumpState === CONSTANTS.jump.UP) {
+    return (
+      props.yStart -
+      ((props.currentTime - props.jumpStartTime) * CONSTANTS.JUMP_POWER -
+        0.5 *
+          (props.currentTime - props.jumpStartTime) ** 2 *
+          CONSTANTS.JUMP_SPEED)
+    );
+  }
+};
+
+// checks to see if a given y value matches a wall
+const checkAtWall = (location, y) => {
+  if (
+    location[0] === 'b' &&
+    ((location[1] <= y && y <= location[2]) ||
+      (location[1] <= y + CONSTANTS.SPRITE_SIDE &&
+        y + CONSTANTS.SPRITE_SIDE <= location[2]))
+  ) {
+    return true;
+  }
+  return false;
+};
+
 // detects a future wall and returns the time of collision
 const findWall = props => {
   // define local variables
@@ -186,118 +294,6 @@ const findEndOfPath = props => {
     }
   }
   return undefined;
-};
-
-// checks to see if a given y value matches a wall
-const checkAtWall = (location, y) => {
-  if (
-    location[0] === 'b' &&
-    ((location[1] <= y && y <= location[2]) ||
-      (location[1] <= y + CONSTANTS.SPRITE_SIDE &&
-        y + CONSTANTS.SPRITE_SIDE <= location[2]))
-  ) {
-    return true;
-  }
-  return false;
-};
-
-/*
- * return the time when the sprite will reach the given y value also given the state of the game
- * comes from solving the distance function in getY for time
- */
-
-const getTimeForGivenY = props => {
-  if (props.jumpState === CONSTANTS.jump.DOWN) {
-    return (
-      Math.sqrt((-props.yStart + props.y) / (0.5 * CONSTANTS.JUMP_SPEED)) +
-      props.descendStartTime
-    );
-  } else if (props.jumpState === CONSTANTS.jump.UP) {
-    return (
-      (-Math.sqrt(
-        CONSTANTS.JUMP_POWER ** 2 +
-          2 * props.y * CONSTANTS.JUMP_SPEED -
-          2 * CONSTANTS.JUMP_SPEED * props.yStart
-      ) +
-        CONSTANTS.JUMP_POWER +
-        props.jumpStartTime * CONSTANTS.JUMP_SPEED) /
-      CONSTANTS.JUMP_SPEED
-    );
-  } else {
-    console.log('returning undefined');
-    return undefined;
-  }
-};
-
-/*
- * return the time when the sprite will reach the given x value also given the state of the game
- * comes from solving the distance function in getX for time
- */
-const getTimeForGivenX = props => {
-  if (props.atWall) {
-    console.log('return undefined');
-    return undefined;
-  } else {
-    return (
-      (props.mapTranslationStart - props.xOffset + props.x) /
-        CONSTANTS.SCROLL_SPEED +
-      props.mapTranslationStartTime
-    );
-  }
-};
-
-// return the x value of the sprite given current state of the game
-const getX = props => {
-  return (
-    props.x -
-    getMapTranslation({
-      currentTime: props.currentTime,
-      mapTranslationStart: props.mapTranslationStart,
-      mapTranslationStartTime: props.mapTranslationStartTime,
-      mapTranslation: props.mapTranslation,
-      atWall: props.atWall,
-      paused: props.paused
-    })
-  );
-};
-/*
-   x = offset - mpastart + (time - starttime) * scroll
-   (x - offset + mapstart) / scroll + starttime = time
-*/
-
-// return the mapTranslation value given current state of the game
-const getMapTranslation = props => {
-  if (props.atWall || props.paused) {
-    return props.mapTranslation;
-  } else {
-    return (
-      props.mapTranslationStart -
-      (props.currentTime - props.mapTranslationStartTime) *
-        CONSTANTS.SCROLL_SPEED
-    );
-  }
-};
-
-// return the y value of the sprite given current state of the game
-const getY = props => {
-  if (props.jumpState === CONSTANTS.jump.STOP || props.paused) {
-    return props.y;
-  } else if (props.jumpState === CONSTANTS.jump.DOWN) {
-    return (
-      props.yStart +
-      0.5 *
-        (props.currentTime - props.descendStartTime) ** 2 *
-        CONSTANTS.JUMP_SPEED
-    );
-  } else if (props.jumpState === CONSTANTS.jump.UP) {
-    return (
-      props.yStart -
-      ((props.currentTime - props.jumpStartTime) * CONSTANTS.JUMP_POWER -
-        0.5 *
-          (props.currentTime - props.jumpStartTime) ** 2 *
-          CONSTANTS.JUMP_SPEED)
-    );
-  }
 };
 
 // determines what should happen when the sprite is stuck at a wall

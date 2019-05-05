@@ -27,6 +27,7 @@ import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
 import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
+import CurrBestTime from './CurrBestTime.js';
 import Tutorial from './Tutorial.js';
 
 import { CONSTANTS } from './constants.js';
@@ -240,7 +241,6 @@ class GameEngine extends Component {
         this.variables.timePaused) /
         1000
     );
-    console.log(finishTime);
 
     if (
       !this.state.guest // exclusive to members
@@ -262,8 +262,7 @@ class GameEngine extends Component {
 
       request
         .put(options)
-        .then(resp => {
-          console.log(resp); // for debugging
+        .then(() => {
           this.setState({ dataSent: true });
         })
         .catch(err => {
@@ -430,6 +429,28 @@ class GameEngine extends Component {
 
   componentDidMount() {
     this.startCountdown();
+
+    if (!this.props.guest) {
+      const options = {
+        url: `${
+          process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000'
+            : 'https://rollrace.herokuapp.com'
+        }/api/users/stats`,
+        json: true
+      };
+      request
+        .get(options)
+        .then(resp => {
+          this.setState({ score: resp.map_1 });
+        })
+        .catch(err => {
+          //console.log('run');
+          throw Error(err);
+        });
+    } else {
+      this.setState({ score: this.props.guest.map_1 });
+    }
 
     if (this.state.multi) {
       this.socket.on('connect', () => {
@@ -608,6 +629,11 @@ class GameEngine extends Component {
                 restart={this.state.restart}
               />
             )}
+            <CurrBestTime
+              y={CONSTANTS.TOOLBAR_Y}
+              x={CONSTANTS.TOOLBAR_X}
+              score={this.state.score}
+            />
 
             <ProgressBar y={CONSTANTS.TOOLBAR_Y} x={CONSTANTS.TOOLBAR_X} />
             <Map
@@ -644,7 +670,7 @@ class GameEngine extends Component {
                 windowHeight={this.state.windowHeight}
                 restart={() => this.restartGame()}
                 exitToMenu={() => this.props.goToMenu()}
-                guest={this.props.guest}
+                score={this.state.score}
               />
             </SVGLayer>
           ) : (
