@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const MapPath = styled.path`
   fill: none;
-  stroke: #000000;
+  stroke: #ffffff;
   stroke-width: ${props => props.stroke || '20'};
   stroke-linecap: butt;
   stroke-linejoin: miter;
