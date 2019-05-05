@@ -119,9 +119,9 @@ class Timer extends Component {
 
   render() {
     return (
-      <Text x={this.props.x + 60} y={this.props.y + 25}>{`${
-        this.state.minutes
-      }:${this.state.seconds}`}</Text>
+      <Text fill={'white'} x={this.props.x + 60} y={this.props.y + 25}>
+        {`${this.state.minutes}:${this.state.seconds}`}
+      </Text>
     );
   }
 }

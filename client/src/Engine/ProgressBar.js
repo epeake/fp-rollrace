@@ -11,7 +11,7 @@ const SpriteTwo = styled.ellipse`
 `;
 
 const Bar = styled.rect`
-  fill: #280b0b;
+  fill: #ffffff;
 `;
 
 class ProgressBar extends Component {

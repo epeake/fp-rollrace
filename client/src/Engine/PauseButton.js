@@ -12,7 +12,7 @@ export default function PauseButton(props) {
         y={15}
         height={50}
         width={50}
-        fill={'black'}
+        fill={'white'}
       />
       <rect
         key={'lft-line'}
@@ -22,7 +22,7 @@ export default function PauseButton(props) {
         y={28}
         height={25}
         width={10}
-        fill={'white'}
+        fill={'black'}
       />
       <rect
         key={'rt-line'}
@@ -32,7 +32,7 @@ export default function PauseButton(props) {
         y={28}
         height={25}
         width={10}
-        fill={'white'}
+        fill={'black'}
       />
     </g>
   );
