@@ -21,7 +21,6 @@ const SPRITE_OFFSET = 45;
 class ProgressBar extends Component {
   constructor(props) {
     super(props);
-    this.interval = null;
     this.state = {
       currentX: this.props.currX
     };
