@@ -1342,7 +1342,13 @@ class GameEngine extends Component {
             <GameoverMenu
               restart={() => this.restartGame()}
               exitToMenu={() => this.props.goToMenu()}
-              score={this.state.score}
+              highscore={this.state.score}
+              score={parseInt(
+                (new Date().getTime() -
+                  this.variables.gameStartTime -
+                  this.variables.timePaused) /
+                  1000
+              )}
               showModal={this.state.gameover}
             />
           )}
