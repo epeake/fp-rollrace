@@ -5,19 +5,9 @@ import request from 'request-promise-native';
 import io from 'socket.io-client';
 import { findMapSpan, buildMapHashtable } from './mapParser.js';
 import {
-  findWall,
-  findPath,
-  findEndOfPath,
-  checkAtWall,
-  getTimeForGivenX,
-  getTimeForGivenY,
   getX,
   getY,
   getMapTranslation,
-  spriteAtWall,
-  spriteOnFlat,
-  spriteGoingUp,
-  spriteGoingDown,
   findNextChange
 } from './engineFunctions.js';
 import PauseMenu from './Menus/PauseMenu.js';
@@ -79,19 +69,9 @@ class GameEngine extends Component {
     this.resumeGame = this.resumeGame.bind(this);
     this.pauseGame = this.pauseGame.bind(this);
     this.sendEndgameData = this.sendEndgameData.bind(this);
-    this.findWall = findWall.bind(this);
-    this.findPath = findPath.bind(this);
-    this.findEndOfPath = findEndOfPath.bind(this);
-    this.checkAtWall = checkAtWall.bind(this);
-    this.getTimeForGivenY = getTimeForGivenY.bind(this);
-    this.getTimeForGivenX = getTimeForGivenX.bind(this);
     this.getX = getX.bind(this);
     this.getMapTranslation = getMapTranslation.bind(this);
     this.getY = getY.bind(this);
-    this.spriteAtWall = spriteAtWall.bind(this);
-    this.spriteOnFlat = spriteOnFlat.bind(this);
-    this.spriteGoingUp = spriteGoingUp.bind(this);
-    this.spriteGoingDown = spriteGoingDown.bind(this);
     this.findNextChange = findNextChange.bind(this);
     this.startLoops = this.startLoops.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
