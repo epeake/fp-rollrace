@@ -65,6 +65,7 @@ const INITIAL_STATE = {
   dataSent: false,
   tutorial: false,
   paused: false,
+  // NEW
   endScore: undefined,
   gameover: false,
   jumpKey: 32, // space bar
@@ -123,6 +124,7 @@ class GameEngine extends Component {
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
+    // NEW
     this.countdownInterval = null;
 
     this.mapLength = findMapSpan(this.props.mapProps.map);

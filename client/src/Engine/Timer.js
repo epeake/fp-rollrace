@@ -8,7 +8,7 @@ const Text = styled.text`
 `;
 
 const MINUTES = '00';
-const SECONDS = '05';
+const SECONDS = '30';
 
 const START_TIME = {
   minutes: MINUTES,
