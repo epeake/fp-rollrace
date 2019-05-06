@@ -8,7 +8,7 @@ import PauseMenu from './Menus/PauseMenu.js';
 import PauseButton from './PauseButton.js';
 import GameoverMenu from './Menus/GameoverMenu.js';
 import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
-import ProgressBar from './ProgressBar.js';
+// import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
 import CurrBestTime from './CurrBestTime.js';
@@ -157,6 +157,7 @@ class GameEngine extends Component {
     this.startLoops = this.startLoops.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.timeOut = this.timeOut.bind(this);
+    this.getScore = this.getScore.bind(this);
   }
 
   /*
@@ -317,7 +318,7 @@ class GameEngine extends Component {
       request
         .put(options)
         .then(() => {
-          this.setState({ dataSent: true });
+          this.setState({ dataSent: true }, this.getScore);
         })
         .catch(err => {
           throw Error(err);
@@ -325,20 +326,26 @@ class GameEngine extends Component {
     } else {
       if (finishTime < this.state.guest.map_1) {
         // TODOOOO MAKE THIS NOT HARDCODEEEEE
-        this.setState({
-          dataSent: true,
-          guest: Object.assign(this.state.guest, {
-            map_1: finishTime,
-            total_games: this.state.guest.total_games + 1
-          })
-        });
+        this.setState(
+          {
+            dataSent: true,
+            guest: Object.assign(this.state.guest, {
+              map_1: finishTime,
+              total_games: this.state.guest.total_games + 1
+            })
+          },
+          this.getScore
+        );
       } else {
-        this.setState({
-          dataSent: true,
-          guest: Object.assign(this.state.guest, {
-            total_games: this.state.guest.total_games + 1
-          })
-        });
+        this.setState(
+          {
+            dataSent: true,
+            guest: Object.assign(this.state.guest, {
+              total_games: this.state.guest.total_games + 1
+            })
+          },
+          this.getScore
+        );
       }
     }
   }
@@ -1078,25 +1085,7 @@ class GameEngine extends Component {
     }, RENDER_TIMEOUT);
   }
 
-  componentDidUpdate() {
-    if (this.state.gameover && !this.state.dataSent) {
-      this.sendEndgameData();
-    }
-  }
-
-  componentWillUnmount() {
-    // prevent memory leak by clearing/stopping loops
-    clearTimeout(this.timeout);
-    clearInterval(this.updateInterval);
-    clearInterval(this.renderInterval);
-    if (this.props.multi) {
-      this.socket.disconnect();
-    }
-  }
-
-  componentDidMount() {
-    this.startCountdown();
-
+  getScore() {
     if (!this.props.guest) {
       const options = {
         url: `${
@@ -1118,6 +1107,28 @@ class GameEngine extends Component {
     } else {
       this.setState({ score: this.props.guest.map_1 });
     }
+  }
+
+  componentDidUpdate() {
+    if (this.state.gameover && !this.state.dataSent) {
+      this.sendEndgameData();
+    }
+  }
+
+  componentWillUnmount() {
+    // prevent memory leak by clearing/stopping loops
+    clearTimeout(this.timeout);
+    clearInterval(this.updateInterval);
+    clearInterval(this.renderInterval);
+    if (this.props.multi) {
+      this.socket.disconnect();
+    }
+  }
+
+  componentDidMount() {
+    this.startCountdown();
+
+    this.getScore();
 
     if (this.state.multi) {
       this.socket.on('connect', () => {
