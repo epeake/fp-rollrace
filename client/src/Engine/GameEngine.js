@@ -26,6 +26,13 @@ const SVGLayer = styled.svg`
   position: absolute;
 `;
 
+// so is still black past the SVG boundary
+const Background = styled.div`
+  background-color: #000000;
+  margin: 0px;
+  height: 100vh;
+`;
+
 class GameEngine extends Component {
   constructor(props) {
     super(props);
@@ -523,6 +530,8 @@ class GameEngine extends Component {
         cx={this.variables.x + CONSTANTS.SPRITE_SIDE / 2}
         cy={this.state.y + CONSTANTS.SPRITE_SIDE / 2}
         r={CONSTANTS.SPRITE_SIDE / 2}
+        stroke="white"
+        strokeWidth="1"
         fill={this.state.playercolor}
       />
     ];
@@ -555,6 +564,8 @@ class GameEngine extends Component {
                 }
                 cy={player.y + CONSTANTS.SPRITE_SIDE / 2}
                 r={CONSTANTS.SPRITE_SIDE / 2}
+                stroke="white"
+                strokeWidth="1"
                 fill={player.color}
                 fill-opacity="0.4"
               />
@@ -567,7 +578,7 @@ class GameEngine extends Component {
     //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
-        <>
+        <Background>
           {/* conditional rendering when the pause button is toggled */}
           {this.state.paused &&
             this.state.hideMenu &&
@@ -577,6 +588,7 @@ class GameEngine extends Component {
                 showMenu={() =>
                   this.setState({ changingKey: false, hideMenu: false })
                 }
+                showModal={this.state.changingKey}
               />
             )}
           {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
@@ -587,8 +599,8 @@ class GameEngine extends Component {
               changeKey={() =>
                 this.setState({ changingKey: true, hideMenu: true })
               }
-              goToMenu={this.props.goToMenu}
-              gameOver={this.state.gameover}
+              goToMenu={() => this.props.goToMenu()}
+              showModal={this.state.paused}
             />
           )}
 
@@ -598,6 +610,8 @@ class GameEngine extends Component {
             height={this.state.windowHeight}
             width={this.state.windowHeight * 2}
           >
+            {/* black background */}
+            <rect x={0} y={0} height={100000} width={100000} fill={'black'} />
             {!this.state.gameover && (
               <Timer
                 y={CONSTANTS.TOOLBAR_Y}
@@ -635,28 +649,23 @@ class GameEngine extends Component {
                 cx={CONSTANTS.ICON_X}
                 cy={CONSTANTS.TOOLBAR_Y + 100}
                 r={CONSTANTS.SPRITE_SIDE / 4}
+                stroke="white"
+                strokeWidth="1"
                 fill={this.state.playercolor}
                 className="icon"
               />
             </g>
           </SVGLayer>
 
-          {this.state.dataSent ? (
-            <SVGLayer
-              viewBox={'0 0 2000 1000'}
-              preserveAspectRatio={'xMinYMin meet'}
-            >
-              <GameoverMenu
-                windowHeight={this.state.windowHeight}
-                restart={() => this.restartGame()}
-                exitToMenu={() => this.props.goToMenu()}
-                score={this.state.score}
-              />
-            </SVGLayer>
-          ) : (
-            <></>
+          {this.state.dataSent && (
+            <GameoverMenu
+              restart={() => this.restartGame()}
+              exitToMenu={() => this.props.goToMenu()}
+              score={this.state.score}
+              showModal={this.state.gameover}
+            />
           )}
-        </>
+        </Background>
       );
     } else {
       return <Tutorial handlePlay={() => this.setState({ tutorial: false })} />;

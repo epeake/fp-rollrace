@@ -25,25 +25,46 @@ const CenteredDiv = styled.div`
 `;
 
 const Background = styled.div`
-  background-color: black;
+  background-color: #2f2f2f;
   margin: 0px;
   height: 100vh;
 `;
 
-const Title = styled.h1`
-  background: linear-gradient(
-    52deg,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(255, 255, 255, 1) 59%,
-    rgba(254, 253, 252, 1) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  padding-top: 10%;
-  padding-bottom: 10%;
-  font-family: 'Gugi', cursive;
-  font-size: 1200%;
+const StyledButton = styled.button`
+  background-color: #008cba;
+  font-size: 30px;
+  border-radius: 12px;
+  border: 2px solid #555555;
+  font-family: monospace;
+  &:hover {
+    background-color: #02a8de;
+  }
 `;
+
+// CSS for title changes whther or not user is on chrome.  Condition checks for chrome
+const Title =
+  !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
+    ? styled.h1`
+        background: linear-gradient(
+          52deg,
+          rgba(0, 0, 0, 1) 0%,
+          rgba(255, 255, 255, 1) 59%,
+          rgba(254, 253, 252, 1) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        padding-top: 10%;
+        padding-bottom: 10%;
+        font-family: 'Gugi', cursive;
+        font-size: 1200%;
+      `
+    : styled.h1`
+        padding-top: 10%;
+        padding-bottom: 10%;
+        font-family: 'Gugi', cursive;
+        font-size: 1200%;
+        color: white;
+      `;
 
 const CurrentUser = styled.h3`
   background: white;
@@ -167,46 +188,35 @@ class App extends Component {
               </Title>
             </CenteredDiv>
             <CenteredDiv>
-              <div>
-                <button
-                  size="lg"
-                  color="success"
-                  className="single"
-                  onClick={() => this.setState({ mode: 'game', multi: false })}
-                >
-                  PLAY
-                </button>
-                &nbsp;&nbsp;&nbsp;
-                <button
-                  size="lg"
-                  color="success"
-                  className="multi"
-                  onClick={() => this.setState({ mode: 'game', multi: true })}
-                >
-                  Play Multi
-                </button>
-                &nbsp;&nbsp;&nbsp;
-                <button
-                  size="lg"
-                  color="success"
-                  className="settings"
-                  onClick={() => this.setState({ mode: 'settings' })}
-                >
-                  Settings
-                </button>{' '}
-                &nbsp;&nbsp;&nbsp;
-                <button
-                  size="lg"
-                  color="success"
-                  className="stats"
-                  onClick={() =>
-                    this.setState({ mode: 'stats' }, this.handleStats)
-                  }
-                >
-                  Statistics
-                </button>
-                {'  '}
-              </div>
+              <StyledButton
+                className="single"
+                onClick={() => this.setState({ mode: 'game', multi: false })}
+              >
+                Play Solo
+              </StyledButton>
+              &nbsp;&nbsp;&nbsp;
+              <StyledButton
+                className="multi"
+                onClick={() => this.setState({ mode: 'game', multi: true })}
+              >
+                Play Multi
+              </StyledButton>
+              &nbsp;&nbsp;&nbsp;
+              <StyledButton
+                className="stats"
+                onClick={() =>
+                  this.setState({ mode: 'stats' }, this.handleStats)
+                }
+              >
+                Stats
+              </StyledButton>
+              &nbsp;&nbsp;&nbsp;
+              <StyledButton
+                className="settings"
+                onClick={() => this.setState({ mode: 'settings' })}
+              >
+                Settings
+              </StyledButton>{' '}
             </CenteredDiv>
 
             <div>
