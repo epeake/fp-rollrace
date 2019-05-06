@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Text = styled.text`
-  margin-top: 10px
-  font-size: 30px;
+  font-size: 200%;
+  font-family: 'Gugi', cursive;
 `;
 
 const MINUTES = '00';

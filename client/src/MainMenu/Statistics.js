@@ -41,7 +41,7 @@ export default function Statistics(props) {
         Total Games: {props.user ? props.user.total_games : ''}
       </StatText>
       <StatText>
-        Best Map 1 Time: {props.user ? props.user.map_1 + ' sec' : ''}
+        Best Map 1 Time: {props.user ? `${props.user.map_1} sec` : ''}
       </StatText>
     </Background>
   );

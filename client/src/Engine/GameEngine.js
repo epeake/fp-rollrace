@@ -25,6 +25,11 @@ const Background = styled.div`
   height: 100vh;
 `;
 
+const Text = styled.text`
+  font-size: 4000%;
+  font-family: 'Gugi', cursive;
+`;
+
 // Jump state enum for clarity
 const jump = {
   STOP: 0,
@@ -37,6 +42,10 @@ const UPDATE_INTERVAL = 20; // milliseconds
 const TOOLBAR_Y = 15;
 const TOOLBAR_X = 800;
 const ICON_X = 40;
+// NEW
+const COUNTDOWN_X = 730;
+// NEW
+const COUNTDOWN_Y = 650;
 const GAMEOVER_X = 667;
 const UPDATE_TIMEOUT = 20; // time between motionChange updates
 const RENDER_TIMEOUT = 20; // time between rerenders
@@ -46,8 +55,12 @@ const SCROLL_SPEED = 0.4;
 const SPRITE_SIDE = 50;
 const PATH_THRESH = 5;
 const TIME_THRESH = RENDER_TIMEOUT;
+// NEW
+const COUNTDOWN_NUMBERS = ['3', '2', '1', ''];
 
 const INITIAL_STATE = {
+  // NEW
+  countdownIndex: 0,
   score: '',
   dataSent: false,
   tutorial: false,
@@ -109,6 +122,7 @@ class GameEngine extends Component {
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
+    this.countdownInterval = null;
 
     this.mapLength = findMapSpan(this.props.mapProps.map);
     this.map = buildMapHashtable(
@@ -198,11 +212,17 @@ class GameEngine extends Component {
       void 0; // do nothing
     }
   }
-  //startsgame after 3 seconds
 
+  //startsgame after 3 seconds
   startCountdown() {
     if (!this.variables.gameStartTime) {
-      setTimeout(this.startLoops, 3000);
+      this.countdownInterval = setInterval(() => {
+        this.setState({ countdownIndex: this.state.countdownIndex + 1 });
+      }, 1000);
+      setTimeout(() => {
+        clearInterval(this.countdownInterval);
+        this.startLoops();
+      }, 3000);
     }
   }
 
@@ -227,7 +247,8 @@ class GameEngine extends Component {
      */
     const restartState = Object.assign({}, INITIAL_STATE, {
       windowHeight: window.innerHeight,
-      restart: true
+      restart: true,
+      score: this.state.score
     });
     this.variables = Object.assign(this.variables, INITIAL_VARIABLES);
     this.setState(restartState);
@@ -1289,6 +1310,10 @@ class GameEngine extends Component {
               handleClick={() => this.pauseGame()}
               className="pauseButton"
             />
+            <Text fill={'#C1BFBF'} x={COUNTDOWN_X} y={COUNTDOWN_Y}>
+              {' '}
+              {COUNTDOWN_NUMBERS[this.state.countdownIndex]}{' '}
+            </Text>
             {/* tutorial used to be here */}
             <g>
               {/* player icon */}
