@@ -634,8 +634,8 @@ class GameEngine extends Component {
             />
 
             <ProgressBar
-              y={TOOLBAR_Y}
-              x={TOOLBAR_X}
+              y={CONSTANTS.TOOLBAR_Y}
+              x={CONSTANTS.TOOLBAR_X}
               currX={this.getX({
                 currentTime: new Date().getTime(),
                 mapTranslationStart: this.variables.mapTranslationStart,
