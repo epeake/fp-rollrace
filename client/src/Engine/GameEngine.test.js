@@ -88,7 +88,7 @@ describe('GameEngine Tests', () => {
     //   });
     // });
     // test('lands when falls at wall', () => {
-    //   gameEngine.instance().variables.descendStartTime = new Date().getTime();
+    //   gameEngine.instance().variables.descentStartTime = new Date().getTime();
     //   gameEngine.instance().variables.atWall = true;
     //   gameEngine.instance().variables.jumpState = 2; // jump.DOWN
     //   gameEngine.instance().variables.yStart =
@@ -116,7 +116,7 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.jumpState = 2; // jump.DOWN
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 5;
-      gameEngine.instance().variables.descendStartTime = new Date().getTime();
+      gameEngine.instance().variables.descentStartTime = new Date().getTime();
       gameEngine
         .instance()
         .setState({ y: gameEngine.instance().variables.yStart });
@@ -137,7 +137,7 @@ describe('GameEngine Tests', () => {
       gameEngine.instance().variables.jumpState = 2; // jump.DOWN
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 191;
-      gameEngine.instance().variables.descendStartTime = new Date().getTime();
+      gameEngine.instance().variables.descentStartTime = new Date().getTime();
       gameEngine
         .instance()
         .setState({ y: gameEngine.instance().variables.yStart });
@@ -158,7 +158,7 @@ describe('GameEngine Tests', () => {
     //   gameEngine.instance().variables.jumpState = 2; // jump.DOWN
     //   gameEngine.instance().variables.yStart =
     //     gameEngine.instance().state.y - 50;
-    //   gameEngine.instance().variables.descendStartTime = new Date().getTime();
+    //   gameEngine.instance().variables.descentStartTime = new Date().getTime();
     //   gameEngine.instance().setState({ y: gameEngine.instance().state.y - 20 });
     //   gameEngine.update();
     //   const motionChange = gameEngine.instance().findNextChange({
