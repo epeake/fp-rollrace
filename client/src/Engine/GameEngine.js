@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import io from 'socket.io-client';
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import { findMapSpan, buildMapHashtable } from './Helpers/MapParser.js';
 import {
   getX,
   getY,
   getMapTranslation,
   findNextChange
-} from './engineFunctions.js';
+} from './Helpers/EngineFunctions.js';
 import PauseMenu from './Menus/PauseMenu.js';
 import PauseButton from './PauseButton.js';
 import GameoverMenu from './Menus/GameoverMenu.js';
@@ -18,19 +18,23 @@ import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
 import CurrBestTime from './CurrBestTime.js';
-import Tutorial from './Tutorial.js';
-
-import { CONSTANTS } from './constants.js';
-
-const SVGLayer = styled.svg`
-  position: absolute;
-`;
+// import Tutorial from './Tutorial.js';
+import { CONSTANTS } from './Helpers/constants.js';
 
 // so is still black past the SVG boundary
 const Background = styled.div`
   background-color: #000000;
   margin: 0px;
   height: 100vh;
+`;
+
+const SVGLayer = styled.svg`
+  position: absolute;
+`;
+
+const Text = styled.text`
+  font-size: 4000%;
+  font-family: 'Gugi', cursive;
 `;
 
 class GameEngine extends Component {
@@ -59,6 +63,7 @@ class GameEngine extends Component {
     this.timeout = null;
     this.renderInterval = null;
     this.updateInterval = null;
+    this.countdownInterval = null;
 
     this.mapLength = findMapSpan(this.props.mapProps.map);
     this.map = buildMapHashtable(
@@ -83,6 +88,7 @@ class GameEngine extends Component {
     this.startLoops = this.startLoops.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.timeOut = this.timeOut.bind(this);
+    this.getScore = this.getScore.bind(this);
   }
 
   /*
@@ -152,11 +158,30 @@ class GameEngine extends Component {
       void 0; // do nothing
     }
   }
-  //startsgame after 3 seconds
 
+  // startsgame after 3 seconds and shows countdown
   startCountdown() {
     if (!this.variables.gameStartTime) {
-      setTimeout(this.startLoops, 3000);
+      this.countdownInterval = setInterval(() => {
+        if (
+          this.state.countdownIndex <
+          CONSTANTS.COUNTDOWN_NUMBERS.length - 1
+        ) {
+          this.setState({ countdownIndex: this.state.countdownIndex + 1 });
+        }
+      }, 1000);
+
+      /*
+       * use the callback to ensure that we have set the countdown to the
+       * empty string.
+       */
+      setTimeout(() => {
+        clearInterval(this.countdownInterval);
+        this.setState(
+          { countdownIndex: CONSTANTS.COUNTDOWN_NUMBERS.length - 1 },
+          this.startLoops()
+        );
+      }, 3000);
     }
   }
 
@@ -181,7 +206,8 @@ class GameEngine extends Component {
      */
     const restartState = Object.assign({}, CONSTANTS.INITIAL_STATE, {
       windowHeight: window.innerHeight,
-      restart: true
+      restart: true,
+      score: this.state.score
     });
     this.variables = Object.assign(this.variables, CONSTANTS.INITIAL_VARIABLES);
     this.setState(restartState);
@@ -250,7 +276,7 @@ class GameEngine extends Component {
       request
         .put(options)
         .then(() => {
-          this.setState({ dataSent: true });
+          this.setState({ dataSent: true }, this.getScore);
         })
         .catch(err => {
           throw Error(err);
@@ -258,20 +284,26 @@ class GameEngine extends Component {
     } else {
       if (finishTime < this.state.guest.map_1) {
         // TODOOOO MAKE THIS NOT HARDCODEEEEE
-        this.setState({
-          dataSent: true,
-          guest: Object.assign(this.state.guest, {
-            map_1: finishTime,
-            total_games: this.state.guest.total_games + 1
-          })
-        });
+        this.setState(
+          {
+            dataSent: true,
+            guest: Object.assign(this.state.guest, {
+              map_1: finishTime,
+              total_games: this.state.guest.total_games + 1
+            })
+          },
+          this.getScore
+        );
       } else {
-        this.setState({
-          dataSent: true,
-          guest: Object.assign(this.state.guest, {
-            total_games: this.state.guest.total_games + 1
-          })
-        });
+        this.setState(
+          {
+            dataSent: true,
+            guest: Object.assign(this.state.guest, {
+              total_games: this.state.guest.total_games + 1
+            })
+          },
+          this.getScore
+        );
       }
     }
   }
@@ -371,7 +403,13 @@ class GameEngine extends Component {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
-            gameover: true
+            gameover: true,
+            endScore: parseInt(
+              (new Date().getTime() -
+                this.variables.gameStartTime -
+                this.variables.timePaused) /
+                1000
+            )
           });
         } else {
           this.setState({
@@ -398,25 +436,7 @@ class GameEngine extends Component {
     }, CONSTANTS.RENDER_TIMEOUT);
   }
 
-  componentDidUpdate() {
-    if (this.state.gameover && !this.state.dataSent) {
-      this.sendEndgameData();
-    }
-  }
-
-  componentWillUnmount() {
-    // prevent memory leak by clearing/stopping loops
-    clearTimeout(this.timeout);
-    clearInterval(this.updateInterval);
-    clearInterval(this.renderInterval);
-    if (this.props.multi) {
-      this.socket.disconnect();
-    }
-  }
-
-  componentDidMount() {
-    this.startCountdown();
-
+  getScore() {
     if (!this.props.guest) {
       const options = {
         url: `${
@@ -438,6 +458,28 @@ class GameEngine extends Component {
     } else {
       this.setState({ score: this.props.guest.map_1 });
     }
+  }
+
+  componentDidUpdate() {
+    if (this.state.gameover && !this.state.dataSent) {
+      this.sendEndgameData();
+    }
+  }
+
+  componentWillUnmount() {
+    // prevent memory leak by clearing/stopping loops
+    clearTimeout(this.timeout);
+    clearInterval(this.updateInterval);
+    clearInterval(this.renderInterval);
+    if (this.props.multi) {
+      this.socket.disconnect();
+    }
+  }
+
+  componentDidMount() {
+    this.startCountdown();
+
+    this.getScore();
 
     if (this.state.multi) {
       this.socket.on('connect', () => {
@@ -513,7 +555,15 @@ class GameEngine extends Component {
 
   //Ends game when timer reaches zero
   timeOut() {
-    this.setState({ gameover: true });
+    this.setState({
+      gameover: true,
+      endScore: parseInt(
+        (new Date().getTime() -
+          this.variables.gameStartTime -
+          this.variables.timePaused) /
+          1000
+      )
+    });
   }
 
   render() {
@@ -578,115 +628,119 @@ class GameEngine extends Component {
         );
       }
     }
+    return (
+      <Background>
+        {/* conditional rendering when the pause button is toggled */}
+        {this.state.paused && this.state.hideMenu && this.state.changingKey && (
+          <ChangeKeyMenu
+            jumpKey={this.state.jumpKey}
+            showMenu={() =>
+              this.setState({ changingKey: false, hideMenu: false })
+            }
+            showModal={this.state.changingKey}
+          />
+        )}
+        {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
+        {this.state.paused && !this.state.hideMenu && (
+          <PauseMenu
+            resume={() => this.resumeGame()}
+            restart={() => this.restartGame()}
+            changeKey={() =>
+              this.setState({ changingKey: true, hideMenu: true })
+            }
+            goToMenu={() => this.props.goToMenu()}
+            showModal={this.state.paused}
+          />
+        )}
 
-    //console.log(this.state.gameover)
-    if (!this.state.tutorial) {
-      return (
-        <Background>
-          {/* conditional rendering when the pause button is toggled */}
-          {this.state.paused &&
-            this.state.hideMenu &&
-            this.state.changingKey && (
-              <ChangeKeyMenu
-                jumpKey={this.state.jumpKey}
-                showMenu={() =>
-                  this.setState({ changingKey: false, hideMenu: false })
-                }
-                showModal={this.state.changingKey}
-              />
-            )}
-          {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
-          {this.state.paused && !this.state.hideMenu && (
-            <PauseMenu
-              resume={() => this.resumeGame()}
-              restart={() => this.restartGame()}
-              changeKey={() =>
-                this.setState({ changingKey: true, hideMenu: true })
-              }
-              goToMenu={() => this.props.goToMenu()}
-              showModal={this.state.paused}
-            />
-          )}
-
-          <SVGLayer
-            viewBox={'0 0 2000 5000'}
-            preserveAspectRatio={'xMaxYMin slice'}
-            height={this.state.windowHeight}
-            width={this.state.windowHeight * 2}
-          >
-            {/* black background */}
-            <rect x={0} y={0} height={100000} width={100000} fill={'black'} />
-            {!this.state.gameover && (
+        <SVGLayer
+          viewBox={'0 0 2000 5000'}
+          preserveAspectRatio={'xMaxYMin slice'}
+          height={this.state.windowHeight}
+          width={this.state.windowHeight * 2}
+        >
+          {/* black background */}
+          <rect x={0} y={0} height={100000} width={100000} fill={'black'} />
+          {!this.state.gameover && (
+            <>
               <Timer
                 y={CONSTANTS.TOOLBAR_Y}
                 x={CONSTANTS.TOOLBAR_X}
                 pause={this.state.paused}
                 multi={this.state.multi}
                 timerCanStart={this.state.timerCanStart}
-                boot={bool => this.setState({ gameover: bool })}
+                boot={bool => this.setState({ gameover: bool }, this.timeOut)}
                 restart={this.state.restart}
               />
-            )}
-            <CurrBestTime
-              y={CONSTANTS.TOOLBAR_Y}
-              x={CONSTANTS.TOOLBAR_X}
-              score={this.state.score}
-            />
-
-            <ProgressBar
-              y={CONSTANTS.TOOLBAR_Y}
-              x={CONSTANTS.TOOLBAR_X}
-              currX={this.getX({
-                currentTime: new Date().getTime(),
-                mapTranslationStart: this.variables.mapTranslationStart,
-                mapTranslationStartTime: this.variables.mapTranslationStartTime,
-                mapTranslation: this.state.mapTranslation,
-                atWall: this.variables.atWall,
-                x: this.variables.x,
-                paused: this.state.paused
-              })}
-              pathLen={pathLength}
-            />
-            <Map
-              translation={this.state.mapTranslation}
-              map={this.props.mapProps.map}
-              stroke={this.props.mapProps.strokeWidth}
-              className="map"
-            />
-            {boxes}
-            <PauseButton
-              x={CONSTANTS.ICON_X}
-              handleClick={() => this.pauseGame()}
-              className="pauseButton"
-            />
-            {/* tutorial used to be here */}
-            <g>
-              {/* player icon */}
-              <circle
-                cx={CONSTANTS.ICON_X}
-                cy={CONSTANTS.TOOLBAR_Y + 100}
-                r={CONSTANTS.SPRITE_SIDE / 4}
-                stroke="white"
-                strokeWidth="1"
-                fill={this.state.playercolor}
-                className="icon"
+              <CurrBestTime
+                y={CONSTANTS.TOOLBAR_Y}
+                x={CONSTANTS.TOOLBAR_X}
+                score={this.state.score}
               />
-            </g>
-          </SVGLayer>
 
-          {this.state.dataSent && (
-            <GameoverMenu
-              restart={() => this.restartGame()}
-              exitToMenu={() => this.props.goToMenu()}
-              score={this.state.score}
-              showModal={this.state.gameover}
-            />
+              <ProgressBar
+                y={CONSTANTS.TOOLBAR_Y}
+                x={CONSTANTS.TOOLBAR_X}
+                currX={this.getX({
+                  currentTime: new Date().getTime(),
+                  mapTranslationStart: this.variables.mapTranslationStart,
+                  mapTranslationStartTime: this.variables
+                    .mapTranslationStartTime,
+                  mapTranslation: this.state.mapTranslation,
+                  atWall: this.variables.atWall,
+                  x: this.variables.x,
+                  paused: this.state.paused
+                })}
+                pathLen={pathLength}
+              />
+            </>
           )}
-        </Background>
-      );
-    } else {
-      return <Tutorial handlePlay={() => this.setState({ tutorial: false })} />;
-    }
+          <Map
+            translation={this.state.mapTranslation}
+            map={this.props.mapProps.map}
+            stroke={this.props.mapProps.strokeWidth}
+            className="map"
+          />
+          {boxes}
+          <PauseButton
+            x={CONSTANTS.ICON_X}
+            handleClick={() => this.pauseGame()}
+            className="pauseButton"
+          />
+          <Text
+            fill={'#C1BFBF'}
+            x={CONSTANTS.COUNTDOWN_X}
+            y={CONSTANTS.COUNTDOWN_Y}
+          >
+            {' '}
+            {CONSTANTS.COUNTDOWN_NUMBERS[this.state.countdownIndex]}{' '}
+          </Text>
+          {/* tutorial used to be here */}
+          <g>
+            {/* player icon */}
+            <circle
+              cx={CONSTANTS.ICON_X}
+              cy={CONSTANTS.TOOLBAR_Y + 100}
+              r={CONSTANTS.SPRITE_SIDE / 4}
+              stroke="white"
+              strokeWidth="1"
+              fill={this.state.playercolor}
+              className="icon"
+            />
+          </g>
+        </SVGLayer>
+
+        {this.state.dataSent && (
+          <GameoverMenu
+            restart={() => this.restartGame()}
+            exitToMenu={() => this.props.goToMenu()}
+            highscore={this.state.score}
+            score={this.state.endScore}
+            showModal={this.state.gameover}
+          />
+        )}
+      </Background>
+    );
   }
 }
 

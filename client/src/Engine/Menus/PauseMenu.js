@@ -1,18 +1,17 @@
 import React from 'react';
 import { ModalProvider } from 'styled-react-modal';
-import StyledModal from './StyledModal.js';
-import StyledButton from './StyledButton.js';
 import PropTypes from 'prop-types';
+import { StyledModal, ModalStyledButton } from '../../Style/ModalStyle.js';
 
 const PauseMenu = props => {
   const { resume, restart, changeKey, goToMenu, showModal } = props;
   return (
     <ModalProvider>
       <StyledModal isOpen={showModal}>
-        <StyledButton onClick={resume}>Resume</StyledButton>
-        <StyledButton onClick={restart}>Restart</StyledButton>
-        <StyledButton onClick={changeKey}> Change Key</StyledButton>
-        <StyledButton onClick={goToMenu}>Main Menu</StyledButton>
+        <ModalStyledButton onClick={resume}>Resume</ModalStyledButton>
+        <ModalStyledButton onClick={restart}>Restart</ModalStyledButton>
+        <ModalStyledButton onClick={changeKey}> Change Key</ModalStyledButton>
+        <ModalStyledButton onClick={goToMenu}>Main Menu</ModalStyledButton>
       </StyledModal>
     </ModalProvider>
   );

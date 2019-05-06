@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { ModalProvider } from 'styled-react-modal';
-import StyledModal from './StyledModal.js';
-import StyledButton from './StyledButton.js';
 import PropTypes from 'prop-types';
+import { StyledModal, ModalStyledButton } from '../../Style/ModalStyle.js';
 
 const StyledP = styled.p`
   text-align: center;
@@ -42,7 +41,7 @@ class ChangeKeyMenu extends Component {
                 : String.fromCharCode(this.state.currentKey).toUpperCase()
             }`}
           </StyledP>
-          <StyledButton onClick={showMenu}>Back</StyledButton>
+          <ModalStyledButton onClick={showMenu}>Back</ModalStyledButton>
         </StyledModal>
       </ModalProvider>
     );

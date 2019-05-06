@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import Modal from 'styled-react-modal';
 
-export const StyledButton = styled.button`
+export const ModalStyledButton = styled.button`
   display: block;
   background-color: #008cba;
   font-size: 30px;
@@ -15,4 +16,10 @@ export const StyledButton = styled.button`
   margin: 15px;
 `;
 
-export default StyledButton;
+export const StyledModal = Modal.styled`
+  width: 20rem;
+  height: auto;
+  display: block;
+  align-items: center;
+  background-color:#2f2f2f;
+`;

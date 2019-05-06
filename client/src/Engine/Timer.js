@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-
-const Text = styled.text`
-  margin-top: 10px
-  font-size: 30px;
-`;
+import { SVGText } from '../Style/EngineStyle.js';
 
 const MINUTES = '00';
-const SECONDS = '45';
+const SECONDS = '30';
 
 const START_TIME = {
   minutes: MINUTES,
@@ -119,9 +114,9 @@ class Timer extends Component {
 
   render() {
     return (
-      <Text fill={'white'} x={this.props.x + 60} y={this.props.y + 25}>
+      <SVGText fill={'white'} x={this.props.x + 60} y={this.props.y + 25}>
         {`${this.state.minutes}:${this.state.seconds}`}
-      </Text>
+      </SVGText>
     );
   }
 }

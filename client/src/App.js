@@ -6,6 +6,7 @@ import GameEngine from './Engine/GameEngine.js';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import Settings from './MainMenu/Settings.js';
 import Statistics from './MainMenu/Statistics.js';
+import { MenuBackground } from './Style/MenuStyle.js';
 // import MapChoice from './MainMenu/MapChoice.js';
 
 const GOOGLE_CLIENT_ID =
@@ -22,12 +23,6 @@ const GUEST_ACCOUNT = {
 const CenteredDiv = styled.div`
   text-align: center;
   padding: 0px;
-`;
-
-const Background = styled.div`
-  background-color: #2f2f2f;
-  margin: 0px;
-  height: 100vh;
 `;
 
 const StyledButton = styled.button`
@@ -180,7 +175,7 @@ class App extends Component {
     switch (this.state.mode) {
       case 'menu':
         return (
-          <Background>
+          <MenuBackground>
             <CenteredDiv>
               <Title>
                 Rollrace
@@ -227,7 +222,7 @@ class App extends Component {
               {!this.state.loggedIn && loginButton}
               {this.state.loggedIn && logoutButton}
             </div>
-          </Background>
+          </MenuBackground>
         );
 
       case 'game':
