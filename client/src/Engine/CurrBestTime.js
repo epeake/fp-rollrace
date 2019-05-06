@@ -1,17 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-
-const Text = styled.text`
-  margin-top: 10px
-  font-size: 30px;
-`;
+import { SVGText } from '../Style/EngineStyle.js';
 
 export default function CurrBestTime(props) {
   return (
-    <Text fill={'white'} x={props.x + 700} y={props.y + 25}>{`Current Best: ${
-      props.score
-    } sec`}</Text>
+    <SVGText fill={'white'} x={props.x + 700} y={props.y + 25}>{`Highscore: ${
+      props.score === -1 || props.score === Infinity
+        ? 'N/A'
+        : `${props.score} sec`
+    }`}</SVGText>
   );
 }
 

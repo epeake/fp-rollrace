@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { ModalProvider } from 'styled-react-modal';
-import StyledModal from './StyledModal.js';
-import StyledButton from './StyledButton.js';
+import { StyledModal, ModalStyledButton } from '../../Style/ModalStyle.js';
 
 const StyledP = styled.p`
   text-align: center;
@@ -16,9 +15,12 @@ export default function GameoverMenu(props) {
     <ModalProvider>
       <StyledModal isOpen={props.showModal}>
         <StyledP>Game Over!</StyledP>
-        <StyledP>{`Current Highscore: ${props.score}`}</StyledP>
-        <StyledButton onClick={props.restart}>Restart</StyledButton>
-        <StyledButton onClick={props.exitToMenu}>Main Menu</StyledButton>
+        <StyledP>{`Score: ${props.score}`}</StyledP>
+        <StyledP>{`Highscore: ${props.highscore}`}</StyledP>
+        <ModalStyledButton onClick={props.restart}>Restart</ModalStyledButton>
+        <ModalStyledButton onClick={props.exitToMenu}>
+          Main Menu
+        </ModalStyledButton>
       </StyledModal>
     </ModalProvider>
   );

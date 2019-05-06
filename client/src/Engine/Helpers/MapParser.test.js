@@ -1,4 +1,4 @@
-import { findMapSpan, buildMapHashtable } from './mapParser.js';
+import { findMapSpan, buildMapHashtable } from './MapParser.js';
 
 describe('findMapSpan tests', () => {
   test('Single start point', () => {

@@ -1,18 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
-const SpriteOne = styled.ellipse`
-  fill: #ff0000;
-`;
-
-const SpriteTwo = styled.ellipse`
-  fill: #00ff00;
-`;
-
-const Bar = styled.rect`
-  fill: #ffffff;
-`;
 const WIDTH = 200; // Set maximum width of progressbar
 const HEIGHT = 20; // bar height
 const POS_OFFSET = 35;
@@ -40,9 +28,9 @@ class ProgressBar extends Component {
   render() {
     /*
     Finds how far the player is as perecntage of the entire path
-    Translate that value to the distance from the start the sprite's icon will be on 
+    Translate that value to the distance from the start the sprite's icon will be on
     the progress bar.
-    Currently it only supports single player mode. 
+    Currently it only supports single player mode.
 
     */
     const percentage = this.state.currentX / this.props.pathLen;
@@ -53,21 +41,26 @@ class ProgressBar extends Component {
 
     return (
       <g>
-        <Bar
+        <rect
+          fill={'#ffffff'}
           width={WIDTH}
           height={HEIGHT}
           x={this.props.x}
           y={this.props.y + POS_OFFSET}
         />
 
-        <SpriteOne
+        {/* sprite 1 */}
+        <ellipse
+          fill={'#ff0000'}
           cx={currentPos} /*update player one position*/
           cy={this.props.y + SPRITE_OFFSET} /* offset */
           rx={2.0}
           ry={9.0}
         />
 
-        <SpriteTwo
+        {/* sprite 2 */}
+        <ellipse
+          fill={'#00ff00'}
           cx={currentPos} /*update player two position*/
           cy={this.props.y + SPRITE_OFFSET}
           rx={2.0}
