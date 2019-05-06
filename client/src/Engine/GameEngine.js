@@ -504,6 +504,7 @@ class GameEngine extends Component {
           if (data !== undefined && data.length > 0) {
             this.setState({ players: data });
           }
+          console.log(this.state.players);
         });
       });
     }
@@ -516,6 +517,8 @@ class GameEngine extends Component {
   }
 
   render() {
+    // Find the length of the map
+    const pathLength = this.mapLength - GAMEOVER_X;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
@@ -542,6 +545,7 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
+            console.log(this.getMapTranslation() - player.mapTrans + 200);
             return (
               <circle
                 key={player.id}
@@ -562,7 +566,7 @@ class GameEngine extends Component {
                   200 +
                   CONSTANTS.SPRITE_SIDE / 2
                 }
-                cy={player.y + CONSTANTS.SPRITE_SIDE / 2}
+                cy={player.y}
                 r={CONSTANTS.SPRITE_SIDE / 2}
                 stroke="white"
                 strokeWidth="1"
@@ -629,7 +633,20 @@ class GameEngine extends Component {
               score={this.state.score}
             />
 
-            <ProgressBar y={CONSTANTS.TOOLBAR_Y} x={CONSTANTS.TOOLBAR_X} />
+            <ProgressBar
+              y={TOOLBAR_Y}
+              x={TOOLBAR_X}
+              currX={this.getX({
+                currentTime: new Date().getTime(),
+                mapTranslationStart: this.variables.mapTranslationStart,
+                mapTranslationStartTime: this.variables.mapTranslationStartTime,
+                mapTranslation: this.state.mapTranslation,
+                atWall: this.variables.atWall,
+                x: this.variables.x,
+                paused: this.state.paused
+              })}
+              pathLen={pathLength}
+            />
             <Map
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}

@@ -25,7 +25,7 @@ export default function GameoverMenu(props) {
 }
 
 GameoverMenu.propTypes = {
-  score: PropTypes.number.isRequired,
+  score: PropTypes.number,
   restart: PropTypes.func.isRequired,
   exitToMenu: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired
