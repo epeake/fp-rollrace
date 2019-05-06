@@ -1,17 +1,21 @@
 import { CONSTANTS } from './constants.js';
 
 /*
- * Outputs the time when the sprite will reach the given y value given the state of the game from props
- *   comes from solving the distance function in getY for time 
- * @params: props: {
+ * Outputs the time when the sprite will reach the given y value given 
+ *   the state of the game from props OR Infinity if the sprite
+ *   isn't moving vertically
+ * 
+ *     functions come from solving the distance function in getY for time 
+ * 
+ * @params: props: { // see constants.js
             yStart: ,
-            y: ,
+            y: , // the y input used for ETA calculation
             descentStartTime: ,
-            jumpState: ,
+            jumpState: , // can't be CONSTANTS.jump.STOP
             jumpStartTime: ,
             currentTime: ,
           }
- * @outputs: time (an integer I think)
+ * @outputs: time (an integer) OR Infinity
  */
 const getTimeForGivenY = props => {
   if (props.jumpState === CONSTANTS.jump.DOWN) {
@@ -31,30 +35,36 @@ const getTimeForGivenY = props => {
       CONSTANTS.JUMP_SPEED
     );
   } else {
-    console.log('returning undefined');
-    return undefined;
+    console.error(
+      "trying to calculate arrival time when sprite isn't moving vertically"
+    );
+    return Infinity;
   }
 };
 
 /*
- * Outputs the time when the sprite will reach the given x value given the state of the game from props
- *   comes from solving the distance function in getX for time 
- * @params: props: {
+ * Outputs the time when the sprite will reach the given x value given 
+ *   the state of the game from props OR Infinity if the sprite
+ *   isn't moving horizontally
+ * 
+ *     functions come from solving the distance function in getX for time 
+ * 
+ * @params: props: { // see constants.js
             mapTranslationStart: ,
             mapTranslationStartTime: ,
-            atWall: ,
-            x: ,
-            xOffset: ,
+            atWall: , // can't be true
+            givenX: , // the x input used for ETA calculation
+            x: , // this is the same x from CONSTANTS.variables.x
           }
- * @outputs: time (an integer I think)
+ * @outputs: time (an integer) OR Infinity
  */
 const getTimeForGivenX = props => {
   if (props.atWall) {
     console.error("trying to calculate arrival time when sprite isn't moving");
-    return undefined;
+    return Infinity;
   } else {
     return (
-      (props.mapTranslationStart - props.xOffset + props.x) /
+      (props.mapTranslationStart - props.x + props.givenX) /
         CONSTANTS.SCROLL_SPEED +
       props.mapTranslationStartTime
     );
@@ -63,7 +73,9 @@ const getTimeForGivenX = props => {
 
 /*
  * Outputs the mapTranslation value of the sprite given a current state of the game
- * @params: props: {
+ *   and currentTime
+ * 
+ * @params: props: { // see constants.js
             currentTime: ,
             mapTranslationStart: ,
             mapTranslationStartTime: ,
@@ -71,7 +83,7 @@ const getTimeForGivenX = props => {
             atWall: ,
             paused: ,
           }
- * @outputs: mapTranslation (an integer) (usually negative)
+ * @outputs: mapTranslation (an integer <= 0)
  */
 const getMapTranslation = props => {
   if (props.atWall || props.paused) {
@@ -87,7 +99,9 @@ const getMapTranslation = props => {
 
 /*
  * Outputs the x value of the sprite given a current state of the game
- * @params: props: {
+ *   and currentTime
+ *
+ * @params: props: { // see constants.js
             currentTime: ,
             mapTranslationStart: ,
             mapTranslationStartTime: ,
@@ -114,7 +128,9 @@ const getX = props => {
 
 /*
  * Outputs the y value of the sprite given a current state of the game
- * @params: props: {
+ *   and currentTime
+ *
+ * @params: props: { // see constants.js
         currentTime: ,
         descentStartTime: ,
         jumpStartTime: ,
@@ -148,6 +164,7 @@ const getY = props => {
 
 /*
  * Outputs whether or not the given y variable sets the sprite within the bounds of the wall
+ *
  * @params: location: an element of the map array
  *          y: the y location of the upper side of the sprite
  * @outputs: boolean
@@ -163,12 +180,14 @@ const checkAtWall = (location, y) => {
 
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is moving)
- *  telling the time of collision
- * @params: props: {
+ *   telling the time of collision OR undefined if there won't be a collision 
+ *   within the given maxX
+ * 
+ * @params: props: { // see constants.js
             mapTranslation: ,
             mapTranslationStart: ,
             mapTranslationStartTime: ,
-            maxX: ,
+            maxX: , // the end of the x range to search for walls
             descentStartTime: ,
             jumpStartTime: ,
             jumpState: ,
@@ -180,7 +199,7 @@ const checkAtWall = (location, y) => {
             map: ,
             paused: 
           }
- * @outputs: { time: , event: , } a motionChange object
+ * @outputs: { time: , event: , } a motionChange object OR undefined
  */
 const findWall = props => {
   // define local variables
@@ -201,6 +220,7 @@ const findWall = props => {
     paused
   } = props;
 
+  // the start of the x range in which to look for walls
   let currentX = Math.round(
     x + CONSTANTS.SPRITE_SIDE - strokeWidth - mapTranslation
   );
@@ -213,8 +233,8 @@ const findWall = props => {
           mapTranslationStart: mapTranslationStart,
           mapTranslationStartTime: mapTranslationStartTime,
           atWall: atWall,
-          x: currentX - CONSTANTS.SPRITE_SIDE,
-          xOffset: x
+          givenX: currentX - CONSTANTS.SPRITE_SIDE,
+          x: x
         }),
         descentStartTime: descentStartTime,
         jumpStartTime: jumpStartTime,
@@ -230,8 +250,8 @@ const findWall = props => {
             mapTranslationStart: mapTranslationStart,
             mapTranslationStartTime: mapTranslationStartTime,
             atWall: atWall,
-            x: currentX - CONSTANTS.SPRITE_SIDE,
-            xOffset: x
+            givenX: currentX - CONSTANTS.SPRITE_SIDE,
+            x: x
           }),
           event: 'block'
         };
@@ -244,8 +264,9 @@ const findWall = props => {
 
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is falling)
- *  telling the time of landing
- * @params: props: {
+ *  telling the time of landing OR undefined if there are to paths to land on
+ *  in the given x interval
+ * @params: props: { // see constants.js
             currentTime: ,
             mapTranslationStart: ,
             mapTranslationStartTime: ,
@@ -255,14 +276,14 @@ const findWall = props => {
             descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
-            maxX: ,
+            maxX: , // the end of the x range to search for walls
             x: ,
             minY: ,
             map: ,
             paused: ,
             strokeWidth: ,
           }
- * @outputs: { time: , event: , } a motionChange object
+ * @outputs: { time: , event: , } a motionChange object OR undefined
  */
 const findPath = props => {
   // declare local variables
@@ -284,7 +305,10 @@ const findPath = props => {
     strokeWidth
   } = props;
 
+  // the start of the x range in which to look for walls
   let currentX = Math.round(x - mapTranslation);
+
+  // the height of the highest path the sprite will land on
   let highest = minY;
 
   for (currentX; currentX <= maxX; currentX++) {
@@ -347,8 +371,8 @@ const findPath = props => {
 
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is on a path)
- *  telling the time of falling off the path
- * @params: props: {
+ *  telling the time of falling off the path OR undefined if it fails to find the end
+ * @params: props: { // see constants.js
             mapTranslation: ,
             y: ,
             mapTranslationStart: ,
@@ -358,7 +382,7 @@ const findPath = props => {
             mapLength: ,
             map: ,
           }
- * @outputs: { time: , event: , } a motionChange object
+ * @outputs: { time: , event: , } a motionChange object OR undefined
  */
 const findEndOfPath = props => {
   // declare local variables
@@ -373,8 +397,11 @@ const findEndOfPath = props => {
     map
   } = props;
 
+  // the start of the x range in which to look for walls
   let currentX = Math.round(x - mapTranslation);
-  let foundPathStart = false; // whether or not we have found the start of the current path
+
+  // whether or not we have found the start of the current path
+  let foundPathStart = false;
 
   for (currentX; currentX <= mapLength; currentX++) {
     const locations = map[currentX];
@@ -405,8 +432,8 @@ const findEndOfPath = props => {
           mapTranslationStart: mapTranslationStart,
           mapTranslationStartTime: mapTranslationStartTime,
           atWall: atWall,
-          x: currentX,
-          xOffset: x
+          givenX: currentX,
+          x: x
         }),
         event: 'fall'
       };
@@ -420,7 +447,7 @@ const findEndOfPath = props => {
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is at a wall)
  *
- * @params: props: {
+ * @params: props: { // see constants.js
             currentTime: ,
             y: ,
             yStart: ,
@@ -459,9 +486,12 @@ const spriteAtWall = props => {
     strokeWidth
   } = props;
 
+  // the start of the x range in which to look for walls
   let currentX = Math.round(x - mapTranslation) + CONSTANTS.SPRITE_SIDE;
+
   let found = false;
   let wall;
+
   // find the wall the sprite is at
   while (!found) {
     const locations = map[currentX];
@@ -549,7 +579,7 @@ const spriteAtWall = props => {
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is traveling along a path)
  *
- * @params: props: {
+ * @params: props: { // see constants.js
             y: ,
             yStart: ,
             descentStartTime: ,
@@ -638,7 +668,7 @@ const spriteOnFlat = props => {
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite freely ascending)
  *
- * @params: props: {
+ * @params: props: { // see constants.js
             y: ,
             yStart: ,
             descentStartTime: ,
@@ -717,7 +747,7 @@ const spriteGoingUp = props => {
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is in freefall)
  *
- * @params: props: {
+ * @params: props: { // see constants.js
               currentTime: ,
               minY: ,
               y: ,
@@ -834,7 +864,7 @@ const spriteGoingDown = props => {
 /*
  * Outputs a motionChange object based on the game state passed as props
  *
- * @params: props: {
+ * @params: props: { // see constants.js
  *          variables: ,
  *          state: ,
  *          strokeWidth: ,
