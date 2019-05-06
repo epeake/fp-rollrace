@@ -8,7 +8,7 @@ import PauseMenu from './Menus/PauseMenu.js';
 import PauseButton from './PauseButton.js';
 import GameoverMenu from './Menus/GameoverMenu.js';
 import ChangeKeyMenu from './Menus/ChangeKeyMenu.js';
-// import ProgressBar from './ProgressBar.js';
+import ProgressBar from './ProgressBar.js';
 import Map from './Map.js';
 import Timer from './Timer.js';
 import CurrBestTime from './CurrBestTime.js';
@@ -65,6 +65,7 @@ const INITIAL_STATE = {
   dataSent: false,
   tutorial: false,
   paused: false,
+  endScore: undefined,
   gameover: false,
   jumpKey: 32, // space bar
   startKey: 115, // s key
@@ -221,10 +222,13 @@ class GameEngine extends Component {
         if (this.state.countdownIndex < 3) {
           this.setState({ countdownIndex: this.state.countdownIndex + 1 });
         }
-      }, 950);
+      }, 1000);
       setTimeout(() => {
         clearInterval(this.countdownInterval);
-        this.startLoops();
+        this.setState(
+          { countdownIndex: COUNTDOWN_NUMBERS.length - 1 },
+          this.startLoops()
+        );
       }, 3000);
     }
   }
@@ -1075,7 +1079,13 @@ class GameEngine extends Component {
           clearInterval(this.renderInterval);
           clearInterval(this.updateInterval);
           this.setState({
-            gameover: true
+            gameover: true,
+            endScore: parseInt(
+              (new Date().getTime() -
+                this.variables.gameStartTime -
+                this.variables.timePaused) /
+                1000
+            )
           });
         } else {
           this.setState({
@@ -1197,6 +1207,7 @@ class GameEngine extends Component {
           if (data !== undefined && data.length > 0) {
             this.setState({ players: data });
           }
+          console.log(this.state.players);
         });
       });
     }
@@ -1205,10 +1216,20 @@ class GameEngine extends Component {
 
   //Ends game when timer reaches zero
   timeOut() {
-    this.setState({ gameover: true });
+    this.setState({
+      gameover: true,
+      endScore: parseInt(
+        (new Date().getTime() -
+          this.variables.gameStartTime -
+          this.variables.timePaused) /
+          1000
+      )
+    });
   }
 
   render() {
+    // Find the length of the map
+    const pathLength = this.mapLength - GAMEOVER_X;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
@@ -1235,13 +1256,13 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
+            console.log(this.getMapTranslation() - player.mapTrans + 200);
             return (
               <circle
                 key={player.id}
                 // this difference allows for other players
                 // to be rendered at different places in the map
                 // based on their x coordinate
-                cx={this.getMapTranslation() - player.mapTrans + 200}
                 cy={player.y}
                 stroke="white"
                 strokeWidth="1"
@@ -1255,7 +1276,6 @@ class GameEngine extends Component {
       }
     }
 
-    //console.log(this.state.gameover)
     if (!this.state.tutorial) {
       return (
         <Background>
@@ -1299,7 +1319,7 @@ class GameEngine extends Component {
                 pause={this.state.paused}
                 multi={this.state.multi}
                 timerCanStart={this.state.timerCanStart}
-                boot={bool => this.setState({ gameover: bool })}
+                boot={bool => this.setState({ gameover: bool }, this.timeOut)}
                 restart={this.state.restart}
               />
             )}
@@ -1309,6 +1329,12 @@ class GameEngine extends Component {
               score={this.state.score}
             />
 
+            <ProgressBar
+              y={TOOLBAR_Y}
+              x={TOOLBAR_X}
+              currX={this.getX()}
+              pathLen={pathLength}
+            />
             <Map
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
@@ -1345,12 +1371,7 @@ class GameEngine extends Component {
               restart={() => this.restartGame()}
               exitToMenu={() => this.props.goToMenu()}
               highscore={this.state.score}
-              score={parseInt(
-                (new Date().getTime() -
-                  this.variables.gameStartTime -
-                  this.variables.timePaused) /
-                  1000
-              )}
+              score={this.state.endScore}
               showModal={this.state.gameover}
             />
           )}
@@ -1361,9 +1382,6 @@ class GameEngine extends Component {
     }
   }
 }
-/*
-<ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
-*/
 
 /* tutorial:
  *<g onClick={() => this.pauseGame()}>
