@@ -4,7 +4,6 @@ import StyledModal from './StyledModal.js';
 import StyledButton from './StyledButton.js';
 import PropTypes from 'prop-types';
 
-
 const PauseMenu = props => {
   const { resume, restart, changeKey, goToMenu, showModal } = props;
   return (
