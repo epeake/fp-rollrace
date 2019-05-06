@@ -1297,7 +1297,6 @@ class GameEngine extends Component {
               score={this.state.score}
             />
 
-            <ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
             <Map
               translation={this.state.mapTranslation}
               map={this.props.mapProps.map}
@@ -1351,6 +1350,9 @@ class GameEngine extends Component {
     }
   }
 }
+/*
+<ProgressBar y={TOOLBAR_Y} x={TOOLBAR_X} />
+*/
 
 /* tutorial:
  *<g onClick={() => this.pauseGame()}>
