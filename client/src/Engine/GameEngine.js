@@ -218,8 +218,10 @@ class GameEngine extends Component {
   startCountdown() {
     if (!this.variables.gameStartTime) {
       this.countdownInterval = setInterval(() => {
-        this.setState({ countdownIndex: this.state.countdownIndex + 1 });
-      }, 1000);
+        if (this.state.countdownIndex < 3) {
+          this.setState({ countdownIndex: this.state.countdownIndex + 1 });
+        }
+      }, 950);
       setTimeout(() => {
         clearInterval(this.countdownInterval);
         this.startLoops();
