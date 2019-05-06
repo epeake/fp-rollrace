@@ -2,24 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'reactstrap';
 import styled from 'styled-components';
-
-const Background = styled.div`
-  background-color: #323232;
-  height: 100vh;
-`;
-
-// CSS for title changes whther or not user is on chrome.  Condition checks for chrome
-const Title = styled.h1`
-  font-family: 'Gugi', cursive;
-  font-size: 600%;
-  color: white;
-`;
-
-const OptionText = styled.h3`
-  font-family: 'Gugi', cursive;
-  font-size: 200%;
-  color: white;
-`;
+import {
+  MenuBackground,
+  MenuTitle,
+  MenuButton,
+  MenuText
+} from '../Style/MenuStyle.js';
 
 const SettingsOption = styled.div`
   padding-top: 5%;
@@ -27,17 +15,6 @@ const SettingsOption = styled.div`
   background-color: #323232;
   margin-left: 2%;
   margin-right: 2%;
-`;
-
-const StyledButton = styled.button`
-  background-color: #fffff;
-  font-size: 16px;
-  border-radius: 12px;
-  border: 2px solid #555555;
-  font-family: monospace;
-  &:hover {
-    background-color: #e8e8e8;
-  }
 `;
 
 const ColorLabel = styled.div`
@@ -61,6 +38,12 @@ const LabeledSlider = props => {
       />
     </div>
   );
+};
+
+LabeledSlider.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
+  valueChange: PropTypes.func.isRequired
 };
 
 class Settings extends Component {
@@ -95,12 +78,12 @@ class Settings extends Component {
 
   render() {
     return (
-      <Background>
-        <Title> Settings </Title>
-        <StyledButton onClick={this.handleClick}>{'<-'} Main Menu</StyledButton>
+      <MenuBackground>
+        <MenuTitle> Settings </MenuTitle>
+        <MenuButton onClick={this.handleClick}>{'<-'} Main Menu</MenuButton>
         <Row>
           <SettingsOption>
-            <OptionText> Choose Your Color </OptionText>
+            <MenuText> Choose Your Color </MenuText>
             <svg height="100" width="100">
               <circle
                 cx="50"
@@ -134,19 +117,14 @@ class Settings extends Component {
             />
           </SettingsOption>
           <SettingsOption>
-            <OptionText> Choose Your Nickname </OptionText>
+            <MenuText> Choose Your Nickname </MenuText>
           </SettingsOption>
         </Row>
-        <StyledButton onClick={this.selectColor}> Save Settings </StyledButton>
-      </Background>
+        <MenuButton onClick={this.selectColor}> Save Settings </MenuButton>
+      </MenuBackground>
     );
   }
 }
-LabeledSlider.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-  valueChange: PropTypes.func.isRequired
-};
 
 Settings.propTypes = {
   goToMenu: PropTypes.func.isRequired

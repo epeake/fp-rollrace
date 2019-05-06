@@ -1,12 +1,12 @@
 import { CONSTANTS } from './constants.js';
 
 /*
- * Outputs the time when the sprite will reach the given y value given 
+ * Outputs the time when the sprite will reach the given y value given
  *   the state of the game from props OR Infinity if the sprite
  *   isn't moving vertically
- * 
- *     functions come from solving the distance function in getY for time 
- * 
+ *
+ *     functions come from solving the distance function in getY for time
+ *
  * @params: props: { // see constants.js
             yStart: ,
             y: , // the y input used for ETA calculation
@@ -43,12 +43,12 @@ const getTimeForGivenY = props => {
 };
 
 /*
- * Outputs the time when the sprite will reach the given x value given 
+ * Outputs the time when the sprite will reach the given x value given
  *   the state of the game from props OR Infinity if the sprite
  *   isn't moving horizontally
- * 
- *     functions come from solving the distance function in getX for time 
- * 
+ *
+ *     functions come from solving the distance function in getX for time
+ *
  * @params: props: { // see constants.js
             mapTranslationStart: ,
             mapTranslationStartTime: ,
@@ -74,7 +74,7 @@ const getTimeForGivenX = props => {
 /*
  * Outputs the mapTranslation value of the sprite given a current state of the game
  *   and currentTime
- * 
+ *
  * @params: props: { // see constants.js
             currentTime: ,
             mapTranslationStart: ,
@@ -108,7 +108,7 @@ const getMapTranslation = props => {
             mapTranslation: ,
             atWall: ,
             x: ,
-            paused: 
+            paused:
           }
  * @outputs: x (an integer)
  */
@@ -180,9 +180,9 @@ const checkAtWall = (location, y) => {
 
 /*
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is moving)
- *   telling the time of collision OR undefined if there won't be a collision 
+ *   telling the time of collision OR undefined if there won't be a collision
  *   within the given maxX
- * 
+ *
  * @params: props: { // see constants.js
             mapTranslation: ,
             mapTranslationStart: ,
@@ -197,7 +197,7 @@ const checkAtWall = (location, y) => {
             x: ,
             strokeWidth: ,
             map: ,
-            paused: 
+            paused:
           }
  * @outputs: { time: , event: , } a motionChange object OR undefined
  */
