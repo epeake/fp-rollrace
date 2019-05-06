@@ -518,7 +518,7 @@ class GameEngine extends Component {
 
   render() {
     // Find the length of the map
-    const pathLength = this.mapLength - GAMEOVER_X;
+    const pathLength = this.mapLength - CONSTANTS.GAMEOVER_X;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
