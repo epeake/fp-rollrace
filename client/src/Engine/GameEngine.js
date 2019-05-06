@@ -109,7 +109,7 @@ class GameEngine extends Component {
   handleJumpKey() {
     this.variables.yStart = this.getY({
       currentTime: new Date().getTime(),
-      descendStartTime: this.variables.descendStartTime,
+      descentStartTime: this.variables.descentStartTime,
       jumpStartTime: this.variables.jumpStartTime,
       jumpState: this.variables.jumpState,
       yStart: this.variables.yStart,
@@ -197,8 +197,8 @@ class GameEngine extends Component {
     this.variables.mapTranslationStartTime =
       this.variables.mapTranslationStartTime + timeElapsed;
     this.variables.jumpStartTime = this.variables.jumpStartTime + timeElapsed;
-    this.variables.descendStartTime =
-      this.variables.descendStartTime + timeElapsed;
+    this.variables.descentStartTime =
+      this.variables.descentStartTime + timeElapsed;
     if (this.variables.motionChange) {
       this.variables.motionChange.time =
         this.variables.motionChange.time + timeElapsed;
@@ -306,7 +306,7 @@ class GameEngine extends Component {
 
         const y = this.getY({
           currentTime: adjustedTime,
-          descendStartTime: this.variables.descendStartTime,
+          descentStartTime: this.variables.descentStartTime,
           jumpStartTime: this.variables.jumpStartTime,
           jumpState: this.variables.jumpState,
           yStart: this.variables.yStart,
@@ -336,7 +336,7 @@ class GameEngine extends Component {
           });
           this.variables.jumpState = CONSTANTS.jump.STOP;
         } else if (this.variables.motionChange.event === 'fall') {
-          this.variables.descendStartTime = currentTime;
+          this.variables.descentStartTime = currentTime;
           this.variables.yStart = y;
           this.variables.jumpState = CONSTANTS.jump.DOWN;
         }
@@ -385,7 +385,7 @@ class GameEngine extends Component {
             }),
             y: this.getY({
               currentTime: new Date().getTime(),
-              descendStartTime: this.variables.descendStartTime,
+              descentStartTime: this.variables.descentStartTime,
               jumpStartTime: this.variables.jumpStartTime,
               jumpState: this.variables.jumpState,
               yStart: this.variables.yStart,

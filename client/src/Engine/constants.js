@@ -44,7 +44,7 @@ export const CONSTANTS = {
     yStart: STARTING_Y,
     jumpState: 0, // CONSTANTS.jump.STOP
     jumpStartTime: undefined,
-    descendStartTime: undefined,
+    descentStartTime: undefined,
     mapTranslationStart: 0,
     atWall: false,
     mapTranslationStartTime: undefined,

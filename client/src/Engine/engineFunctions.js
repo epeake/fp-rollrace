@@ -6,7 +6,7 @@ import { CONSTANTS } from './constants.js';
  * @params: props: {
             yStart: ,
             y: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
             currentTime: ,
@@ -17,7 +17,7 @@ const getTimeForGivenY = props => {
   if (props.jumpState === CONSTANTS.jump.DOWN) {
     return (
       Math.sqrt((-props.yStart + props.y) / (0.5 * CONSTANTS.JUMP_SPEED)) +
-      props.descendStartTime
+      props.descentStartTime
     );
   } else if (props.jumpState === CONSTANTS.jump.UP) {
     return (
@@ -116,7 +116,7 @@ const getX = props => {
  * Outputs the y value of the sprite given a current state of the game
  * @params: props: {
         currentTime: ,
-        descendStartTime: ,
+        descentStartTime: ,
         jumpStartTime: ,
         jumpState: ,
         yStart: ,
@@ -132,7 +132,7 @@ const getY = props => {
     return (
       props.yStart +
       0.5 *
-        (props.currentTime - props.descendStartTime) ** 2 *
+        (props.currentTime - props.descentStartTime) ** 2 *
         CONSTANTS.JUMP_SPEED
     );
   } else if (props.jumpState === CONSTANTS.jump.UP) {
@@ -169,7 +169,7 @@ const checkAtWall = (location, y) => {
             mapTranslationStart: ,
             mapTranslationStartTime: ,
             maxX: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpStartTime: ,
             jumpState: ,
             yStart: ,
@@ -189,7 +189,7 @@ const findWall = props => {
     mapTranslationStart,
     mapTranslationStartTime,
     maxX,
-    descendStartTime,
+    descentStartTime,
     jumpStartTime,
     jumpState,
     yStart,
@@ -216,7 +216,7 @@ const findWall = props => {
           x: currentX - CONSTANTS.SPRITE_SIDE,
           xOffset: x
         }),
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpStartTime: jumpStartTime,
         jumpState: jumpState,
         yStart: yStart,
@@ -252,7 +252,7 @@ const findWall = props => {
             mapTranslation: ,
             atWall: ,
             yStart: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
             maxX: ,
@@ -273,7 +273,7 @@ const findPath = props => {
     mapTranslation,
     atWall,
     yStart,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     maxX,
@@ -295,7 +295,7 @@ const findPath = props => {
         const time = getTimeForGivenY({
           yStart: yStart,
           y: locations[j][1] - CONSTANTS.SPRITE_SIDE,
-          descendStartTime: descendStartTime,
+          descentStartTime: descentStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
           currentTime: currentTime
@@ -331,7 +331,7 @@ const findPath = props => {
       time: getTimeForGivenY({
         yStart: yStart,
         y: highest,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         currentTime: currentTime
@@ -424,7 +424,7 @@ const findEndOfPath = props => {
             currentTime: ,
             y: ,
             yStart: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
             atWall: ,
@@ -446,7 +446,7 @@ const spriteAtWall = props => {
     y,
     mapTranslation,
     yStart,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     atWall,
@@ -481,7 +481,7 @@ const spriteAtWall = props => {
     if (
       getY({
         currentTime: peakTime,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpStartTime: jumpStartTime,
         jumpState: jumpState,
         yStart: yStart,
@@ -496,7 +496,7 @@ const spriteAtWall = props => {
         time: getTimeForGivenY({
           yStart: yStart,
           y: wall[1] - CONSTANTS.SPRITE_SIDE - strokeWidth,
-          descendStartTime: descendStartTime,
+          descentStartTime: descentStartTime,
           jumpState: jumpState,
           jumpStartTime: jumpStartTime,
           currentTime: currentTime
@@ -512,7 +512,7 @@ const spriteAtWall = props => {
       time: getTimeForGivenY({
         yStart: yStart,
         y: wall[2],
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         currentTime: currentTime
@@ -528,7 +528,7 @@ const spriteAtWall = props => {
       mapTranslation: mapTranslation,
       atWall: atWall,
       yStart: yStart,
-      descendStartTime: descendStartTime,
+      descentStartTime: descentStartTime,
       jumpState: jumpState,
       jumpStartTime: jumpStartTime,
       maxX: currentX + CONSTANTS.SPRITE_SIDE,
@@ -552,7 +552,7 @@ const spriteAtWall = props => {
  * @params: props: {
             y: ,
             yStart: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
             atWall: ,
@@ -573,7 +573,7 @@ const spriteOnFlat = props => {
     y,
     mapTranslation,
     yStart,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     atWall,
@@ -615,7 +615,7 @@ const spriteOnFlat = props => {
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
     maxX: pathEnd + CONSTANTS.SPRITE_SIDE,
-    descendStartTime: descendStartTime,
+    descentStartTime: descentStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
     yStart: yStart,
@@ -641,7 +641,7 @@ const spriteOnFlat = props => {
  * @params: props: {
             y: ,
             yStart: ,
-            descendStartTime: ,
+            descentStartTime: ,
             jumpState: ,
             jumpStartTime: ,
             atWall: ,
@@ -661,7 +661,7 @@ const spriteGoingUp = props => {
     y,
     mapTranslation,
     yStart,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     atWall,
@@ -694,7 +694,7 @@ const spriteGoingUp = props => {
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
     maxX: jumpEndX,
-    descendStartTime: descendStartTime,
+    descentStartTime: descentStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
     yStart: yStart,
@@ -722,7 +722,7 @@ const spriteGoingUp = props => {
               minY: ,
               y: ,
               yStart: ,
-              descendStartTime: ,
+              descentStartTime: ,
               jumpState: ,
               jumpStartTime: ,
               atWall: ,
@@ -744,7 +744,7 @@ const spriteGoingDown = props => {
     y,
     mapTranslation,
     yStart,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     atWall,
@@ -763,7 +763,7 @@ const spriteGoingDown = props => {
       currentTime: getTimeForGivenY({
         yStart: yStart,
         y: minY,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         currentTime: currentTime
@@ -782,7 +782,7 @@ const spriteGoingDown = props => {
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
     maxX: maxX,
-    descendStartTime: descendStartTime,
+    descentStartTime: descentStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
     yStart: yStart,
@@ -802,7 +802,7 @@ const spriteGoingDown = props => {
     mapTranslation: mapTranslation,
     atWall: atWall,
     yStart: yStart,
-    descendStartTime: descendStartTime,
+    descentStartTime: descentStartTime,
     jumpState: jumpState,
     jumpStartTime: jumpStartTime,
     maxX: maxX,
@@ -849,7 +849,7 @@ const findNextChange = props => {
   const {
     yStart,
     minY,
-    descendStartTime,
+    descentStartTime,
     jumpState,
     jumpStartTime,
     atWall,
@@ -860,7 +860,7 @@ const findNextChange = props => {
   const currentTime = new Date().getTime();
   const y = getY({
     currentTime: new Date().getTime(),
-    descendStartTime: descendStartTime,
+    descentStartTime: descentStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
     yStart: yStart,
@@ -889,7 +889,7 @@ const findNextChange = props => {
         currentTime: currentTime,
         y: y,
         yStart: yStart,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         atWall: atWall,
@@ -913,7 +913,7 @@ const findNextChange = props => {
       return spriteOnFlat({
         y: y,
         yStart: yStart,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         atWall: atWall,
@@ -935,7 +935,7 @@ const findNextChange = props => {
       return spriteGoingUp({
         y: y,
         yStart: yStart,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         atWall: atWall,
@@ -960,7 +960,7 @@ const findNextChange = props => {
         minY: minY,
         y: y,
         yStart: yStart,
-        descendStartTime: descendStartTime,
+        descentStartTime: descentStartTime,
         jumpState: jumpState,
         jumpStartTime: jumpStartTime,
         atWall: atWall,
