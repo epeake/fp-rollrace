@@ -1245,8 +1245,7 @@ class GameEngine extends Component {
               changeKey={() =>
                 this.setState({ changingKey: true, hideMenu: true })
               }
-              goToMenu={this.props.goToMenu}
-              gameOver={this.state.gameover}
+              goToMenu={() => this.props.goToMenu()}
               showModal={this.state.paused}
             />
           )}
@@ -1304,20 +1303,13 @@ class GameEngine extends Component {
             </g>
           </SVGLayer>
 
-          {this.state.dataSent ? (
-            <SVGLayer
-              viewBox={'0 0 2000 1000'}
-              preserveAspectRatio={'xMinYMin meet'}
-            >
-              <GameoverMenu
-                windowHeight={this.state.windowHeight}
-                restart={() => this.restartGame()}
-                exitToMenu={() => this.props.goToMenu()}
-                score={this.state.score}
-              />
-            </SVGLayer>
-          ) : (
-            <></>
+          {this.state.dataSent && (
+            <GameoverMenu
+              restart={() => this.restartGame()}
+              exitToMenu={() => this.props.goToMenu()}
+              score={this.state.score}
+              showModal={this.state.gameover}
+            />
           )}
         </Background>
       );
