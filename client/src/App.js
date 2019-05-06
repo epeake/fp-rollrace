@@ -7,7 +7,8 @@ import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import Settings from './MainMenu/Settings.js';
 import Statistics from './MainMenu/Statistics.js';
 import { MenuBackground } from './Style/MenuStyle.js';
-// import MapChoice from './MainMenu/MapChoice.js';
+import Lobbies from './MainMenu/Lobbies.js';
+
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
@@ -81,6 +82,7 @@ class App extends Component {
       user: GUEST_ACCOUNT,
       mode: 'menu',
       multi: false,
+      lobby: undefined,
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`
@@ -226,19 +228,44 @@ class App extends Component {
         );
 
       case 'game':
-        return (
-          <GameEngine
-            mapProps={Object.assign(
-              {},
-              { map: this.state.map, strokeWidth: this.state.strokeWidth }
-            )}
-            goToMenu={this.handleGoToMenu}
-            guest={this.state.guest}
-            multi={this.state.multi}
-            playercolor={this.state.playercolor}
-          />
-        );
-
+        if (this.state.multi) {
+          //render the lobbies
+          if (this.state.lobby) {
+            /*
+             * make a request here for those players in that lobby and pass to the game
+             * engine as a prop.
+             **/
+            return (
+              <GameEngine
+                mapProps={Object.assign(
+                  {},
+                  { map: this.state.map, strokeWidth: this.state.strokeWidth }
+                )}
+                goToMenu={this.handleGoToMenu}
+                guest={this.state.guest}
+                multi={this.state.multi}
+                playercolor={this.state.playercolor}
+              />
+            );
+          } else {
+            return (
+              <Lobbies chosen={lName => this.setState({ lobby: lName })} />
+            );
+          }
+        } else {
+          return (
+            <GameEngine
+              mapProps={Object.assign(
+                {},
+                { map: this.state.map, strokeWidth: this.state.strokeWidth }
+              )}
+              goToMenu={this.handleGoToMenu}
+              guest={this.state.guest}
+              multi={this.state.multi}
+              playercolor={this.state.playercolor}
+            />
+          );
+        }
       case 'settings':
         return (
           <div>
@@ -262,9 +289,4 @@ class App extends Component {
     }
   }
 }
-
-// <MapChoice
-//   key={'mapchoice'}
-//   func={() => console.log('func called')}
-// />
 export default App;
