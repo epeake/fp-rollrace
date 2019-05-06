@@ -6,9 +6,9 @@ import StyledModal from './StyledModal.js';
 import StyledButton from './StyledButton.js';
 
 const StyledP = styled.p`
-  display: block;
   text-align: center;
   color: white;
+  font-family: 'Gugi', cursive;
 `;
 
 export default function GameoverMenu(props) {

@@ -1245,8 +1245,7 @@ class GameEngine extends Component {
               changeKey={() =>
                 this.setState({ changingKey: true, hideMenu: true })
               }
-              goToMenu={this.props.goToMenu}
-              gameOver={this.state.gameover}
+              goToMenu={() => this.props.goToMenu()}
               showModal={this.state.paused}
             />
           )}

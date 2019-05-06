@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { ModalProvider } from 'styled-react-modal';
 import StyledModal from './StyledModal.js';
 import StyledButton from './StyledButton.js';
+import PropTypes from 'prop-types';
 
 const StyledP = styled.p`
-  display: block;
   text-align: center;
   color: white;
+  font-family: 'Gugi', cursive;
 `;
 
 class ChangeKeyMenu extends Component {
@@ -41,10 +42,17 @@ class ChangeKeyMenu extends Component {
                 : String.fromCharCode(this.state.currentKey).toUpperCase()
             }`}
           </StyledP>
-          <StyledButton onClick={showMenu}>Previous Menu</StyledButton>
+          <StyledButton onClick={showMenu}>Back</StyledButton>
         </StyledModal>
       </ModalProvider>
     );
   }
 }
+
+ChangeKeyMenu.propTypes = {
+  showMenu: PropTypes.bool.isRequired,
+  jumpKey: PropTypes.string.isRequired,
+  showModal: PropTypes.bool.isRequired
+};
+
 export default ChangeKeyMenu;

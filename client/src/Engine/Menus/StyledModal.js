@@ -5,8 +5,7 @@ export const StyledModal = Modal.styled`
   height: auto;
   display: block;
   align-items: center;
-  justify-content: center;
-  background-color:#2e352a;
+  background-color:#2f2f2f;
 `;
 
 export default StyledModal;

@@ -2,6 +2,7 @@ import React from 'react';
 import { ModalProvider } from 'styled-react-modal';
 import StyledModal from './StyledModal.js';
 import StyledButton from './StyledButton.js';
+import PropTypes from 'prop-types';
 
 const PauseMenu = props => {
   const { resume, restart, changeKey, goToMenu, showModal } = props;
@@ -15,6 +16,14 @@ const PauseMenu = props => {
       </StyledModal>
     </ModalProvider>
   );
+};
+
+PauseMenu.propTypes = {
+  resume: PropTypes.func.isRequired,
+  restart: PropTypes.func.isRequired,
+  changeKey: PropTypes.func.isRequired,
+  goToMenu: PropTypes.func.isRequired,
+  showModal: PropTypes.bool.isRequired
 };
 
 export default PauseMenu;
