@@ -13,8 +13,8 @@ const SpriteTwo = styled.ellipse`
 const Bar = styled.rect`
   fill: #ffffff;
 `;
-const WIDTH = 200;
-const HEIGHT = 20;
+const WIDTH = 200; // Set maximum width of progressbar
+const HEIGHT = 20; // bar height
 const POS_OFFSET = 35;
 const SPRITE_OFFSET = 45;
 
@@ -22,10 +22,12 @@ class ProgressBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentX: this.props.currX
+      currentX: this.props.currX // save the position into state so that it can be updated
     };
   }
 
+  // Listen to prop changes that affect the state of our component
+  // when the current x position of player changes it updates the state.
   static getDerivedStateFromProps(props, state) {
     if (props.currX !== state.currentX) {
       return {
@@ -40,8 +42,7 @@ class ProgressBar extends Component {
     Finds how far the player is as perecntage of the entire path
     Translate that value to the distance from the start the sprite's icon will be on 
     the progress bar.
-     Currently it only supports single player mode but once I figure out how to 
-     find the x-coordinate of the other players I will fix that. 
+    Currently it only supports single player mode. 
 
     */
     const percentage = this.state.currentX / this.props.pathLen;
