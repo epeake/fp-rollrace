@@ -716,18 +716,24 @@ class GameEngine extends Component {
             {CONSTANTS.COUNTDOWN_NUMBERS[this.state.countdownIndex]}{' '}
           </Text>
           {/* tutorial used to be here */}
-          <g>
-            {/* player icon */}
-            <circle
-              cx={CONSTANTS.ICON_X}
-              cy={CONSTANTS.TOOLBAR_Y + 100}
-              r={CONSTANTS.SPRITE_SIDE / 4}
-              stroke="white"
-              strokeWidth="1"
-              fill={this.state.playercolor}
-              className="icon"
-            />
-          </g>
+
+          {/*Remove the player color icon in singleplayer mode*/}
+          {this.state.multi ? (
+            <g>
+              {/* player icon */}
+              <circle
+                cx={CONSTANTS.ICON_X}
+                cy={CONSTANTS.TOOLBAR_Y + 100}
+                r={CONSTANTS.SPRITE_SIDE / 4}
+                stroke="white"
+                strokeWidth="1"
+                fill={this.state.playercolor}
+                className="icon"
+              />
+            </g>
+          ) : (
+            <></>
+          )}
         </SVGLayer>
 
         {this.state.dataSent && (
