@@ -1,37 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
 import { ModalProvider } from 'styled-react-modal';
-import Modal from 'styled-react-modal';
+import StyledModal from './StyledModal.js';
+import StyledButton from './StyledButton.js';
+import PropTypes from 'prop-types';
 
-const StyledButton = styled.button`
-  display: block;
-  padding: 15px;
-  font-size: 24px;
-  font-family: monospace;
-  cursor: pointer;
-  text-align: center;
-  color: white;
-  background-color:#008cba;
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 9px #999;
-  margin: 15px;
-  width:90%;
- :hover {background-color: #02a8de}
- :active {
-  background-color: #02a8de;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
-`;
-
-const StyledModal = Modal.styled`
-  width: 20rem;
-  height: 20rem;
-  display: block;
-  align-items: center;
-  justify-content: center;
-  background-color:#2e352a;
-`;
 const PauseMenu = props => {
   const { resume, restart, changeKey, goToMenu, showModal } = props;
   return (
@@ -44,6 +16,14 @@ const PauseMenu = props => {
       </StyledModal>
     </ModalProvider>
   );
+};
+
+PauseMenu.propTypes = {
+  resume: PropTypes.func.isRequired,
+  restart: PropTypes.func.isRequired,
+  changeKey: PropTypes.func.isRequired,
+  goToMenu: PropTypes.func.isRequired,
+  showModal: PropTypes.bool.isRequired
 };
 
 export default PauseMenu;
