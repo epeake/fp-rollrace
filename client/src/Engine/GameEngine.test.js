@@ -61,7 +61,7 @@ describe('GameEngine Tests', () => {
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 140,
+        time: new Date().getTime() + 140, // a constant
         event: 'block'
       });
     });
@@ -113,7 +113,7 @@ describe('GameEngine Tests', () => {
     //   });
     // });
     test('lands while falling', () => {
-      gameEngine.instance().variables.jumpState = 2; // jump.DOWN
+      gameEngine.instance().variables.jumpState = 2; // CONSTANTS.jump.DOWN
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 5;
       gameEngine.instance().variables.descentStartTime = new Date().getTime();
@@ -129,12 +129,12 @@ describe('GameEngine Tests', () => {
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 110.94,
+        time: new Date().getTime() + 110.94, // a constant
         event: 'land'
       });
     });
     test('lands while falling on corner', () => {
-      gameEngine.instance().variables.jumpState = 2; // jump.DOWN
+      gameEngine.instance().variables.jumpState = 2; // CONSTANTS.jump.DOWN
       gameEngine.instance().variables.yStart =
         gameEngine.instance().state.y - 191;
       gameEngine.instance().variables.descentStartTime = new Date().getTime();
@@ -150,7 +150,7 @@ describe('GameEngine Tests', () => {
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 146.7598,
+        time: new Date().getTime() + 146.7598, // a constant
         event: 'land'
       });
     });
@@ -212,7 +212,7 @@ describe('GameEngine Tests', () => {
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
-        time: new Date().getTime() + 538.4614,
+        time: new Date().getTime() + 538.4614, // a constant
         event: 'fall'
       });
     });
