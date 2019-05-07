@@ -14,35 +14,24 @@ class Timer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign({}, START_TIME, {
-      multi: this.props.multi,
-      pause: this.props.pause,
-      timerCanStart: this.props.timerCanStart,
-      restart: this.props.restart
-    });
+    this.state = START_TIME;
 
-    this.timer = undefined;
-
+    this.tickInterval = undefined;
     this.tick = this.tick.bind(this);
   }
 
+  /*
+   * Each time tick is called the minutes and seconds (state) are updated
+   * so that the timer is diplaying in a MM:SS format
+   */
   tick() {
-    //console.log(this.state.restart);
-    if (this.state.restart === true) {
+    if (this.props.resetTimer) {
       this.setState({ minutes: MINUTES, seconds: SECONDS });
     }
-    if (!this.state.pause && this.state.timerCanStart === true) {
-      /*
-  			function: tick()
-
-  			Each time tick is called the minutes and seconds (state) are updated
-  			so that the timer is diplaying in a MM:SS fomrat
-  		*/
+    if (!this.props.paused && this.props.timerCanStart) {
       const { minutes, seconds } = this.state; // curr minutes and seconds
-
       let resMinutes; // store resulting minutes
       let resSeconds; // store resulting seconds
-
       let intMin = parseInt(minutes, 10);
       let intSec = parseInt(seconds, 10);
 
@@ -62,9 +51,9 @@ class Timer extends Component {
 
       if (intMin === 0 && intSec === 0) {
         // stop ticking when there is no more time left
-        clearInterval(this.timer);
+        clearInterval(this.tickInterval);
         this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
-        this.props.boot(true); //Let game know that time is up
+        this.props.handleBoot(); //Let game know that time is up
         return;
       }
 
@@ -90,26 +79,12 @@ class Timer extends Component {
     }
   }
 
-  //Use this method to handle props that are being updated in the parent class
-  componentWillReceiveProps(nextProps) {
-    const { timerCanStart } = nextProps;
-    this.setState({ timerCanStart });
-    if (nextProps.pause !== this.props.pause && !this.props.multi) {
-      //Perform some operation
-      this.setState({ pause: nextProps.pause });
-    }
-    if (nextProps.restart !== this.props.restart) {
-      //Perform some operation
-      this.setState({ restart: nextProps.restart });
-    }
-  }
-
   componentWillUnmount() {
-    clearInterval(this.timer);
+    clearInterval(this.tickInterval);
   }
 
   componentDidMount() {
-    this.timer = setInterval(this.tick, 1000); // update the timer once every second
+    this.tickInterval = setInterval(this.tick, 1000); // update the timer once every second
   }
 
   render() {
@@ -124,9 +99,10 @@ class Timer extends Component {
 Timer.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  multi: PropTypes.bool.isRequired,
-  pause: PropTypes.bool.isRequired,
-  boot: PropTypes.func.isRequired
+  timerCanStart: PropTypes.bool.isRequired,
+  paused: PropTypes.bool.isRequired,
+  resetTimer: PropTypes.bool.isRequired,
+  handleBoot: PropTypes.func.isRequired
 };
 
 export default Timer;
