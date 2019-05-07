@@ -132,6 +132,7 @@ class App extends Component {
   handleGoogleFailure(err) {
     console.log(err);
   }
+
   handleGoogleLogout() {
     this.setState({
       loggedIn: false,

@@ -57,7 +57,7 @@ describe('GameEngine Tests', () => {
         variables: gameEngine.instance().variables,
         state: gameEngine.instance().state,
         strokeWidth: gameEngine.instance().props.mapProps.strokeWidth,
-        map: gameEngine.instance().map,
+        hashedGameMap: gameEngine.instance().hashedGameMap,
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
@@ -125,7 +125,7 @@ describe('GameEngine Tests', () => {
         variables: gameEngine.instance().variables,
         state: gameEngine.instance().state,
         strokeWidth: gameEngine.instance().props.mapProps.strokeWidth,
-        map: gameEngine.instance().map,
+        hashedGameMap: gameEngine.instance().hashedGameMap,
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
@@ -146,7 +146,7 @@ describe('GameEngine Tests', () => {
         variables: gameEngine.instance().variables,
         state: gameEngine.instance().state,
         strokeWidth: gameEngine.instance().props.mapProps.strokeWidth,
-        map: gameEngine.instance().map,
+        hashedGameMap: gameEngine.instance().hashedGameMap,
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
@@ -208,7 +208,7 @@ describe('GameEngine Tests', () => {
         variables: gameEngine.instance().variables,
         state: gameEngine.instance().state,
         strokeWidth: gameEngine.instance().props.mapProps.strokeWidth,
-        map: gameEngine.instance().map,
+        hashedGameMap: gameEngine.instance().hashedGameMap,
         mapLength: gameEngine.instance().mapLength
       });
       expect(motionChange).toEqual({
