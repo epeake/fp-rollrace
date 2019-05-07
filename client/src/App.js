@@ -9,7 +9,8 @@ import Statistics from './MainMenu/Statistics.js';
 import { MenuBackground } from './Style/MenuStyle.js';
 import Lobbies from './MainMenu/Lobbies.js';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID =
+  '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
 
 const GUEST_ACCOUNT = {
   email: 'Guest',
