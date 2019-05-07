@@ -6,9 +6,9 @@ import GameEngine from './Engine/GameEngine.js';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import Settings from './MainMenu/Settings.js';
 import Statistics from './MainMenu/Statistics.js';
-import { MenuBackground } from './Style/MenuStyle.js';
+import MapChooser from './MainMenu/MapChooser.js';
+import { MenuBackground, MainButton } from './Style/MenuStyle.js';
 import Lobbies from './MainMenu/Lobbies.js';
-
 
 const GOOGLE_CLIENT_ID =
   '106374852521-g72q4hfca8bc1u3hvjhjial2e1moadri.apps.googleusercontent.com';
@@ -24,17 +24,6 @@ const GUEST_ACCOUNT = {
 const CenteredDiv = styled.div`
   text-align: center;
   padding: 0px;
-`;
-
-const StyledButton = styled.button`
-  background-color: #008cba;
-  font-size: 30px;
-  border-radius: 12px;
-  border: 2px solid #555555;
-  font-family: monospace;
-  &:hover {
-    background-color: #02a8de;
-  }
 `;
 
 // CSS for title changes whther or not user is on chrome.  Condition checks for chrome
@@ -185,35 +174,35 @@ class App extends Component {
               </Title>
             </CenteredDiv>
             <CenteredDiv>
-              <StyledButton
+              <MainButton
                 className="single"
-                onClick={() => this.setState({ mode: 'game', multi: false })}
+                onClick={() => this.setState({ mode: 'choose', multi: false })}
               >
                 Play Solo
-              </StyledButton>
+              </MainButton>
               &nbsp;&nbsp;&nbsp;
-              <StyledButton
+              <MainButton
                 className="multi"
                 onClick={() => this.setState({ mode: 'game', multi: true })}
               >
                 Play Multi
-              </StyledButton>
+              </MainButton>
               &nbsp;&nbsp;&nbsp;
-              <StyledButton
+              <MainButton
                 className="stats"
                 onClick={() =>
                   this.setState({ mode: 'stats' }, this.handleStats)
                 }
               >
                 Stats
-              </StyledButton>
+              </MainButton>
               &nbsp;&nbsp;&nbsp;
-              <StyledButton
+              <MainButton
                 className="settings"
                 onClick={() => this.setState({ mode: 'settings' })}
               >
                 Settings
-              </StyledButton>{' '}
+              </MainButton>{' '}
             </CenteredDiv>
 
             <div>
@@ -225,6 +214,11 @@ class App extends Component {
               {this.state.loggedIn && logoutButton}
             </div>
           </MenuBackground>
+        );
+
+      case 'choose':
+        return (
+          <MapChooser handlePlay={() => this.setState({ mode: 'game' })} />
         );
 
       case 'game':

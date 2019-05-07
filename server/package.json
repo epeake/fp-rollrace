@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "connect-pg-simple": "^5.0.0",
     "cors": "^2.8.5",
     "db-errors": "^0.2.2",
     "dotenv": "^7.0.0",

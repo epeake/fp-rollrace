@@ -13,8 +13,8 @@ export const MenuBackground = styled.div`
 
 export const MenuButton = styled.button`
   background-color: #fffff;
-  font-size: 16px;
-  border-radius: 12px;
+  font-size: 125%;
+  border-radius: 15%;
   border: 2px solid #555555;
   font-family: monospace;
   &:hover {
@@ -27,4 +27,15 @@ export const MenuText = styled.h3`
   margin-top: 2.5%;
   font-size: 200%;
   color: white;
+`;
+
+export const MainButton = styled.button`
+  background-color: #008cba;
+  font-size: 250%;
+  border-radius: 15%;
+  border: 2px solid #555555;
+  font-family: monospace;
+  &:hover {
+    background-color: #02a8de;
+  }
 `;

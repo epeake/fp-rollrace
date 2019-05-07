@@ -198,7 +198,6 @@ class GameEngine extends Component {
     clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
-    clearInterval(this.multiplayerInterval);
 
     /*
      * make sure window is correct size
@@ -209,7 +208,7 @@ class GameEngine extends Component {
       restart: true,
       score: this.state.score
     });
-    this.variables = Object.assign(this.variables, CONSTANTS.INITIAL_VARIABLES);
+    this.variables = Object.assign({}, CONSTANTS.INITIAL_VARIABLES);
     this.setState(restartState);
     this.startCountdown();
   }
@@ -387,7 +386,6 @@ class GameEngine extends Component {
 
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
-        // 666 is a bad constant and should be declared elsewhere!
         if (
           this.getX({
             currentTime: new Date().getTime(),
