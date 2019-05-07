@@ -43,7 +43,7 @@ export const CONSTANTS = {
   INITIAL_VARIABLES: {
     gameStartTime: undefined, // the time the game starts
     x: 200, // this is how far from the left edge of the screen the sprite is
-    minY: 1000, // should loop over all of map or whatever to find this.
+    minY: 1000, // PANIC should loop over all of map or whatever to find this.
     motionChange: undefined, // will take an object of the following form {time: , event: } options for event are block, go, land, and fall
     yStart: STARTING_Y, // a reference point that get's set when the sprite starts moving up or down
     jumpState: 0, // CONSTANTS.jump.STOP === 0 // the current jump state of the game

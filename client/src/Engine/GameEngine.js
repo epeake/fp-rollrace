@@ -209,7 +209,7 @@ class GameEngine extends Component {
       restart: true,
       score: this.state.score
     });
-    this.variables = Object.assign(this.variables, CONSTANTS.INITIAL_VARIABLES);
+    this.variables = Object.assign({}, CONSTANTS.INITIAL_VARIABLES);
     this.setState(restartState);
     this.startCountdown();
   }
@@ -471,6 +471,7 @@ class GameEngine extends Component {
     clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
+    clearInterval(this.multiplayerInterval);
     if (this.props.multi) {
       this.socket.disconnect();
     }
