@@ -58,7 +58,7 @@ if (process.env.NODE_ENV !== 'production') {
 } else {
   app.use(
     session({
-      store: new (require('connect-pg-simple')(session))(),
+      store: new (require('connect-pg-simple')(session))(), // eslint-disable-line
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false
