@@ -14,11 +14,9 @@ const MapPath = styled.path`
 export default function Map(props) {
   return (
     <g transform={`translate(${props.translation} 0)`}>
-      {props.map.map(
-        (curr, index) => (
-          <MapPath key={`${index}mappath`} stroke={props.stroke} d={curr} />
-        ) // eslint-disable-line
-      )}
+      {props.map.map((curr, index) => (
+        <MapPath key={`${index}mappath`} stroke={props.stroke} d={curr} /> // eslint-disable-line
+      ))}
     </g>
   );
 }
