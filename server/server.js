@@ -47,6 +47,25 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+if (process.env.NODE_ENV !== 'production') {
+  app.use(
+    session({
+      secret: 'asfdasfdasf123412',
+      resave: false,
+      saveUninitialized: false
+    })
+  );
+} else {
+  app.use(
+    session({
+      store: new (require('connect-pg-simple')(session))(),
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false
+    })
+  );
+}
+
 app.use(
   session({
     secret:
