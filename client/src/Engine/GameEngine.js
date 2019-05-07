@@ -386,7 +386,6 @@ class GameEngine extends Component {
 
     this.renderInterval = setInterval(() => {
       if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
-        // 666 is a bad constant and should be declared elsewhere!
         if (
           this.getX({
             currentTime: new Date().getTime(),
