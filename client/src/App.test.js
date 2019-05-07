@@ -1,9 +1,9 @@
 import React from 'react';
 import App from './App';
 import { mount } from 'enzyme';
-// import Settings from './MainMenu/Settings.js';
-// import Statistics from './MainMenu/Statistics.js';
-// import GameEngine from './Engine/GameEngine.js';
+import Settings from './MainMenu/Settings.js';
+import Statistics from './MainMenu/Statistics.js';
+import MapChooser from './MainMenu/MapChooser.js';
 
 describe('Main Menu rendering tests', () => {
   let app;
@@ -13,31 +13,33 @@ describe('Main Menu rendering tests', () => {
   });
 
   test('Starts in main menu with 4 button buttons', () => {
-    expect(2 + 2).toEqual(4); // placeholder
-    // expect(app).toContainExactlyOneMatchingElement('.settings');
-    // expect(app).toContainExactlyOneMatchingElement('.stats');
-    // expect(app).toContainExactlyOneMatchingElement('.single');
-    // expect(app).toContainExactlyOneMatchingElement('.multi');
+    expect(app.find('.settings').exists()).toEqual(true);
+    expect(app.find('.stats').exists()).toEqual(true);
+    expect(app.find('.single').exists()).toEqual(true);
+    expect(app.find('.multi').exists()).toEqual(true);
   });
 
-  // test('Clicking on settings opens settings menu', () => {
-  //   const settingsButton = app.find('.settings');
-  //   expect(settingsButton).toExist();
-  //   settingsButton.simulate('click');
-  //   expect(app).toContainExactlyOneMatchingElement(Settings);
-  // });
-  //
-  // test('Clicking on statistics opens statistics menu', () => {
-  //   const statsButton = app.find('.stats');
-  //   expect(statsButton).toExist();
-  //   statsButton.simulate('click');
-  //   expect(app).toContainExactlyOneMatchingElement(Statistics);
-  // });
-  //
-  // test('Clicking on play button opens game', () => {
-  //   const playButton = app.find('.single');
-  //   expect(playButton).toExist();
-  //   playButton.simulate('click');
-  //   expect(app).toContainExactlyOneMatchingElement(GameEngine);
-  // });
+  test('Clicking on settings opens settings menu', () => {
+    const settingsButton = app
+      .find('.settings')
+      .filterWhere(n => n.name() === 'button');
+    settingsButton.simulate('click');
+    expect(app).toContainExactlyOneMatchingElement(Settings);
+  });
+
+  test('Clicking on statistics opens statistics menu', () => {
+    const statsButton = app
+      .find('.stats')
+      .filterWhere(n => n.name() === 'button');
+    statsButton.simulate('click');
+    expect(app).toContainExactlyOneMatchingElement(Statistics);
+  });
+
+  test('Clicking on play button opens mapchooser', () => {
+    const playButton = app
+      .find('.single')
+      .filterWhere(n => n.name() === 'button');
+    playButton.simulate('click');
+    expect(app).toContainExactlyOneMatchingElement(MapChooser);
+  });
 });
