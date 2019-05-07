@@ -407,7 +407,7 @@ const findEndOfPath = props => {
   // whether or not we have found the start of the current path
   let foundPathStart = false;
 
-  for (currentX; currentX <= mapLength; currentX++) {
+  for (currentX; currentX < mapLength; currentX++) {
     const locations = map[currentX];
     let found = false; // whether we have found part of the current path this iteration
     for (let j = 0; j < locations.length; j++) {
