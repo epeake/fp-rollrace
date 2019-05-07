@@ -198,7 +198,6 @@ class GameEngine extends Component {
     clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
-    clearInterval(this.multiplayerInterval); // we can't restart during multiplayer? so we don't need this?
 
     /*
      * make sure window is correct size
@@ -471,7 +470,6 @@ class GameEngine extends Component {
     clearTimeout(this.timeout);
     clearInterval(this.updateInterval);
     clearInterval(this.renderInterval);
-    clearInterval(this.multiplayerInterval);
     if (this.props.multi) {
       this.socket.disconnect();
     }
