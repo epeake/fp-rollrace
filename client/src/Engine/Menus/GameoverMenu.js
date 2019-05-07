@@ -15,8 +15,8 @@ export default function GameoverMenu(props) {
     <ModalProvider>
       <StyledModal isOpen={props.showModal}>
         <StyledP>Game Over!</StyledP>
-        <StyledP>{`Score: ${props.score}`}</StyledP>
-        <StyledP>{`Highscore: ${props.highscore}`}</StyledP>
+        <StyledP>{`Score: ${props.score} sec`}</StyledP>
+        <StyledP>{`Highscore: ${props.highscore} sec`}</StyledP>
         <ModalStyledButton onClick={props.restart}>Restart</ModalStyledButton>
         <ModalStyledButton onClick={props.exitToMenu}>
           Main Menu

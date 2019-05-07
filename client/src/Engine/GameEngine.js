@@ -43,9 +43,7 @@ class GameEngine extends Component {
   constructor(props) {
     super(props);
 
-    this.state = Object.assign({}, CONSTANTS.INITIAL_STATE, {
-      guest: this.props.guest
-    });
+    this.state = Object.assign({}, CONSTANTS.INITIAL_STATE);
 
     this.restartMinutes = this.props.minutes;
     this.variables = Object.assign({}, CONSTANTS.INITIAL_VARIABLES);
@@ -273,7 +271,7 @@ class GameEngine extends Component {
     );
 
     if (
-      !this.state.guest // exclusive to members
+      !this.props.guest // exclusive to members
     ) {
       const options = {
         url: `${
@@ -299,29 +297,11 @@ class GameEngine extends Component {
           throw Error(err);
         });
     } else {
-      if (finishTime < this.state.guest.map_1) {
-        // TODOOOO MAKE THIS NOT HARDCODEEEEE
-        this.setState(
-          {
-            dataSent: true,
-            guest: Object.assign(this.state.guest, {
-              map_1: finishTime,
-              total_games: this.state.guest.total_games + 1
-            })
-          },
-          this.getScore
-        );
-      } else {
-        this.setState(
-          {
-            dataSent: true,
-            guest: Object.assign(this.state.guest, {
-              total_games: this.state.guest.total_games + 1
-            })
-          },
-          this.getScore
-        );
-      }
+      // first we update the guest's states, then we set out dataSent to true, then we getScore
+      this.props.updateGuestStats(
+        finishTime,
+        this.setState({ dataSent: true }, this.getScore)
+      );
     }
   }
 
@@ -738,7 +718,9 @@ GameEngine.propTypes = {
   guest: PropTypes.object,
   mapProps: PropTypes.object.isRequired,
   multi: PropTypes.bool.isRequired,
-  goToMenu: PropTypes.func.isRequired
+  goToMenu: PropTypes.func.isRequired,
+  playercolor: PropTypes.string.isRequired,
+  updateGuestStats: PropTypes.func.isRequired
 };
 
 export default GameEngine;
