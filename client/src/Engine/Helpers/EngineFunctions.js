@@ -197,7 +197,8 @@ const checkAtWall = (location, y) => {
             x: ,
             strokeWidth: ,
             map: ,
-            paused:
+            paused: ,
+            mapLength ,
           }
  * @outputs: { time: , event: , } a motionChange object OR undefined
  */
@@ -217,7 +218,8 @@ const findWall = props => {
     x,
     strokeWidth,
     map,
-    paused
+    paused,
+    mapLength
   } = props;
 
   // the start of the x range in which to look for walls
@@ -225,7 +227,7 @@ const findWall = props => {
     x + CONSTANTS.SPRITE_SIDE - strokeWidth - mapTranslation
   );
 
-  for (currentX; currentX <= maxX; currentX++) {
+  for (currentX; currentX <= Math.min(maxX, mapLength - 1); currentX++) {
     const locations = map[currentX];
     for (let j = 0; j < locations.length; j++) {
       const newY = getY({
@@ -282,6 +284,7 @@ const findWall = props => {
             map: ,
             paused: ,
             strokeWidth: ,
+            mapLength: ,
           }
  * @outputs: { time: , event: , } a motionChange object OR undefined
  */
@@ -302,7 +305,8 @@ const findPath = props => {
     minY,
     map,
     paused,
-    strokeWidth
+    strokeWidth,
+    mapLength
   } = props;
 
   // the start of the x range in which to look for walls
@@ -311,7 +315,7 @@ const findPath = props => {
   // the height of the highest path the sprite will land on
   let highest = minY;
 
-  for (currentX; currentX <= maxX; currentX++) {
+  for (currentX; currentX <= Math.min(maxX, mapLength - 1); currentX++) {
     const locations = map[currentX];
     for (let j = 0; j < locations.length; j++) {
       if (locations[j][1] - CONSTANTS.SPRITE_SIDE < highest) {
@@ -463,6 +467,7 @@ const findEndOfPath = props => {
             minY: minY,
             paused: ,
             strokeWidth: ,
+            mapLength: ,
           }
  * @outputs: { time: , event: , } a motionChange object
  */
@@ -483,7 +488,8 @@ const spriteAtWall = props => {
     map,
     minY,
     paused,
-    strokeWidth
+    strokeWidth,
+    mapLength
   } = props;
 
   // the start of the x range in which to look for walls
@@ -566,7 +572,8 @@ const spriteAtWall = props => {
       minY: minY,
       map: map,
       paused: paused,
-      strokeWidth: strokeWidth
+      strokeWidth: strokeWidth,
+      mapLength: mapLength
     });
     if (!timeToLand || timeToLand.time > timeToEscape.time) {
       return timeToEscape;
@@ -654,7 +661,8 @@ const spriteOnFlat = props => {
     x: x,
     strokeWidth: strokeWidth,
     map: map,
-    paused: paused
+    paused: paused,
+    mapLength: mapLength
   });
 
   // if there is a wall then stop at the wall (else the sprite will fall off the path)
@@ -682,6 +690,7 @@ const spriteOnFlat = props => {
             map: ,
             paused: ,
             x: ,
+            mapLength: ,
           }
  * @outputs: { time: , event: , } a motionChange object
  */
@@ -700,7 +709,8 @@ const spriteGoingUp = props => {
     strokeWidth,
     map,
     paused,
-    x
+    x,
+    mapLength
   } = props;
 
   // the time when the sprite will start to fall
@@ -733,7 +743,8 @@ const spriteGoingUp = props => {
     x: x,
     strokeWidth: strokeWidth,
     map: map,
-    paused: paused
+    paused: paused,
+    mapLength: mapLength
   });
 
   // check to see if wall is defined meaning the sprite will hit a wall before it falls
@@ -763,6 +774,7 @@ const spriteGoingUp = props => {
               map: ,
               paused: ,
               x: ,
+              mapLength: ,
             }
  * @outputs: { time: , event: , } a motionChange object
  */
@@ -783,7 +795,8 @@ const spriteGoingDown = props => {
     strokeWidth,
     map,
     paused,
-    x
+    x,
+    mapLength
   } = props;
 
   // determines a maxX value that the sprite will never go beyond as to not need
@@ -821,7 +834,8 @@ const spriteGoingDown = props => {
     x: x,
     strokeWidth: strokeWidth,
     map: map,
-    paused: paused
+    paused: paused,
+    mapLength: mapLength
   });
 
   // finds the soonest path the sprite is going to land on
@@ -840,7 +854,8 @@ const spriteGoingDown = props => {
     minY: minY,
     map: map,
     paused: paused,
-    strokeWidth: strokeWidth
+    strokeWidth: strokeWidth,
+    mapLength: mapLength
   });
 
   if (wall && path) {
@@ -930,7 +945,8 @@ const findNextChange = props => {
         map: props.map,
         minY: minY,
         paused: props.state.paused,
-        strokeWidth: props.strokeWidth
+        strokeWidth: props.strokeWidth,
+        mapLength: props.mapLength
       });
     }
     // (!atWall)
@@ -975,7 +991,8 @@ const findNextChange = props => {
         strokeWidth: props.strokeWidth,
         map: props.map,
         paused: props.state.paused,
-        x: x
+        x: x,
+        mapLength: props.mapLength
       });
     }
     // (jumpState === jump.DOWN)
@@ -1000,7 +1017,8 @@ const findNextChange = props => {
         strokeWidth: props.strokeWidth,
         map: props.map,
         paused: props.state.paused,
-        x: x
+        x: x,
+        mapLength: props.mapLength
       });
     }
     // the sprite is stopped at a wall
