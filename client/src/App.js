@@ -82,6 +82,7 @@ class App extends Component {
     this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
     this.handleGoogleLogout = this.handleGoogleLogout.bind(this);
     this.handleStats = this.handleStats.bind(this);
+    this.updateGuestStats = this.updateGuestStats.bind(this);
     this.selectColor = this.selectColor.bind(this);
   }
 
@@ -132,6 +133,7 @@ class App extends Component {
   handleGoogleFailure(err) {
     console.log(err);
   }
+
   handleGoogleLogout() {
     this.setState({
       loggedIn: false,
@@ -142,6 +144,36 @@ class App extends Component {
 
   handleGoToMenu() {
     this.setState({ mode: 'menu' });
+  }
+
+  /*
+   * Updates the guest account's score to the finish time if better than current
+   * otherwise, we just increment the gamecount.
+   *  Params: finishTime: int
+   *          callback: function to be called once the guest is updated
+   */
+  updateGuestStats(finishTime, callback) {
+    if (finishTime < this.state.guest.map_1) {
+      // TODOOOO MAKE THIS NOT HARDCODEEEEE
+      this.setState(
+        {
+          guest: Object.assign(this.state.guest, {
+            map_1: finishTime,
+            total_games: this.state.guest.total_games + 1
+          })
+        },
+        callback
+      );
+    } else {
+      this.setState(
+        {
+          guest: Object.assign(this.state.guest, {
+            total_games: this.state.guest.total_games + 1
+          })
+        },
+        callback
+      );
+    }
   }
 
   render() {
@@ -257,6 +289,7 @@ class App extends Component {
               guest={this.state.guest}
               multi={this.state.multi}
               playercolor={this.state.playercolor}
+              updateGuestStats={this.updateGuestStats}
             />
           );
         }
