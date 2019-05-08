@@ -126,7 +126,7 @@ class Settings extends Component {
             <MenuText> Choose Your Nickname </MenuText>
             <Form>
               <Label> Nickname </Label>
-              <Input type="text" onChange={this.selectName} />
+              <Input type="text" onChange={this.selectName} maxlength="13" />
             </Form>
           </SettingsOption>
         </Row>

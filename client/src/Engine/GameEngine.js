@@ -562,13 +562,13 @@ class GameEngine extends Component {
     ];
 
     const nickname = (
-      <p
+      <text
         x={this.variables.x + 55 - this.props.playerName.length * 5}
         y={this.state.y - 30}
-        fill="white"
+        fill="red"
       >
         {this.props.playerName}
-      </p>
+      </text>
     );
     if (this.props.multi) {
       // now we need to account for other players that should be rendered
