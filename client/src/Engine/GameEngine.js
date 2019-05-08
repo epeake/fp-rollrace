@@ -662,7 +662,7 @@ class GameEngine extends Component {
                   paused: this.state.paused
                 })}
                 pathLen={pathLength}
-                players={this.state.players}
+                spriteColor={this.state.playercolor}
               />
             </>
           )}
