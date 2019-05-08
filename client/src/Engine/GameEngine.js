@@ -567,7 +567,6 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
-            console.log(this.getMapTranslation() - player.mapTrans + 200);
             return (
               <circle
                 key={player.id}
@@ -663,6 +662,7 @@ class GameEngine extends Component {
                   paused: this.state.paused
                 })}
                 pathLen={pathLength}
+                spriteColor={this.state.playercolor}
               />
             </>
           )}
@@ -686,18 +686,25 @@ class GameEngine extends Component {
             {' '}
             {CONSTANTS.COUNTDOWN_NUMBERS[this.state.countdownIndex]}{' '}
           </Text>
-          <g>
-            {/* player icon */}
-            <circle
-              cx={CONSTANTS.ICON_X}
-              cy={CONSTANTS.TOOLBAR_Y + 100}
-              r={CONSTANTS.SPRITE_SIDE / 4}
-              stroke="white"
-              strokeWidth="1"
-              fill={this.props.playercolor}
-              className="icon"
-            />
-          </g>
+          {/* tutorial used to be here */}
+
+          {/*Remove the player color icon in singleplayer mode*/}
+          {this.state.multi ? (
+            <g>
+              {/* player icon */}
+              <circle
+                cx={CONSTANTS.ICON_X}
+                cy={CONSTANTS.TOOLBAR_Y + 100}
+                r={CONSTANTS.SPRITE_SIDE / 4}
+                stroke="white"
+                strokeWidth="1"
+                fill={this.state.playercolor}
+                className="icon"
+              />
+            </g>
+          ) : (
+            <></>
+          )}
         </SVGLayer>
 
         {this.state.dataSent && (
