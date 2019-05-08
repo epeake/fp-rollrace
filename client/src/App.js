@@ -75,7 +75,7 @@ class App extends Component {
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`,
-      nickName: 'guest'
+      nickName: ' '
     };
 
     this.handleGoToMenu = this.handleGoToMenu.bind(this);
@@ -88,7 +88,12 @@ class App extends Component {
     this.selectName = this.selectName.bind(this);
   }
   selectName(selectedName) {
-    this.setState({ nickName: selectedName });
+    console.log(selectedName);
+    if (selectedName === null) {
+      this.setState({ nickName: ' ' });
+    } else {
+      this.setState({ nickName: selectedName });
+    }
   }
   selectColor(selectedColor) {
     this.setState({ playercolor: selectedColor });

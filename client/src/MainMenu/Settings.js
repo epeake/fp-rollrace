@@ -72,6 +72,9 @@ class Settings extends Component {
       this.state.blue
     })`;
     this.props.selectedColor(color);
+    if (this.state.nickName === null) {
+      this.setState({ nickName: ' ' });
+    }
     this.props.selectedName(this.state.nickName);
   }
 
@@ -125,8 +128,7 @@ class Settings extends Component {
           <SettingsOption>
             <MenuText> Choose Your Nickname </MenuText>
             <Form>
-              <Label> Nickname </Label>
-              <Input type="text" onChange={this.selectName} maxlength="13" />
+              <Input type="text" onChange={this.selectName} maxLength="13" />
             </Form>
           </SettingsOption>
         </Row>

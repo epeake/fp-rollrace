@@ -563,9 +563,9 @@ class GameEngine extends Component {
 
     const nickname = (
       <text
-        x={this.variables.x + 55 - this.props.playerName.length * 5}
+        x={this.variables.x + 50 - this.props.playerName.length * 4}
         y={this.state.y - 30}
-        fill="red"
+        fill="white"
       >
         {this.props.playerName}
       </text>
