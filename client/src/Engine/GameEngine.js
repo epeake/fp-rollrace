@@ -567,7 +567,6 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
-            console.log(this.getMapTranslation() - player.mapTrans + 200);
             return (
               <circle
                 key={player.id}
@@ -663,6 +662,7 @@ class GameEngine extends Component {
                   paused: this.state.paused
                 })}
                 pathLen={pathLength}
+                players={this.state.players}
               />
             </>
           )}
