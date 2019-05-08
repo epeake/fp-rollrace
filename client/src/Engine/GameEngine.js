@@ -561,6 +561,15 @@ class GameEngine extends Component {
       />
     ];
 
+    const nickname = (
+      <p
+        x={this.variables.x + 55 - this.props.playerName.length * 5}
+        y={this.state.y - 30}
+        fill="white"
+      >
+        {this.props.playerName}
+      </p>
+    );
     if (this.props.multi) {
       // now we need to account for other players that should be rendered
       if (this.state.players !== undefined) {
@@ -672,6 +681,7 @@ class GameEngine extends Component {
             stroke={this.props.mapProps.strokeWidth}
             className="map"
           />
+          {nickname}
           {boxes}
           <PauseButton
             x={CONSTANTS.ICON_X}
@@ -720,6 +730,7 @@ GameEngine.propTypes = {
   multi: PropTypes.bool.isRequired,
   goToMenu: PropTypes.func.isRequired,
   playercolor: PropTypes.string.isRequired,
+  playerName: PropTypes.string.isRequired,
   updateGuestStats: PropTypes.func.isRequired
 };
 

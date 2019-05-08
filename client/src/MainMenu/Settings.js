@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'reactstrap';
+import { Row, Form, Label, Input } from 'reactstrap';
 import styled from 'styled-components';
 import {
   MenuBackground,
@@ -52,21 +52,27 @@ class Settings extends Component {
     this.state = {
       red: Math.random() * 255,
       green: Math.random() * 255,
-      blue: Math.random() * 255
+      blue: Math.random() * 255,
+      nickName: null
     };
     this.handleClick = this.handleClick.bind(this);
-    this.selectColor = this.selectColor.bind(this);
+    this.saveSettings = this.saveSettings.bind(this);
     this.makeColor = this.makeColor.bind(this);
+    this.selectName = this.selectName.bind(this);
   }
   handleClick() {
     this.props.goToMenu();
   }
-
-  selectColor() {
+  selectName(event) {
+    this.setState({ nickName: event.target.value });
+    console.log(this.state.nickName);
+  }
+  saveSettings() {
     const color = `rgb(${this.state.red},${this.state.green},${
       this.state.blue
     })`;
     this.props.selectedColor(color);
+    this.props.selectedName(this.state.nickName);
   }
 
   makeColor() {
@@ -118,9 +124,13 @@ class Settings extends Component {
           </SettingsOption>
           <SettingsOption>
             <MenuText> Choose Your Nickname </MenuText>
+            <Form>
+              <Label> Nickname </Label>
+              <Input type="text" onChange={this.selectName} />
+            </Form>
           </SettingsOption>
         </Row>
-        <MenuButton onClick={this.selectColor}> Save Settings </MenuButton>
+        <MenuButton onClick={this.saveSettings}> Save Settings </MenuButton>
       </MenuBackground>
     );
   }
