@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Row, Form, Label, Input } from 'reactstrap';
+import { Row, Form, Input } from 'reactstrap';
 import styled from 'styled-components';
 import {
   MenuBackground,
