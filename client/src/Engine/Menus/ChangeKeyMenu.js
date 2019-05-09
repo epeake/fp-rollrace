@@ -43,15 +43,26 @@ class ChangeKeyMenu extends Component {
   }
 
   render() {
-    const { showModal } = this.props;
+    const { showModal, currentKey } = this.props;
     const { jumpKey } = this.state;
     return (
       <ModalProvider>
         <StyledModal isOpen={showModal}>
           <StyledP>Press New jumpKey</StyledP>
+          <StyledP>
+            {`Current Key: ${
+              currentKey === 32
+                ? 'SPACE'
+                : String.fromCharCode(currentKey).toUpperCase()
+            }`}
+          </StyledP>
           {jumpKey && (
             <StyledP>
-              {`Selected Key: ${String.fromCharCode(jumpKey).toUpperCase()}`}
+              {`Selected Key: ${
+                jumpKey === 32
+                  ? 'SPACE'
+                  : String.fromCharCode(jumpKey).toUpperCase()
+              }`}
             </StyledP>
           )}
           <ModalStyledButton onClick={this.handleExit}>Back</ModalStyledButton>

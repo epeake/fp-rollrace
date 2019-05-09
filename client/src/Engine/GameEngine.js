@@ -114,7 +114,11 @@ class GameEngine extends Component {
   }
 
   handleBack(newKey) {
-    this.setState({ jumpKey: newKey, changingKey: false, hideMenu: false });
+    if (newKey) {
+      this.setState({ jumpKey: newKey, changingKey: false, hideMenu: false });
+    } else {
+      this.setState({ changingKey: false, hideMenu: false });
+    }
   }
 
   // Initiates jump
@@ -603,6 +607,7 @@ class GameEngine extends Component {
           <ChangeKeyMenu
             goBack={this.handleBack}
             showModal={this.state.changingKey}
+            currentKey={this.state.jumpKey}
           />
         )}
         {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
