@@ -47,7 +47,7 @@ ProgressBar.propTypes = {
   y: PropTypes.number.isRequired,
   currX: PropTypes.number,
   x: PropTypes.number.isRequired,
-  spriteColor: PropTypes.string.isRequired
+  spriteColor: PropTypes.string
 };
 
 export default ProgressBar;
