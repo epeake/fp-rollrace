@@ -89,7 +89,7 @@ class Timer extends Component {
 
   render() {
     return (
-      <SVGText fill={'white'} x={this.props.x + 60} y={this.props.y + 25}>
+      <SVGText fill={'white'} x={this.props.x + 100} y={this.props.y + 25}>
         {`${this.state.minutes}:${this.state.seconds}`}
       </SVGText>
     );

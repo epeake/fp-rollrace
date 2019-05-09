@@ -12,7 +12,7 @@ export const CONSTANTS = {
   TOOLBAR_Y: 15,
   TOOLBAR_X: 800,
   ICON_X: 40,
-  GAMEOVER_X: 9067, // X position of the end of game
+  GAMEOVER_X: 900, // X position of the end of game
   UPDATE_TIMEOUT: 20, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game

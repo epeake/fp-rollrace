@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const WIDTH = 200; // Set maximum width of progressbar
-const HEIGHT = 20; // bar height
+const WIDTH = 300; // Set maximum width of progressbar
+const HEIGHT = 30; // bar height
 const POS_OFFSET = 35;
-const SPRITE_OFFSET = 45;
+const SPRITE_OFFSET = 50;
 
 const ProgressBar = props => {
   const { currX, pathLen, spriteColor, x, y } = props;
@@ -36,8 +36,8 @@ const ProgressBar = props => {
         fill={spriteColor}
         cx={currentPos} /*update player one position*/
         cy={y + SPRITE_OFFSET} /* offset */
-        rx={2.0}
-        ry={9.0}
+        rx={5.0}
+        ry={15.0}
       />
     </g>
   );
