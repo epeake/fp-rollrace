@@ -77,7 +77,7 @@ class GameEngine extends Component {
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleJumpKey = this.handleJumpKey.bind(this);
-    this.handleChangeJumpKey = this.handleChangeJumpKey.bind(this);
+    this.handleBack = this.handleBack.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.restartGame = this.restartGame.bind(this);
     this.resumeGame = this.resumeGame.bind(this);
@@ -113,6 +113,14 @@ class GameEngine extends Component {
     };
   }
 
+  handleBack(newKey) {
+    if (newKey) {
+      this.setState({ jumpKey: newKey, changingKey: false, hideMenu: false });
+    } else {
+      this.setState({ changingKey: false, hideMenu: false });
+    }
+  }
+
   // Initiates jump
   handleJumpKey() {
     // set the starting position of the jump
@@ -138,19 +146,12 @@ class GameEngine extends Component {
     })();
   }
 
-  // Changes our current jump key
-  handleChangeJumpKey(event) {
-    this.setState({ jumpKey: event.keyCode });
-  }
-
   /*
    * Allows the character to jump when spacebar is pressed and prevents the
    * character from jumping mid-jump
    */
   handleKeyPress(event) {
-    if (this.state.changingKey) {
-      this.handleChangeJumpKey(event);
-    } else if (
+    if (
       event.keyCode === this.state.jumpKey &&
       this.variables.jumpState === CONSTANTS.jump.STOP &&
       !this.state.paused &&
@@ -604,11 +605,9 @@ class GameEngine extends Component {
         {/* conditional rendering when the pause button is toggled */}
         {this.state.paused && this.state.hideMenu && this.state.changingKey && (
           <ChangeKeyMenu
-            jumpKey={this.state.jumpKey}
-            showMenu={() =>
-              this.setState({ changingKey: false, hideMenu: false })
-            }
+            goBack={this.handleBack}
             showModal={this.state.changingKey}
+            currentKey={this.state.jumpKey}
           />
         )}
         {/*Pause menu renders if the pause button is toggled and the changekey menu is not being displayed*/}
@@ -662,7 +661,7 @@ class GameEngine extends Component {
                   paused: this.state.paused
                 })}
                 pathLen={pathLength}
-                spriteColor={this.state.playercolor}
+                spriteColor={this.props.playercolor}
               />
             </>
           )}
