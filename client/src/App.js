@@ -88,7 +88,6 @@ class App extends Component {
     this.selectName = this.selectName.bind(this);
   }
   selectName(selectedName) {
-    console.log(selectedName);
     if (selectedName === null) {
       this.setState({ nickName: ' ' });
     } else {
@@ -311,7 +310,7 @@ class App extends Component {
               selectedColor={this.selectColor}
               selectedName={this.selectName}
               playerName={this.state.nickName}
-              playercolor={this.state.playercolor}
+              playerColor={this.state.playercolor}
             />
           </div>
         );

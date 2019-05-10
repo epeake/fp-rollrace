@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import {
   MenuBackground,
   MenuTitle,
-  MenuButton,
+  MainButton,
   MenuText
 } from '../Style/MenuStyle.js';
 
@@ -42,7 +42,7 @@ const LabeledSlider = props => {
 
 LabeledSlider.propTypes = {
   label: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   valueChange: PropTypes.func.isRequired
 };
 
@@ -60,17 +60,26 @@ class Settings extends Component {
     this.selectName = this.selectName.bind(this);
     this.findColor = this.findColor.bind(this);
   }
+  //uses playercolor prop passed down from app to find
+  //corresponding red,green,blue values for the sliders
   findColor(i) {
-    const rgb = this.props.playercolor.match(/\d+/g);
+    const color = this.props.playerColor;
+    const rgb = color.match(/\d+/g);
     return rgb[i];
   }
+
+  //handles go to menu button
   handleClick() {
     this.props.goToMenu();
   }
+
+  //updates nickname state everytime something is typed
   selectName(event) {
     this.setState({ nickName: event.target.value });
-    console.log(this.state.nickName);
   }
+
+  //passes down nickname and color that are chosen when clicked on
+  //save settings
   saveSettings() {
     const color = `rgb(${this.state.red},${this.state.green},${
       this.state.blue
@@ -90,7 +99,9 @@ class Settings extends Component {
     return (
       <MenuBackground>
         <MenuTitle> Settings </MenuTitle>
-        <MenuButton onClick={this.handleClick}>{'<-'} Main Menu</MenuButton>
+        <MainButton className="tomenu" onClick={this.handleClick}>
+          {'<-'} Main Menu
+        </MainButton>
         <Row>
           <SettingsOption>
             <MenuText> Choose Your Color </MenuText>
@@ -140,7 +151,10 @@ class Settings extends Component {
             </Form>
           </SettingsOption>
         </Row>
-        <MenuButton onClick={this.saveSettings}> Save Settings </MenuButton>
+        <MainButton className="savesettings" onClick={this.saveSettings}>
+          {' '}
+          Save Settings{' '}
+        </MainButton>
       </MenuBackground>
     );
   }
@@ -148,7 +162,9 @@ class Settings extends Component {
 
 Settings.propTypes = {
   playerName: PropTypes.string.isRequired,
+  playerColor: PropTypes.string.isRequired,
   selectedColor: PropTypes.func.isRequired,
+  selectedName: PropTypes.func.isRequired,
   goToMenu: PropTypes.func.isRequired
 };
 
