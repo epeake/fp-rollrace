@@ -181,12 +181,12 @@ class App extends Component {
    *  Params: finishTime: int
    *          callback: function to be called once the guest is updated
    */
-  updateGuestStats(finishTime, callback) {
+  updateGuestStats(finishTime, wasBooted, callback) {
     const mapParam = `map_${this.state.mapProps.mapId}`;
-    console.log(mapParam);
     if (
-      finishTime < this.state.guest[mapParam] ||
-      this.state.guest[mapParam] === -1
+      !wasBooted &&
+      (finishTime < this.state.guest[mapParam] ||
+        this.state.guest[mapParam] === -1)
     ) {
       this.setState(
         {

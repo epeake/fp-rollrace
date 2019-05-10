@@ -249,11 +249,12 @@ class GameEngine extends Component {
   }
 
   // causes the game to stop rendering and sets gameover to true
-  endGame() {
+  endGame(wasBooted) {
     clearInterval(this.renderInterval);
     clearInterval(this.updateInterval);
     this.setState({
       gameover: true,
+      wasBooted: wasBooted,
       endScore: parseInt(
         (new Date().getTime() -
           this.variables.gameStartTime -
@@ -289,7 +290,6 @@ class GameEngine extends Component {
         },
         json: true
       };
-      console.log(this.props.mapProps.mapId);
       request
         .put(options)
         .then(() => {
@@ -302,6 +302,7 @@ class GameEngine extends Component {
       // first we update the guest's states, then we set out dataSent to true, then we getScore
       this.props.updateGuestStats(
         finishTime,
+        this.state.wasBooted,
         this.setState({ dataSent: true }, this.getScore)
       );
     }
@@ -397,7 +398,7 @@ class GameEngine extends Component {
           }) >=
           this.mapLength - this.props.mapProps.end
         ) {
-          this.endGame();
+          this.endGame(false); // game ended not due to a boot
         } else {
           this.setState({
             mapTranslation: this.getMapTranslation({
@@ -717,6 +718,7 @@ class GameEngine extends Component {
             exitToMenu={() => this.props.goToMenu()}
             highscore={this.state.highscore}
             score={this.state.endScore}
+            wasBooted={this.state.wasBooted}
             showModal={this.state.gameover}
           />
         )}

@@ -1,3 +1,4 @@
+// eslint-disable react/no-array-index-key
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import request from 'request-promise-native';
@@ -43,8 +44,6 @@ class Statistics extends Component {
         const mapIndex = `map_${currMap.mapId}`;
         return (
           <MenuText key={`${i}mapstatstext`}>
-            {' '}
-            {/* eslint-disable-line react/no-array-index-key*/}
             {`Best ${currMap.title}: `}
             {this.props.user[mapIndex] === -1
               ? 'N/A'

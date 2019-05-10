@@ -20,14 +20,14 @@ export const CONSTANTS = {
   SPRITE_SIDE: 100, // size of the invisiable square surrounding the sprite
   PATH_THRESH: 4, // a constant used when finding the end of a path
   TIME_THRESH: RENDER_TIMEOUT, // a constant used in the motionChange update loop
-  COUNTDOWN_X: 730, // X position of countdown numbers
+  COUNTDOWN_X: 760, // X position of countdown numbers
   COUNTDOWN_Y: 650, // Y position of countdown numbers
   COUNTDOWN_NUMBERS: ['3', '2', '1', ''], // displayed countdown values
   INITIAL_STATE: {
     countdownIndex: 0, // index of our countdown numbers (where we are in the countdown)
     highscore: '', // current highscore for the current map
     dataSent: false, // indicates if we have sent data (put request) at the end of a game
-    // tutorial: false,
+    wasBooted: false, // indicated whether the game ended due to a boot
     paused: false, // boolean to determine whether or not the game is in the paused state
     endScore: undefined, // score at the completion of the game
     gameover: false, // boolean to determine whether or not the game has ended
