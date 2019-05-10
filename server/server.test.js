@@ -87,6 +87,12 @@ describe('Rollrace API', () => {
         .expect(maps.get(1));
     });
 
+    test('GET /maps/easy.png should return OK', () => {
+      return request(app)
+        .get('/maps/easy.png')
+        .expect(200);
+    });
+
     test('GET should fail when unauthorized', () => {
       app.request.isAuthenticated = () => false;
       return request(app)

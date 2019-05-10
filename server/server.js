@@ -3,29 +3,30 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const knexConfig = require('./knexfile');
 const knex = require('knex')(knexConfig[process.env.NODE_ENV || 'development']);
-const { Model } = require('objection'); // ValidationError
+const { Model } = require('objection');
 const Users = require('./models/Users');
 const session = require('express-session');
+const path = require('path');
 const passport = require('passport');
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const { OAuth2Client } = require('google-auth-library');
 
 /* We will need to update the number of lobbies later */
 const { lobbies } = require('./seeds/dev/lobbies.js');
+
+// db-errors provides a consistent wrapper around database errors
+const { wrapError, DBError } = require('db-errors');
+
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
 Model.knex(knex);
-
-// db-errors provides a consistent wrapper around database errors
-const { wrapError, DBError } = require('db-errors');
 const app = express();
 const maps = new Map();
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Resolve client build directory as absolute path to avoid errors in express
-  const path = require('path'); // eslint-disable-line global-require
   const buildPath = path.resolve(__dirname, '../client/build');
 
   app.use(express.static(buildPath));
@@ -46,6 +47,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+
+// middleware to host images
+app.use('/maps', express.static(path.join(__dirname, '/maps')));
 if (process.env.NODE_ENV !== 'production') {
   app.use(
     session({
