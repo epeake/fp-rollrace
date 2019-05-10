@@ -286,7 +286,8 @@ class GameEngine extends Component {
           contents: {
             time: finishTime
           },
-          mapId: this.props.mapProps.mapId
+          mapId: this.props.mapProps.mapId,
+          wasBooted: this.state.wasBooted
         },
         json: true
       };

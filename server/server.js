@@ -142,8 +142,8 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
     (async () => {
       const user = await Users.query().findById(request.user.id);
       if (
-        user[mapParam] === -1 ||
-        user[mapParam] > request.body.contents.time
+        !request.body.wasBooted &&
+        (user[mapParam] === -1 || user[mapParam] > request.body.contents.time)
       ) {
         user
           .$query()
