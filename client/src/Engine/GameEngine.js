@@ -65,7 +65,7 @@ class GameEngine extends Component {
     this.countdownInterval = null;
 
     // length in SVG coordinates
-    this.mapLength = findMapSpan(this.props.mapProps.map);
+    this.mapLength = findMapSpan(this.props.ops.map);
 
     // our svg in hashmap form
     this.hashedGameMap = buildMapHashtable(
@@ -284,7 +284,8 @@ class GameEngine extends Component {
           type: 'end',
           contents: {
             time: finishTime
-          }
+          },
+          mapId: this.props.mapProps.mapId
         },
         json: true
       };
@@ -435,14 +436,18 @@ class GameEngine extends Component {
       request
         .get(options)
         .then(resp => {
-          this.setState({ highscore: resp.map_1 });
+          this.setState({
+            highscore: resp[`map_${this.props.mapProps.mapId}`]
+          });
         })
         .catch(err => {
           //console.log('run');
           throw Error(err);
         });
     } else {
-      this.setState({ highscore: this.props.guest.map_1 });
+      this.setState({
+        highscore: this.props.guest[`map_${this.props.mapProps.mapId}`]
+      });
     }
   }
 

@@ -115,11 +115,7 @@ passport.use(
           user = await Users.query().insertAndFetch({
             googleId: payload.sub,
             givenName: payload.given_name,
-            email: payload.email,
-            total_games: 0,
-            total_multi_games: 0,
-            total_multi_wins: 0,
-            map_1: -1
+            email: payload.email
           });
         }
         done(null, user);
@@ -142,16 +138,18 @@ app.post(
 
 // update player's stats
 app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
+  const mapParam = `map_${request.body.mapId}`;
   if (request.body.type === 'end') {
     (async () => {
       const user = await Users.query().findById(request.user.id);
-      if (user.map_1 === -1 || user.map_1 > request.body.contents.time) {
-        // TODOOO MAKE THIS NOT HARDCODEEE
-        // REPLACE WITH GENERICCC
+      if (
+        user[mapParam] === -1 ||
+        user[mapParam] > request.body.contents.time
+      ) {
         user
           .$query()
           .patchAndFetch({
-            map_1: request.body.contents.time,
+            [mapParam]: request.body.contents.time, // give key var name?
             total_games: user.total_games + 1
           })
           .then(rows => {
