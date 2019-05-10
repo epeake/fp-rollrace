@@ -250,7 +250,10 @@ class App extends Component {
 
       case 'choose':
         return (
-          <MapChooser handlePlay={() => this.setState({ mode: 'game' })} />
+          <MapChooser
+            goToMenu={this.handleGoToMenu}
+            handlePlay={() => this.setState({ mode: 'game' })}
+          />
         );
 
       case 'game':
