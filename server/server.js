@@ -12,7 +12,6 @@ const { OAuth2Client } = require('google-auth-library');
 
 /* We will need to update the number of lobbies later */
 const { lobbies } = require('./seeds/dev/lobbies.js');
-
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
@@ -20,8 +19,8 @@ Model.knex(knex);
 
 // db-errors provides a consistent wrapper around database errors
 const { wrapError, DBError } = require('db-errors');
-
 const app = express();
+const maps = new Map();
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -193,7 +192,18 @@ app.get('/api/lobbies/', (request, response) => {
   response.send(available);
 });
 
-// Simple error handler.
+// get a map object
+app.get('/api/maps/:id', (request, response) => {
+  const mapId = parseInt(request.params.id, 10);
+  response.send(maps.get(mapId));
+});
+
+// get all maps
+app.get('/api/maps', (request, response) => {
+  response.send(Array.from(maps.values()));
+});
+
+// Error handler.
 app.use((error, request, response, next) => {
   if (response.headersSent) {
     next(error);
@@ -219,5 +229,6 @@ app.use((error, request, response, next) => {
 
 module.exports = {
   app,
-  knex
+  knex,
+  maps
 };
