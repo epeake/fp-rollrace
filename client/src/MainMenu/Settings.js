@@ -50,15 +50,19 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      red: Math.random() * 255,
-      green: Math.random() * 255,
-      blue: Math.random() * 255,
-      nickName: null
+      red: this.findColor(0),
+      green: this.findColor(1),
+      blue: this.findColor(2),
+      nickName: 'dog'
     };
     this.handleClick = this.handleClick.bind(this);
     this.saveSettings = this.saveSettings.bind(this);
-    this.makeColor = this.makeColor.bind(this);
     this.selectName = this.selectName.bind(this);
+    this.findColor = this.findColor.bind(this);
+  }
+  findColor(i) {
+    const rgb = this.props.playercolor.match(/\d+/g);
+    return rgb[i];
   }
   handleClick() {
     this.props.goToMenu();
@@ -77,12 +81,9 @@ class Settings extends Component {
     }
     this.props.selectedName(this.state.nickName);
   }
-
-  makeColor() {
-    const color = `rgb(${this.state.red},${this.state.green},${
-      this.state.blue
-    })`;
-    return color;
+  componentDidMount() {
+    const tempName = this.props.playerName;
+    this.setState({ nickName: tempName });
   }
 
   render() {
@@ -100,7 +101,9 @@ class Settings extends Component {
                 r="40"
                 stroke="white"
                 strokeWidth="1"
-                fill={this.makeColor()}
+                fill={`rgb(${this.state.red},${this.state.green},${
+                  this.state.blue
+                })`}
               />
             </svg>
             <LabeledSlider
@@ -128,7 +131,12 @@ class Settings extends Component {
           <SettingsOption>
             <MenuText> Choose Your Nickname </MenuText>
             <Form>
-              <Input type="text" onChange={this.selectName} maxLength="13" />
+              <Input
+                type="text"
+                onChange={this.selectName}
+                maxLength="13"
+                defaultValue={this.props.playerName}
+              />
             </Form>
           </SettingsOption>
         </Row>
@@ -139,6 +147,8 @@ class Settings extends Component {
 }
 
 Settings.propTypes = {
+  playerName: PropTypes.string.isRequired,
+  selectedColor: PropTypes.func.isRequired,
   goToMenu: PropTypes.func.isRequired
 };
 
