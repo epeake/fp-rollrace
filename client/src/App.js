@@ -74,7 +74,8 @@ class App extends Component {
       lobby: undefined,
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
-        255},${Math.random() * 255})`
+        255},${Math.random() * 255})`,
+      nickName: 'Player'
     };
 
     this.handleGoToMenu = this.handleGoToMenu.bind(this);
@@ -84,8 +85,15 @@ class App extends Component {
     this.handleStats = this.handleStats.bind(this);
     this.updateGuestStats = this.updateGuestStats.bind(this);
     this.selectColor = this.selectColor.bind(this);
+    this.selectName = this.selectName.bind(this);
   }
-
+  selectName(selectedName) {
+    if (selectedName === null) {
+      this.setState({ nickName: ' ' });
+    } else {
+      this.setState({ nickName: selectedName });
+    }
+  }
   selectColor(selectedColor) {
     this.setState({ playercolor: selectedColor });
   }
@@ -293,6 +301,7 @@ class App extends Component {
               multi={this.state.multi}
               playercolor={this.state.playercolor}
               updateGuestStats={this.updateGuestStats}
+              playerName={this.state.nickName}
             />
           );
         }
@@ -302,6 +311,9 @@ class App extends Component {
             <Settings
               goToMenu={this.handleGoToMenu}
               selectedColor={this.selectColor}
+              selectedName={this.selectName}
+              playerName={this.state.nickName}
+              playerColor={this.state.playercolor}
             />
           </div>
         );
