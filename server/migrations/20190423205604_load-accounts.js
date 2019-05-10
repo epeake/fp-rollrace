@@ -19,7 +19,15 @@ exports.up = function(knex, Promise) {
       .notNullable()
       .defaultTo(0);
     table
+      .integer('map_0')
+      .notNullable()
+      .defaultTo(-1);
+    table
       .integer('map_1')
+      .notNullable()
+      .defaultTo(-1);
+    table
+      .integer('map_2')
       .notNullable()
       .defaultTo(-1);
   });

@@ -10,12 +10,14 @@ const user = {
   total_games: 10,
   total_multi_games: 9,
   total_multi_wins: 9,
-  map_1: 120
+  map_0: 120,
+  map_1: -1,
+  map_2: -1
 };
 
 const mapContent = [
   {
-    id: 1,
+    id: 0,
     title: 'Lazy Hills',
     level: 'Easy',
     image: 'easy.jpg',
@@ -25,7 +27,7 @@ const mapContent = [
     end: 667
   },
   {
-    id: 2,
+    id: 1,
     title: 'Slippery when Wet',
     level: 'Medium',
     image: 'medium.jpg',

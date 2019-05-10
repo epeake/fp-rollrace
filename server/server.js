@@ -131,7 +131,6 @@ app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
   (request, response) => {
-    // console.log(request.user);  for debugging
     response.sendStatus(200);
   }
 );

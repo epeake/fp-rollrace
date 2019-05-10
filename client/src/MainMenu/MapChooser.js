@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import {
@@ -90,7 +91,7 @@ class MapChooser extends Component {
             <div>
               <MainButton
                 className="playbutton"
-                onClick={this.props.handlePlay}
+                onClick={() => this.props.handleChooseMap(this.state.currMap)}
               >
                 {' '}
                 Play!
@@ -102,5 +103,9 @@ class MapChooser extends Component {
     );
   }
 }
+
+MapChooser.propTypes = {
+  handleChooseMap: PropTypes.func
+};
 
 export default MapChooser;

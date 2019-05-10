@@ -65,13 +65,13 @@ class GameEngine extends Component {
     this.countdownInterval = null;
 
     // length in SVG coordinates
-    this.mapLength = findMapSpan(this.props.ops.map);
+    this.mapLength = findMapSpan(this.props.mapProps.path);
 
     // our svg in hashmap form
     this.hashedGameMap = buildMapHashtable(
       this.mapLength,
       this.props.mapProps.strokeWidth,
-      this.props.mapProps.map
+      this.props.mapProps.path
     );
 
     this.debounce = this.debounce.bind(this);
@@ -289,7 +289,7 @@ class GameEngine extends Component {
         },
         json: true
       };
-
+      console.log(this.props.mapProps.mapId);
       request
         .put(options)
         .then(() => {
@@ -395,7 +395,7 @@ class GameEngine extends Component {
             x: this.variables.x,
             paused: this.state.paused
           }) >=
-          this.mapLength - CONSTANTS.GAMEOVER_X
+          this.mapLength - this.props.mapProps.end
         ) {
           this.endGame();
         } else {
@@ -546,7 +546,7 @@ class GameEngine extends Component {
 
   render() {
     // Find the length of the map
-    const pathLength = this.mapLength - CONSTANTS.GAMEOVER_X;
+    const pathLength = this.mapLength - this.props.mapProps.end;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
@@ -672,7 +672,7 @@ class GameEngine extends Component {
           )}
           <Map
             translation={this.state.mapTranslation}
-            map={this.props.mapProps.map}
+            path={this.props.mapProps.path}
             stroke={this.props.mapProps.strokeWidth}
             className="map"
           />
