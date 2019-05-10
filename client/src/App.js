@@ -75,7 +75,7 @@ class App extends Component {
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`,
-      nickName: 'Guest'
+      nickName: 'Player'
     };
 
     this.handleGoToMenu = this.handleGoToMenu.bind(this);
