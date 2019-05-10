@@ -6,11 +6,15 @@ const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
 
-// populate our maps Map (lol)
+/*
+ * First we populate the maps map (lol), then we create the server.  The map
+ * comes from our server file and uses tha maps map to fulfull get requests.
+ * we populate the maps here to ensure the map is populated the second our
+ * our client has loaded the page.
+ */
 readFile(path.join(__dirname, 'maps/maps.json'))
   .then(contents => {
     const mapsArr = JSON.parse(contents);
-
     mapsArr.forEach(map => maps.set(map.id, map));
 
     const server = http.createServer(app).listen(process.env.PORT || 3001); // 3002?); switch these back in production
@@ -71,5 +75,6 @@ readFile(path.join(__dirname, 'maps/maps.json'))
     });
   })
   .catch(err => {
+    // in this case there was an error parsing the file, so throw and log on server
     console.error(err); // eslint-disable-line no-console
   });
