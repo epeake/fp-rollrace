@@ -1,3 +1,10 @@
+/* This is the settings page. It includes the options to change the
+ * the player color and player name. It also includes the slider
+ * component (inspired by the practicals) that changes the color of the plaer.
+ * The player name and colors (rgb) get saved as a state and get sent back up
+ * to app through a call back.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Form, Input } from 'reactstrap';

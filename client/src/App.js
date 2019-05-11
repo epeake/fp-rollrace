@@ -1,3 +1,13 @@
+/*  App component that displays the main menu. The main menu includes options to
+ * play single player, multiplayer, change user settings (such as player color and name),
+ * and an option to see player stats. App maintains various of the important states needed
+ * throughout the game; It maintains the game states that get passed down to game engine, it maintains
+ * the state that indicate whether you are playing multiplayer or not, it maintains the playercolor
+ * and playername as a state that gets passed down to settings and game engine. Lastly, the main
+ * page includes a log in component that allows you to create an account that saves player statistics. The
+ * app also maintains the state indicating if you are logged in.
+ */
+
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import request from 'request-promise-native';
@@ -101,6 +111,7 @@ class App extends Component {
     this.selectColor = this.selectColor.bind(this);
     this.selectName = this.selectName.bind(this);
   }
+  //updates nickName state that gets sent in the callback from settings
   selectName(selectedName) {
     if (selectedName === null) {
       this.setState({ nickName: ' ' });
@@ -108,6 +119,7 @@ class App extends Component {
       this.setState({ nickName: selectedName });
     }
   }
+  //updates player color state that gets sent in the callback from settings
   selectColor(selectedColor) {
     this.setState({ playercolor: selectedColor });
   }
