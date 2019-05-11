@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import { Button, ButtonGroup } from 'reactstrap';
 import styled from 'styled-components';
 import request from 'request-promise-native';
 import GameEngine from './Engine/GameEngine.js';
@@ -18,8 +17,9 @@ const GUEST_ACCOUNT = {
   total_games: 0,
   total_multi_games: 0,
   total_multi_wins: 0,
-  map_1: Infinity,
-  control: 32
+  map_0: -1,
+  map_1: -1,
+  map_2: -1
 };
 
 const CenteredDiv = styled.div`
@@ -64,10 +64,22 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      map: [
-        'm 0, 650 h 359 v -180 h 159 v 100 h 95 v 100 h 143 v -100 h 381 v -100 h 159 v 100 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 333 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 397 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 318 h 460 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 412 v -1000 h 500'
-      ],
-      strokeWidth: 6, // must be an even number for the parsing algorithm
+      /*
+       * This is the default for multiplayer for the time being because we do
+       * not go to the map chooser menu
+       */
+      mapProps: {
+        map: [
+          'm 0, 650 h 359 v -180 h 159 v 100 h 95 v 100 h 143 v -100 h 381 v -100 h 159 v 100 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 333 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 397 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 318 h 460 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 412 v -1000 h 500'
+        ],
+        strokeWidth: 6, // must be an even number for the parsing algorithm
+        mapId: 1,
+        end: 667,
+        startTime: {
+          minutes: '00',
+          seconds: '30'
+        }
+      },
       guest: GUEST_ACCOUNT,
       user: GUEST_ACCOUNT,
       mode: 'menu',
@@ -84,6 +96,7 @@ class App extends Component {
     this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
     this.handleGoogleLogout = this.handleGoogleLogout.bind(this);
     this.handleStats = this.handleStats.bind(this);
+    this.handleChooseMap = this.handleChooseMap.bind(this);
     this.updateGuestStats = this.updateGuestStats.bind(this);
     this.selectColor = this.selectColor.bind(this);
     this.selectName = this.selectName.bind(this);
@@ -124,6 +137,25 @@ class App extends Component {
     }
   }
 
+  handleChooseMap(mapId) {
+    const options = {
+      url: `${
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : 'https://rollrace.herokuapp.com'
+      }/api/maps/${mapId}`,
+      json: true
+    };
+    request
+      .get(options)
+      .then(resp => {
+        this.setState({ mapProps: resp, mode: 'game' });
+      })
+      .catch(err => {
+        throw Error(err);
+      });
+  }
+
   handleGoogleLogin(response) {
     fetch('/login', {
       method: 'POST',
@@ -162,15 +194,18 @@ class App extends Component {
    *  Params: finishTime: int
    *          callback: function to be called once the guest is updated
    */
-  updateGuestStats(finishTime, key, callback) {
-    if (finishTime < this.state.guest.map_1) {
-      // TODOOOO MAKE THIS NOT HARDCODEEEEE
+  updateGuestStats(finishTime, wasBooted, callback) {
+    const mapParam = `map_${this.state.mapProps.mapId}`;
+    if (
+      !wasBooted &&
+      (finishTime < this.state.guest[mapParam] ||
+        this.state.guest[mapParam] === -1)
+    ) {
       this.setState(
         {
           guest: Object.assign(this.state.guest, {
-            map_1: finishTime,
-            total_games: this.state.guest.total_games + 1,
-            control: key
+            [mapParam]: finishTime,
+            total_games: this.state.guest.total_games + 1
           })
         },
         callback
@@ -264,42 +299,20 @@ class App extends Component {
         return (
           <MapChooser
             goToMenu={this.handleGoToMenu}
-            handlePlay={() => this.setState({ mode: 'game' })}
+            handleChooseMap={this.handleChooseMap}
           />
         );
 
       case 'game':
-        if (this.state.multi) {
-          //render the lobbies
-          if (this.state.lobby) {
-            /*
-             * make a request here for those players in that lobby and pass to the game
-             * engine as a prop.
-             **/
-            return (
-              <GameEngine
-                mapProps={Object.assign(
-                  {},
-                  { map: this.state.map, strokeWidth: this.state.strokeWidth }
-                )}
-                goToMenu={this.handleGoToMenu}
-                guest={this.state.guest}
-                multi={this.state.multi}
-                playercolor={this.state.playercolor}
-              />
-            );
-          } else {
-            return (
-              <Lobbies chosen={lName => this.setState({ lobby: lName })} />
-            );
-          }
-        } else {
+        // render the lobbies
+        if (this.state.lobby || !this.state.multi) {
+          /*
+           * make a request here for those players in that lobby and pass to the game
+           * engine as a prop.
+           **/
           return (
             <GameEngine
-              mapProps={Object.assign(
-                {},
-                { map: this.state.map, strokeWidth: this.state.strokeWidth }
-              )}
+              mapProps={this.state.mapProps}
               goToMenu={this.handleGoToMenu}
               guest={this.state.guest}
               multi={this.state.multi}
@@ -308,6 +321,8 @@ class App extends Component {
               playerName={this.state.nickName}
             />
           );
+        } else {
+          return <Lobbies chosen={lName => this.setState({ lobby: lName })} />;
         }
       case 'settings':
         return (
