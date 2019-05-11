@@ -263,6 +263,7 @@ class GameEngine extends Component {
       )
     });
   }
+
   // send gameover data
   sendEndgameData() {
     const finishTime = parseInt(
