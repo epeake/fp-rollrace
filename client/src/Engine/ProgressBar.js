@@ -1,3 +1,9 @@
+/*
+ * This is the svg for our progress bar in the game.  Bar keeps track of the
+ * player's current position relative to the end of the map.  Map (path) length
+ * and current player position are passed as props as well as color.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 

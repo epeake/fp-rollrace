@@ -9,7 +9,7 @@ import styled from 'styled-components';
  *
  * props: chosen (call back)
  *
- * This class servers as an interface into the available
+ * This class serves as an interface into the available
  * lobbies for multiplayer. When the component is mounted
  * there is a request made to /api/lobbies/ that will give
  * list of available lobbies in cards. When a lobby is clicked on

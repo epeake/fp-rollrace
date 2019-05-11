@@ -1,3 +1,12 @@
+/*
+ * This file appropriately renders the time left for the player until they are
+ * booted from the map.  The timer is an SVG that displays minutes and seconds
+ * left, but it also controls game booting, sending a signal back to GameEngine
+ * to boot the player when the time has run our with handleBoot, which is passed
+ * as a prop.  Also worth noting is that game time is passed as a prop to the
+ * timer
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { SVGText } from '../Style/EngineStyle.js';
@@ -6,6 +15,10 @@ class Timer extends Component {
   constructor(props) {
     super(props);
 
+    /*
+     * We have to maintain a separate state because the timer must count down.
+     * The prop is our starting time, but then we change state locally to count down
+     */
     this.state = {
       minutes: this.props.startTime.minutes,
       seconds: this.props.startTime.seconds
