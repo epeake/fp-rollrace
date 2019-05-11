@@ -9,12 +9,11 @@ import {
   MenuText
 } from '../Style/MenuStyle.js';
 
-let allMaps;
-
 class Statistics extends Component {
   constructor(props) {
     super(props);
     this.state = { isMounted: false };
+    this.allMaps = null;
   }
 
   componentDidMount() {
@@ -29,7 +28,7 @@ class Statistics extends Component {
     request
       .get(options)
       .then(resp => {
-        allMaps = resp;
+        this.allMaps = resp;
         this.setState({ isMounted: true });
       })
       .catch(err => {
@@ -39,11 +38,11 @@ class Statistics extends Component {
 
   render() {
     let allMapsText;
-    if (allMaps) {
-      allMapsText = allMaps.map((currMap, i) => {
+    if (this.allMaps) {
+      allMapsText = this.allMaps.map((currMap, i) => {
         const mapIndex = `map_${currMap.mapId}`;
         return (
-          <MenuText key={`${i}mapstatstext`}>
+          <MenuText className={'besttime'} key={`${i}mapstatstext`}>
             {`Best ${currMap.title}: `}
             {this.props.user[mapIndex] === -1
               ? 'N/A'
@@ -56,10 +55,14 @@ class Statistics extends Component {
     return (
       <MenuBackground>
         <MenuTitle> Stats </MenuTitle>
-        <MenuButton onClick={this.props.goToMenu}>{'<-'} Main Menu </MenuButton>
+        <MenuButton className={'tomenu'} onClick={this.props.goToMenu}>
+          {'<-'} Main Menu{' '}
+        </MenuButton>
         {this.state.isMounted && (
           <>
-            <MenuText>Total Games: {this.props.user.total_games}</MenuText>
+            <MenuText className={'totalgames'}>
+              Total Games: {this.props.user.total_games}
+            </MenuText>
             {allMapsText}
           </>
         )}
