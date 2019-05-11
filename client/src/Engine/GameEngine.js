@@ -74,6 +74,20 @@ class GameEngine extends Component {
       this.props.mapProps.map
     );
 
+    // find minY based on map
+    this.variables.minY = this.hashedGameMap.reduce(
+      (accumulator, currentValue) => {
+        let minY = accumulator;
+        for (let j = 0; j < currentValue.length; j++) {
+          if (currentValue[j][1] > minY) {
+            minY = currentValue[j][1];
+          }
+        }
+        return minY;
+      },
+      0
+    );
+
     this.debounce = this.debounce.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleJumpKey = this.handleJumpKey.bind(this);
