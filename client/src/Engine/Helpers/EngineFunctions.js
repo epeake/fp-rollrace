@@ -13,7 +13,6 @@ import { CONSTANTS } from './constants.js';
             descentStartTime: ,
             jumpState: , // can't be CONSTANTS.jump.STOP
             jumpStartTime: ,
-            currentTime: ,
           }
  * @outputs: time (an integer) OR Infinity
  */
@@ -325,8 +324,7 @@ const findPath = props => {
           y: locations[j][1] - CONSTANTS.SPRITE_SIDE,
           descentStartTime: descentStartTime,
           jumpState: jumpState,
-          jumpStartTime: jumpStartTime,
-          currentTime: currentTime
+          jumpStartTime: jumpStartTime
         });
 
         // the x position of the back of the sprite at the given time
@@ -361,8 +359,7 @@ const findPath = props => {
         y: highest,
         descentStartTime: descentStartTime,
         jumpState: jumpState,
-        jumpStartTime: jumpStartTime,
-        currentTime: currentTime
+        jumpStartTime: jumpStartTime
       }),
       event: 'land'
     };
@@ -534,8 +531,7 @@ const spriteAtWall = props => {
           y: wall[1] - CONSTANTS.SPRITE_SIDE - strokeWidth,
           descentStartTime: descentStartTime,
           jumpState: jumpState,
-          jumpStartTime: jumpStartTime,
-          currentTime: currentTime
+          jumpStartTime: jumpStartTime
         }),
         event: 'go'
       };
@@ -550,8 +546,7 @@ const spriteAtWall = props => {
         y: wall[2],
         descentStartTime: descentStartTime,
         jumpState: jumpState,
-        jumpStartTime: jumpStartTime,
-        currentTime: currentTime
+        jumpStartTime: jumpStartTime
       }),
       event: 'go'
     };
@@ -808,8 +803,7 @@ const spriteGoingDown = props => {
         y: minY,
         descentStartTime: descentStartTime,
         jumpState: jumpState,
-        jumpStartTime: jumpStartTime,
-        currentTime: currentTime
+        jumpStartTime: jumpStartTime
       }),
       mapTranslationStart: mapTranslationStart,
       mapTranslationStartTime: mapTranslationStartTime,
@@ -1027,4 +1021,11 @@ const findNextChange = props => {
   }
 };
 
-export { getX, getY, getMapTranslation, findNextChange };
+export {
+  getX,
+  getY,
+  getMapTranslation,
+  findNextChange,
+  getTimeForGivenY,
+  getTimeForGivenX
+};
