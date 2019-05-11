@@ -320,7 +320,12 @@ class App extends Component {
             />
           );
         } else {
-          return <Lobbies chosen={lName => this.setState({ lobby: lName })} />;
+          return (
+            <Lobbies
+              goToMenu={this.handleGoToMenu}
+              chosen={lName => this.setState({ lobby: lName })}
+            />
+          );
         }
       case 'settings':
         return (
