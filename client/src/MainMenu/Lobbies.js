@@ -18,6 +18,11 @@ import styled from 'styled-components';
  *
  */
 
+const Img = styled.img`
+  width: 100%;
+  heigh: 50%;
+`;
+
 const Card = styled.div`
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   transition: 0.3s;
@@ -96,8 +101,9 @@ class Lobbies extends Component {
   render() {
     const { lobbies } = this.state;
     let cards = undefined;
+    const maps = ['maps/hard.png', 'maps/medium.png', 'maps/easy.png'];
     if (lobbies !== undefined) {
-      cards = lobbies.map(lobby => {
+      cards = lobbies.map((lobby, i) => {
         return (
           <Card
             key={lobby.lName}
@@ -105,6 +111,7 @@ class Lobbies extends Component {
               this.props.func(lobby.lName);
             }}
           >
+            <Img alt={'Game maps that can be played in multi'} src={maps[i]} />
             <Container>
               <h4>
                 <b>{lobby.lName}</b>

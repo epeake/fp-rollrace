@@ -302,28 +302,46 @@ class App extends Component {
         );
 
       case 'game':
-        // render the lobbies
-        if (this.state.lobby || !this.state.multi) {
-          /*
-           * make a request here for those players in that lobby and pass to the game
-           * engine as a prop.
-           **/
+        if (this.state.multi) {
+          //render the lobbies
+          if (this.state.lobby) {
+            /*
+             * make a request here for those players in that lobby and pass to the game
+             * engine as a prop.
+             **/
+            return (
+              <GameEngine
+                resetLobby={() => {
+                  this.setState({ lobby: '' });
+                }}
+                lobby={this.state.lobby}
+                mapProps={Object.assign(
+                  {},
+                  { map: this.state.map, strokeWidth: this.state.strokeWidth }
+                )}
+                goToMenu={this.handleGoToMenu}
+                guest={this.state.guest}
+                multi={this.state.multi}
+                playercolor={this.state.playercolor}
+              />
+            );
+          } else {
+            return (
+              <Lobbies chosen={lName => this.setState({ lobby: lName })} />
+            );
+          }
+        } else {
           return (
             <GameEngine
-              mapProps={this.state.mapProps}
+              lobby={''}
+              mapProps={Object.assign(
+                {},
+                { map: this.state.map, strokeWidth: this.state.strokeWidth }
+              )}
               goToMenu={this.handleGoToMenu}
               guest={this.state.guest}
               multi={this.state.multi}
               playercolor={this.state.playercolor}
-              updateGuestStats={this.updateGuestStats}
-              playerName={this.state.nickName}
-            />
-          );
-        } else {
-          return (
-            <Lobbies
-              goToMenu={this.handleGoToMenu}
-              chosen={lName => this.setState({ lobby: lName })}
             />
           );
         }
