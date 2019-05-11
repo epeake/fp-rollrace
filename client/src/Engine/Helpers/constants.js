@@ -3,7 +3,7 @@
 const RENDER_TIMEOUT = 20;
 
 // Where the sprite first starts
-const STARTING_Y = 547;
+const STARTING_Y = 547; // currently the same for all maps
 
 // constants object for game initialization
 export const CONSTANTS = {

@@ -268,7 +268,6 @@ const findWall = props => {
  *  telling the time of landing OR undefined if there are to paths to land on
  *  in the given x interval
  * @params: props: { // see constants.js
-            currentTime: ,
             mapTranslationStart: ,
             mapTranslationStartTime: ,
             mapTranslation: ,
@@ -290,7 +289,6 @@ const findWall = props => {
 const findPath = props => {
   // declare local variables
   const {
-    currentTime,
     mapTranslationStart,
     mapTranslationStartTime,
     mapTranslation,
@@ -449,7 +447,6 @@ const findEndOfPath = props => {
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is at a wall)
  *
  * @params: props: { // see constants.js
-            currentTime: ,
             y: ,
             yStart: ,
             descentStartTime: ,
@@ -471,7 +468,6 @@ const findEndOfPath = props => {
 const spriteAtWall = props => {
   // declare local variables
   const {
-    currentTime,
     y,
     mapTranslation,
     yStart,
@@ -553,7 +549,6 @@ const spriteAtWall = props => {
 
     // the time the sprite will land on a path
     const timeToLand = findPath({
-      currentTime: currentTime,
       mapTranslationStart: mapTranslationStart,
       mapTranslationStartTime: mapTranslationStartTime,
       mapTranslation: mapTranslation,
@@ -754,7 +749,6 @@ const spriteGoingUp = props => {
  * Outputs a motionChange object based on the game state passed as props (assuming the sprite is in freefall)
  *
  * @params: props: { // see constants.js
-              currentTime: ,
               minY: ,
               y: ,
               yStart: ,
@@ -776,7 +770,6 @@ const spriteGoingUp = props => {
 const spriteGoingDown = props => {
   // declare local variables
   const {
-    currentTime,
     minY,
     y,
     mapTranslation,
@@ -834,7 +827,6 @@ const spriteGoingDown = props => {
 
   // finds the soonest path the sprite is going to land on
   const path = findPath({
-    currentTime: currentTime,
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
     mapTranslation: mapTranslation,
@@ -898,7 +890,7 @@ const findNextChange = props => {
   } = props.variables;
   const currentTime = new Date().getTime();
   const y = getY({
-    currentTime: new Date().getTime(),
+    currentTime: currentTime,
     descentStartTime: descentStartTime,
     jumpStartTime: jumpStartTime,
     jumpState: jumpState,
@@ -907,7 +899,7 @@ const findNextChange = props => {
     paused: props.state.paused
   });
   const mapTranslation = getMapTranslation({
-    currentTime: new Date().getTime(),
+    currentTime: currentTime,
     mapTranslationStart: mapTranslationStart,
     mapTranslationStartTime: mapTranslationStartTime,
     mapTranslation: props.state.mapTranslation,
@@ -925,7 +917,6 @@ const findNextChange = props => {
        *  3. the sprite falls until it hits the ground
        */
       return spriteAtWall({
-        currentTime: currentTime,
         y: y,
         yStart: yStart,
         descentStartTime: descentStartTime,
@@ -997,7 +988,6 @@ const findNextChange = props => {
        *  2. the sprite hits a wall while going down
        */
       return spriteGoingDown({
-        currentTime: currentTime,
         minY: minY,
         y: y,
         yStart: yStart,
