@@ -1,4 +1,8 @@
-// constants for our constants:
+/*
+ * This file contains all of the constants used throughout the game.
+ */
+
+// RENDER_TIMEOUT and STARTING_Y are constants for our constants.
 // time between rerenders
 const RENDER_TIMEOUT = 20;
 
@@ -9,9 +13,9 @@ const STARTING_Y = 547;
 export const CONSTANTS = {
   jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
   UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
-  TOOLBAR_Y: 15,
-  TOOLBAR_X: 800,
-  ICON_X: 40,
+  TOOLBAR_Y: 15, // controls the y positions of the timer and the progress bar
+  TOOLBAR_X: 800, // controls the x positions of the timer and the progress bar
+  ICON_X: 40, // controls the x position of the pause button and player color icon
   UPDATE_TIMEOUT: 20, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game

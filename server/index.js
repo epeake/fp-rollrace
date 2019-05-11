@@ -1,3 +1,8 @@
+/*
+ * Index.js loads up the server, populates the maps Map used in the server.js file
+ * and controls all sockets.
+ */
+
 const http = require('http');
 const { app, maps } = require('./server');
 const fs = require('fs');
@@ -22,27 +27,27 @@ readFile(path.join(__dirname, 'maps/maps.json'))
     const io = require('socket.io')(server); // eslint-disable-line global-require
 
     /*
-	use map to store players
-	given that socket ids are unique
-	this helps remove players
- 	when they disconnect
-
- 	NOTE: emitting anything requires sending the data
- 	in a JS object
-*/
+     *	use map to store players
+     *	given that socket ids are unique
+     *	this helps remove players
+     *	when they disconnect
+     *
+     * NOTE: emitting anything requires sending the data
+     *	in a JS object
+     */
     const players = new Map();
     io.on('connection', socket => {
       socket.on('NEW_PLAYER', (player, fn) => {
         /*
-			add the new player to the list of players
-			and them emit the new list of players
-		*/
+         *	add the new player to the list of players
+         *	and them emit the new list of players
+         */
         players.set(socket.id, player);
 
         /*
-			tell this newly connected socket about the other players
-			player
-		*/
+         *	tell this newly connected socket about the other players
+         *	player
+         */
         const arr = Array.from(players.values()).filter(playerData => {
           return playerData.key !== socket.id;
         });

@@ -1,3 +1,10 @@
+/*
+ * This file appropriately renders the map according to the specified stroke width
+ * and the current translation specified by the GameEngine.  The translation is
+ * how the player moves along in the map.  That is, the player never moves, the
+ * map just translates.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';

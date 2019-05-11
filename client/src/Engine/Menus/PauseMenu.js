@@ -1,3 +1,8 @@
+/*
+ * This file contains the PauseMenu, displayed after the user clicks the pause
+ * button from within the game.
+ */
+
 import React from 'react';
 import { ModalProvider } from 'styled-react-modal';
 import PropTypes from 'prop-types';

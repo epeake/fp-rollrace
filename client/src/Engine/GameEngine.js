@@ -1,3 +1,8 @@
+/*
+ * This file is the game.  It links together all of the other files contained
+ * in this Engine folder.  The brains of it all.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
