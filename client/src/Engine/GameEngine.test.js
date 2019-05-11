@@ -47,8 +47,11 @@ describe('GameEngine Tests', () => {
           mapProps={Object.assign(
             {},
             {
-              map: gameEngineProps.map,
-              strokeWidth: gameEngineProps.strokeWidth
+              path: gameEngineProps.path,
+              strokeWidth: gameEngineProps.strokeWidth,
+              mapId: gameEngineProps.mapId,
+              end: gameEngineProps.end,
+              startTime: gameEngineProps.startTime
             }
           )}
           goToMenu={menuCallback}
@@ -220,7 +223,7 @@ describe('GameEngine Tests', () => {
     //     variables: gameEngine.instance().variables,
     //     state: gameEngine.instance().state,
     //     strokeWidth: gameEngine.instance().props.mapProps.strokeWidth,
-    //     map: gameEngine.instance().props.mapProps.map,
+    //     path: gameEngine.instance().props.mapProps.path,
     //     mapLength: gameEngine.instance().mapLength
     //   });
     //   expect(motionChange).toEqual({

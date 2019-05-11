@@ -82,13 +82,19 @@ class GameEngine extends Component {
     // find minY based on map
     this.variables.minY = this.hashedGameMap.reduce(
       (accumulator, currentValue) => {
-        let minY = accumulator;
-        for (let j = 0; j < currentValue.length; j++) {
-          if (currentValue[j][1] > minY) {
-            minY = currentValue[j][1];
+        const minY = currentValue.reduce((accumulator2, currentValue2) => {
+          //console.log(currentValue[0]);
+          if (currentValue2[1] > accumulator2) {
+            return currentValue2[1];
+          } else {
+            return accumulator2;
           }
+        }, 0);
+        if (minY > accumulator) {
+          return minY;
+        } else {
+          return accumulator;
         }
-        return minY;
       },
       0
     );
