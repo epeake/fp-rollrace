@@ -1,3 +1,8 @@
+/*
+ * This file contains the SVG for the current best time AKA highscore, which is
+ * displayed for the current map ingame.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { SVGText } from '../Style/EngineStyle.js';
@@ -5,9 +10,7 @@ import { SVGText } from '../Style/EngineStyle.js';
 export default function CurrBestTime(props) {
   return (
     <SVGText fill={'white'} x={props.x + 700} y={props.y + 25}>{`Highscore: ${
-      props.highscore === -1 || props.highscore === Infinity
-        ? 'N/A'
-        : `${props.highscore} sec`
+      props.highscore === -1 ? 'N/A' : `${props.highscore} sec`
     }`}</SVGText>
   );
 }

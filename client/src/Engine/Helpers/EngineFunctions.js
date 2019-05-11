@@ -1,3 +1,7 @@
+/*
+ * This file is comprised of helper functions to be used in the GameEngine file.
+ */
+
 import { CONSTANTS } from './constants.js';
 
 /*

@@ -1,20 +1,28 @@
+/*
+ * This file appropriately renders the time left for the player until they are
+ * booted from the map.  The timer is an SVG that displays minutes and seconds
+ * left, but it also controls game booting, sending a signal back to GameEngine
+ * to boot the player when the time has run our with handleBoot, which is passed
+ * as a prop.  Also worth noting is that game time is passed as a prop to the
+ * timer
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { SVGText } from '../Style/EngineStyle.js';
-
-const MINUTES = '00';
-const SECONDS = '30';
-
-const START_TIME = {
-  minutes: MINUTES,
-  seconds: SECONDS
-};
 
 class Timer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = START_TIME;
+    /*
+     * We have to maintain a separate state because the timer must count down.
+     * The prop is our starting time, but then we change state locally to count down
+     */
+    this.state = {
+      minutes: this.props.startTime.minutes,
+      seconds: this.props.startTime.seconds
+    };
 
     this.tickInterval = undefined;
     this.tick = this.tick.bind(this);
@@ -26,7 +34,10 @@ class Timer extends Component {
    */
   tick() {
     if (this.props.resetTimer) {
-      this.setState({ minutes: MINUTES, seconds: SECONDS });
+      this.setState({
+        minutes: this.props.startTime.minutes,
+        seconds: this.props.startTime.seconds
+      });
     }
     if (!this.props.paused && this.props.timerCanStart) {
       const { minutes, seconds } = this.state; // curr minutes and seconds
@@ -53,7 +64,7 @@ class Timer extends Component {
         // stop ticking when there is no more time left
         clearInterval(this.tickInterval);
         this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
-        this.props.handleBoot(); //Let game know that time is up
+        this.props.handleBoot(true); //Let game know that time is up and set booted state to true
         return;
       }
 
@@ -89,7 +100,7 @@ class Timer extends Component {
 
   render() {
     return (
-      <SVGText fill={'white'} x={this.props.x + 100} y={this.props.y + 25}>
+      <SVGText fill={'white'} x={this.props.x + 105} y={this.props.y + 25}>
         {`${this.state.minutes}:${this.state.seconds}`}
       </SVGText>
     );
@@ -99,6 +110,7 @@ class Timer extends Component {
 Timer.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
+  startTime: PropTypes.object.isRequired,
   timerCanStart: PropTypes.bool.isRequired,
   paused: PropTypes.bool.isRequired,
   resetTimer: PropTypes.bool.isRequired,

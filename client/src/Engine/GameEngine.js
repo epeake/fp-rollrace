@@ -1,3 +1,8 @@
+/*
+ * This file is the game.  It links together all of the other files contained
+ * in this Engine folder.  The brains of it all.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -65,13 +70,13 @@ class GameEngine extends Component {
     this.countdownInterval = null;
 
     // length in SVG coordinates
-    this.mapLength = findMapSpan(this.props.mapProps.map);
+    this.mapLength = findMapSpan(this.props.mapProps.path);
 
     // our svg in hashmap form
     this.hashedGameMap = buildMapHashtable(
       this.mapLength,
       this.props.mapProps.strokeWidth,
-      this.props.mapProps.map
+      this.props.mapProps.path
     );
 
     // find minY based on map
@@ -263,11 +268,12 @@ class GameEngine extends Component {
   }
 
   // causes the game to stop rendering and sets gameover to true
-  endGame() {
+  endGame(wasBooted) {
     clearInterval(this.renderInterval);
     clearInterval(this.updateInterval);
     this.setState({
       gameover: true,
+      wasBooted: wasBooted,
       endScore: parseInt(
         (new Date().getTime() -
           this.variables.gameStartTime -
@@ -276,6 +282,7 @@ class GameEngine extends Component {
       )
     });
   }
+
   // send gameover data
   sendEndgameData() {
     const finishTime = parseInt(
@@ -298,11 +305,12 @@ class GameEngine extends Component {
           type: 'end',
           contents: {
             time: finishTime
-          }
+          },
+          mapId: this.props.mapProps.mapId,
+          wasBooted: this.state.wasBooted
         },
         json: true
       };
-
       request
         .put(options)
         .then(() => {
@@ -315,6 +323,7 @@ class GameEngine extends Component {
       // first we update the guest's states, then we set out dataSent to true, then we getScore
       this.props.updateGuestStats(
         finishTime,
+        this.state.wasBooted,
         this.setState({ dataSent: true }, this.getScore)
       );
     }
@@ -408,9 +417,9 @@ class GameEngine extends Component {
             x: this.variables.x,
             paused: this.state.paused
           }) >=
-          this.mapLength - CONSTANTS.GAMEOVER_X
+          this.mapLength - this.props.mapProps.end
         ) {
-          this.endGame();
+          this.endGame(false); // game ended not due to a boot
         } else {
           this.setState({
             mapTranslation: this.getMapTranslation({
@@ -449,14 +458,18 @@ class GameEngine extends Component {
       request
         .get(options)
         .then(resp => {
-          this.setState({ highscore: resp.map_1 });
+          this.setState({
+            highscore: resp[`map_${this.props.mapProps.mapId}`]
+          });
         })
         .catch(err => {
           //console.log('run');
           throw Error(err);
         });
     } else {
-      this.setState({ highscore: this.props.guest.map_1 });
+      this.setState({
+        highscore: this.props.guest[`map_${this.props.mapProps.mapId}`]
+      });
     }
   }
 
@@ -555,7 +568,7 @@ class GameEngine extends Component {
 
   render() {
     // Find the length of the map
-    const pathLength = this.mapLength - CONSTANTS.GAMEOVER_X;
+    const pathLength = this.mapLength - this.props.mapProps.end;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 
@@ -659,6 +672,7 @@ class GameEngine extends Component {
               <Timer
                 y={CONSTANTS.TOOLBAR_Y}
                 x={CONSTANTS.TOOLBAR_X}
+                startTime={this.props.mapProps.startTime}
                 paused={this.state.paused}
                 timerCanStart={this.state.timerCanStart}
                 handleBoot={this.endGame}
@@ -690,7 +704,7 @@ class GameEngine extends Component {
           )}
           <Map
             translation={this.state.mapTranslation}
-            map={this.props.mapProps.map}
+            path={this.props.mapProps.path}
             stroke={this.props.mapProps.strokeWidth}
             className="map"
           />
@@ -736,6 +750,7 @@ class GameEngine extends Component {
             exitToMenu={() => this.props.goToMenu()}
             highscore={this.state.highscore}
             score={this.state.endScore}
+            wasBooted={this.state.wasBooted}
             showModal={this.state.gameover}
           />
         )}

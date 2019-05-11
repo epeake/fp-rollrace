@@ -1,3 +1,8 @@
+/*
+ * This file contains the ChangeKeyMenu component, which is called from the
+ * when the player is either booted, or reached the end of the map.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -15,8 +20,13 @@ export default function GameoverMenu(props) {
     <ModalProvider>
       <StyledModal isOpen={props.showModal}>
         <StyledP>Game Over!</StyledP>
-        <StyledP>{`Score: ${props.score} sec`}</StyledP>
-        <StyledP>{`Highscore: ${props.highscore} sec`}</StyledP>
+        {/* only show the current score if the player actually completed the game */}
+        {!props.wasBooted && <StyledP>{`Score: ${props.score} sec`}</StyledP>}
+
+        {/* only show the highscore if the player has one on file for the map */}
+        {props.highscore !== -1 && (
+          <StyledP>{`Highscore: ${props.highscore} sec`}</StyledP>
+        )}
         <ModalStyledButton onClick={props.restart}>Restart</ModalStyledButton>
         <ModalStyledButton onClick={props.exitToMenu}>
           Main Menu

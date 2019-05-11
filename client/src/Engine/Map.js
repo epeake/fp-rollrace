@@ -1,3 +1,10 @@
+/*
+ * This file appropriately renders the map according to the specified stroke width
+ * and the current translation specified by the GameEngine.  The translation is
+ * how the player moves along in the map.  That is, the player never moves, the
+ * map just translates.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -14,7 +21,7 @@ const MapPath = styled.path`
 export default function Map(props) {
   return (
     <g transform={`translate(${props.translation} 0)`}>
-      {props.map.map((curr, index) => (
+      {props.path.map((curr, index) => (
         <MapPath key={`${index}mappath`} stroke={props.stroke} d={curr} /> // eslint-disable-line
       ))}
     </g>
@@ -23,6 +30,6 @@ export default function Map(props) {
 
 Map.propTypes = {
   translation: PropTypes.number.isRequired,
-  map: PropTypes.array.isRequired,
+  path: PropTypes.array.isRequired,
   stroke: PropTypes.number.isRequired
 };

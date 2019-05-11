@@ -1,3 +1,7 @@
+/*  This file defines the styles for all the modal menus. This includes the pause menu,
+ * gameover menu, and change key menu
+ */
+
 import styled from 'styled-components';
 import Modal from 'styled-react-modal';
 

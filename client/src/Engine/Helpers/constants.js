@@ -1,4 +1,8 @@
-// constants for our constants:
+/*
+ * This file contains all of the constants used throughout the game.
+ */
+
+// RENDER_TIMEOUT and STARTING_Y are constants for our constants.
 // time between rerenders
 const RENDER_TIMEOUT = 20;
 
@@ -9,10 +13,9 @@ const STARTING_Y = 547; // currently the same for all maps
 export const CONSTANTS = {
   jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
   UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
-  TOOLBAR_Y: 15,
-  TOOLBAR_X: 800,
-  ICON_X: 40,
-  GAMEOVER_X: 900, // X position of the end of game
+  TOOLBAR_Y: 15, // controls the y positions of the timer and the progress bar
+  TOOLBAR_X: 800, // controls the x positions of the timer and the progress bar
+  ICON_X: 40, // controls the x position of the pause button and player color icon
   UPDATE_TIMEOUT: 20, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game
@@ -21,14 +24,14 @@ export const CONSTANTS = {
   SPRITE_SIDE: 100, // size of the invisiable square surrounding the sprite
   PATH_THRESH: 4, // a constant used when finding the end of a path
   TIME_THRESH: RENDER_TIMEOUT, // a constant used in the motionChange update loop
-  COUNTDOWN_X: 730, // X position of countdown numbers
+  COUNTDOWN_X: 760, // X position of countdown numbers
   COUNTDOWN_Y: 650, // Y position of countdown numbers
   COUNTDOWN_NUMBERS: ['3', '2', '1', ''], // displayed countdown values
   INITIAL_STATE: {
     countdownIndex: 0, // index of our countdown numbers (where we are in the countdown)
     highscore: '', // current highscore for the current map
     dataSent: false, // indicates if we have sent data (put request) at the end of a game
-    // tutorial: false,
+    wasBooted: false, // indicated whether the game ended due to a boot
     paused: false, // boolean to determine whether or not the game is in the paused state
     endScore: undefined, // score at the completion of the game
     gameover: false, // boolean to determine whether or not the game has ended

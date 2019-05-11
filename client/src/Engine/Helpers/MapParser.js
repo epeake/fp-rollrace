@@ -1,4 +1,11 @@
 /*
+ * This file is comprised of two functions, findMapSpan and buildMapHashtable.
+ * These functions are used to convert our SVG path into a hash table so we can
+ * make sure the player's sprite 1) stays on the map and 2) stops at boundaries
+ * in constant time.
+ */
+
+/*
  * Finds the boundaries of all our map paths so that we can allocate enough
  * space for our map hash table.  Assumes the map starts at X = 0
  *

@@ -1,3 +1,18 @@
+/*
+ * Contains all the backend required for http requests/database interaction and
+ * login.
+ *
+ * POST: '/login' : Handles login
+ *
+ * PUT: '/api/users/' : Updates a logged-in user's stats
+ *
+ * GET: '/api/users/stats' : Gets a logged-in player's maps
+ *      '/api/maps' : Gets all the maps from the maps.json file
+ *      '/api/maps/:id' : Gets a specific map from the maps.json file
+ *      '/api/lobbies/' : Gets lobbies
+ *
+ */
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -11,7 +26,7 @@ const passport = require('passport');
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const { OAuth2Client } = require('google-auth-library');
 
-/* We will need to update the number of lobbies later */
+// We will need to update the number of lobbies later
 const { lobbies } = require('./seeds/dev/lobbies.js');
 
 // db-errors provides a consistent wrapper around database errors
@@ -22,6 +37,8 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // Bind all Models to a knex instance.
 Model.knex(knex);
 const app = express();
+
+// maps is populated by index.js.  This is all of the current maps for single player
 const maps = new Map();
 
 // express only serves static assets in production
@@ -50,6 +67,8 @@ app.use(bodyParser.json());
 
 // middleware to host images
 app.use('/maps', express.static(path.join(__dirname, '/maps')));
+
+// We need to store sessions in our database if we are in production
 if (process.env.NODE_ENV !== 'production') {
   app.use(
     session({
@@ -69,19 +88,10 @@ if (process.env.NODE_ENV !== 'production') {
   );
 }
 
-app.use(
-  session({
-    secret:
-      process.env.NODE_ENV !== 'production'
-        ? 'asfdasfdasf123412'
-        : process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-  })
-);
 app.use(passport.initialize());
 app.use(passport.session());
 
+// serialization for login
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -115,11 +125,7 @@ passport.use(
           user = await Users.query().insertAndFetch({
             googleId: payload.sub,
             givenName: payload.given_name,
-            email: payload.email,
-            total_games: 0,
-            total_multi_games: 0,
-            total_multi_wins: 0,
-            map_1: -1
+            email: payload.email
           });
         }
         done(null, user);
@@ -135,23 +141,24 @@ app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
   (request, response) => {
-    // console.log(request.user);  for debugging
     response.sendStatus(200);
   }
 );
 
 // update player's stats
 app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
+  const mapParam = `map_${request.body.mapId}`;
   if (request.body.type === 'end') {
     (async () => {
       const user = await Users.query().findById(request.user.id);
-      if (user.map_1 === -1 || user.map_1 > request.body.contents.time) {
-        // TODOOO MAKE THIS NOT HARDCODEEE
-        // REPLACE WITH GENERICCC
+      if (
+        !request.body.wasBooted &&
+        (user[mapParam] === -1 || user[mapParam] > request.body.contents.time)
+      ) {
         user
           .$query()
           .patchAndFetch({
-            map_1: request.body.contents.time,
+            [mapParam]: request.body.contents.time, // give key var name?
             total_games: user.total_games + 1
           })
           .then(rows => {
