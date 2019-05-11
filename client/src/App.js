@@ -74,7 +74,11 @@ class App extends Component {
         ],
         strokeWidth: 6, // must be an even number for the parsing algorithm
         mapId: 1,
-        end: 667
+        end: 667,
+        startTime: {
+          minutes: '00',
+          seconds: '30'
+        }
       },
       guest: GUEST_ACCOUNT,
       user: GUEST_ACCOUNT,

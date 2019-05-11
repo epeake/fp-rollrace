@@ -643,6 +643,7 @@ class GameEngine extends Component {
               <Timer
                 y={CONSTANTS.TOOLBAR_Y}
                 x={CONSTANTS.TOOLBAR_X}
+                startTime={this.props.mapProps.startTime}
                 paused={this.state.paused}
                 timerCanStart={this.state.timerCanStart}
                 handleBoot={this.endGame}

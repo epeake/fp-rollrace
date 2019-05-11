@@ -2,19 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { SVGText } from '../Style/EngineStyle.js';
 
-const MINUTES = '00';
-const SECONDS = '30';
-
-const START_TIME = {
-  minutes: MINUTES,
-  seconds: SECONDS
-};
-
 class Timer extends Component {
   constructor(props) {
     super(props);
 
-    this.state = START_TIME;
+    this.state = {
+      minutes: this.props.startTime.minutes,
+      seconds: this.props.startTime.seconds
+    };
 
     this.tickInterval = undefined;
     this.tick = this.tick.bind(this);
@@ -26,7 +21,10 @@ class Timer extends Component {
    */
   tick() {
     if (this.props.resetTimer) {
-      this.setState({ minutes: MINUTES, seconds: SECONDS });
+      this.setState({
+        minutes: this.props.startTime.minutes,
+        seconds: this.props.startTime.seconds
+      });
     }
     if (!this.props.paused && this.props.timerCanStart) {
       const { minutes, seconds } = this.state; // curr minutes and seconds
@@ -89,7 +87,7 @@ class Timer extends Component {
 
   render() {
     return (
-      <SVGText fill={'white'} x={this.props.x + 100} y={this.props.y + 25}>
+      <SVGText fill={'white'} x={this.props.x + 105} y={this.props.y + 25}>
         {`${this.state.minutes}:${this.state.seconds}`}
       </SVGText>
     );
@@ -99,6 +97,7 @@ class Timer extends Component {
 Timer.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
+  startTime: PropTypes.object.isRequired,
   timerCanStart: PropTypes.bool.isRequired,
   paused: PropTypes.bool.isRequired,
   resetTimer: PropTypes.bool.isRequired,
