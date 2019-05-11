@@ -119,7 +119,8 @@ passport.use(
             total_games: 0,
             total_multi_games: 0,
             total_multi_wins: 0,
-            map_1: -1
+            map_1: -1,
+            control: 32
           });
         }
         done(null, user);
@@ -135,12 +136,13 @@ app.post(
   '/login',
   passport.authenticate('bearer', { session: true }),
   (request, response) => {
-    // console.log(request.user);  for debugging
+    // eslint-disable-next-line no-console
+    console.log(request.user); // for debugging
     response.sendStatus(200);
   }
 );
 
-// update player's stats
+// update player's stats and settings
 app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
   if (request.body.type === 'end') {
     (async () => {
@@ -152,7 +154,8 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
           .$query()
           .patchAndFetch({
             map_1: request.body.contents.time,
-            total_games: user.total_games + 1
+            total_games: user.total_games + 1,
+            control: request.body.contents.control
           })
           .then(rows => {
             response.send(rows);
@@ -161,7 +164,8 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
         user
           .$query()
           .patchAndFetch({
-            total_games: user.total_games + 1
+            total_games: user.total_games + 1,
+            control: request.body.contents.jumpkey // add the jumpkey to the databse
           })
           .then(rows => {
             response.send(rows);

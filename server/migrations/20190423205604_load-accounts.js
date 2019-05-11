@@ -10,6 +10,7 @@ exports.up = function(knex, Promise) {
     table.integer('total_multi_games').notNullable();
     table.integer('total_multi_wins').notNullable();
     table.integer('map_1').notNullable();
+    table.integer('control').notNullable();
   });
 };
 

@@ -7,12 +7,17 @@ const STARTING_Y = 547;
 
 // constants object for game initialization
 export const CONSTANTS = {
+  WIDTH: 300, // Set maximum width of progressbar
+  HEIGHT: 30, // bar height
+  POS_OFFSET: 35, //
+  SPRITE_OFFSET: 50,
+
   jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
   UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
   TOOLBAR_Y: 15,
   TOOLBAR_X: 800,
   ICON_X: 40,
-  GAMEOVER_X: 900, // X position of the end of game
+  GAMEOVER_X: 6900, // X position of the end of game
   UPDATE_TIMEOUT: 20, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game

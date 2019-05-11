@@ -18,7 +18,8 @@ const GUEST_ACCOUNT = {
   total_games: 0,
   total_multi_games: 0,
   total_multi_wins: 0,
-  map_1: Infinity
+  map_1: Infinity,
+  control: 32
 };
 
 const CenteredDiv = styled.div`
@@ -113,6 +114,7 @@ class App extends Component {
         .get(options)
         .then(resp => {
           this.setState({ user: resp });
+          console.log(resp);
         })
         .catch(err => {
           throw Error(err);
@@ -160,14 +162,15 @@ class App extends Component {
    *  Params: finishTime: int
    *          callback: function to be called once the guest is updated
    */
-  updateGuestStats(finishTime, callback) {
+  updateGuestStats(finishTime, key, callback) {
     if (finishTime < this.state.guest.map_1) {
       // TODOOOO MAKE THIS NOT HARDCODEEEEE
       this.setState(
         {
           guest: Object.assign(this.state.guest, {
             map_1: finishTime,
-            total_games: this.state.guest.total_games + 1
+            total_games: this.state.guest.total_games + 1,
+            control: key
           })
         },
         callback
@@ -176,7 +179,8 @@ class App extends Component {
       this.setState(
         {
           guest: Object.assign(this.state.guest, {
-            total_games: this.state.guest.total_games + 1
+            total_games: this.state.guest.total_games + 1,
+            control: key
           })
         },
         callback

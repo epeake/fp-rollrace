@@ -270,6 +270,7 @@ class GameEngine extends Component {
         this.variables.timePaused) /
         1000
     );
+    const { jumpKey } = this.state;
 
     if (
       !this.props.guest // exclusive to members
@@ -283,7 +284,8 @@ class GameEngine extends Component {
         body: {
           type: 'end',
           contents: {
-            time: finishTime
+            time: finishTime,
+            control: jumpKey
           }
         },
         json: true
@@ -301,6 +303,7 @@ class GameEngine extends Component {
       // first we update the guest's states, then we set out dataSent to true, then we getScore
       this.props.updateGuestStats(
         finishTime,
+        jumpKey,
         this.setState({ dataSent: true }, this.getScore)
       );
     }
