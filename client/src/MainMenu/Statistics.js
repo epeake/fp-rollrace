@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* Statistics page that displays the best scores for each map for the player.
  * If the player is logged in, this information is saved in the database and is
  * updated anytime the player plays. If the player is not logged in, the statistics
