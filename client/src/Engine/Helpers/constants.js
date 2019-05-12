@@ -11,11 +11,10 @@ const STARTING_Y = 547; // currently the same for all maps
 
 // constants object for game initialization
 export const CONSTANTS = {
-  WIDTH: 300, // Set maximum width of progressbar
-  HEIGHT: 30, // bar height
-  POS_OFFSET: 35, //
-  SPRITE_OFFSET: 50,
-
+  PROGRESS_BAR_WIDTH: 300, // Set maximum width of progress bar
+  PROGRESS_BAR_HEIGHT: 30, // Progress bar height
+  PROGRESS_BAR_POS_OFFSET: 35, // X position offset for the progress bar
+  PROGRESS_BAR_SPRITE_OFFSET: 50, // X position offset for the progress bar sprite
   jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
   UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
   TOOLBAR_Y: 15, // controls the y positions of the timer and the progress bar
