@@ -136,7 +136,7 @@ class App extends Component {
     }
   }
 
-  handleChooseMap(mapId) {
+  handleChooseMap(lobby, mapId) {
     const options = {
       url: `${
         process.env.NODE_ENV === 'development'
@@ -148,7 +148,12 @@ class App extends Component {
     request
       .get(options)
       .then(resp => {
-        this.setState({ mapProps: resp, mode: 'game' });
+        if (this.state.multi) {
+          console.log(resp);
+          this.setState({ mapProps: resp, mode: 'game', lobby: lobby });
+        } else {
+          this.setState({ mapProps: resp, mode: 'game' });
+        }
       })
       .catch(err => {
         throw Error(err);
@@ -327,7 +332,12 @@ class App extends Component {
             );
           } else {
             return (
-              <Lobbies chosen={lName => this.setState({ lobby: lName })} />
+              <Lobbies
+                chosen={(lName, mapId) => {
+                  this.handleChooseMap(lName, mapId);
+                }}
+                goToMenu={this.handleGoToMenu}
+              />
             );
           }
         } else {

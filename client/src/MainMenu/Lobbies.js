@@ -101,14 +101,14 @@ class Lobbies extends Component {
   render() {
     const { lobbies } = this.state;
     let cards = undefined;
-    const maps = ['maps/hard.png', 'maps/medium.png', 'maps/easy.png'];
+    const maps = ['maps/easy.png', 'maps/medium.png', 'maps/hard.png'];
     if (lobbies !== undefined) {
       cards = lobbies.map((lobby, i) => {
         return (
           <Card
             key={lobby.lName}
-            onclick={() => {
-              this.props.func(lobby.lName);
+            onClick={() => {
+              this.props.chosen(lobby.lName, i);
             }}
           >
             <Img alt={'Game maps that can be played in multi'} src={maps[i]} />

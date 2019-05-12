@@ -91,7 +91,9 @@ class MapChooser extends Component {
             <div>
               <MainButton
                 className="playbutton"
-                onClick={() => this.props.handleChooseMap(this.state.currMap)}
+                onClick={() =>
+                  this.props.handleChooseMap(undefined, this.state.currMap)
+                }
               >
                 {' '}
                 Play!
