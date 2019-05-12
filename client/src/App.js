@@ -94,7 +94,7 @@ class App extends Component {
       user: GUEST_ACCOUNT,
       mode: 'menu',
       multi: false,
-      lobby: undefined,
+      lobby: '',
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`,
@@ -148,7 +148,7 @@ class App extends Component {
     }
   }
 
-  handleChooseMap(mapId) {
+  handleChooseMap(lobby, mapId) {
     const options = {
       url: `${
         process.env.NODE_ENV === 'development'
@@ -160,7 +160,11 @@ class App extends Component {
     request
       .get(options)
       .then(resp => {
-        this.setState({ mapProps: resp, mode: 'game' });
+        if (this.state.multi) {
+          this.setState({ mapProps: resp, mode: 'game', lobby: lobby });
+        } else {
+          this.setState({ mapProps: resp, mode: 'game' });
+        }
       })
       .catch(err => {
         throw Error(err);
@@ -314,12 +318,38 @@ class App extends Component {
         );
 
       case 'game':
-        // render the lobbies
-        if (this.state.lobby || !this.state.multi) {
-          /*
-           * make a request here for those players in that lobby and pass to the game
-           * engine as a prop.
-           **/
+        if (this.state.multi) {
+          //render the lobbies
+          if (this.state.lobby) {
+            /*
+             * make a request here for those players in that lobby and pass to the game
+             * engine as a prop.
+             **/
+            return (
+              <GameEngine
+                resetLobby={() => {
+                  this.setState({ lobby: '' });
+                }}
+                mapProps={this.state.mapProps}
+                goToMenu={this.handleGoToMenu}
+                guest={this.state.guest}
+                multi={this.state.multi}
+                playercolor={this.state.playercolor}
+                updateGuestStats={this.updateGuestStats}
+                playerName={this.state.nickName}
+              />
+            );
+          } else {
+            return (
+              <Lobbies
+                chosen={(lName, mapId) => {
+                  this.handleChooseMap(lName, mapId);
+                }}
+                goToMenu={this.handleGoToMenu}
+              />
+            );
+          }
+        } else {
           return (
             <GameEngine
               mapProps={this.state.mapProps}
@@ -329,13 +359,6 @@ class App extends Component {
               playercolor={this.state.playercolor}
               updateGuestStats={this.updateGuestStats}
               playerName={this.state.nickName}
-            />
-          );
-        } else {
-          return (
-            <Lobbies
-              goToMenu={this.handleGoToMenu}
-              chosen={lName => this.setState({ lobby: lName })}
             />
           );
         }

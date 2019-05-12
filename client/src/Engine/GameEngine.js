@@ -58,7 +58,7 @@ class GameEngine extends Component {
        * each game will have a socket to connect back to the server
        * store the other players as a member for THIS player
        */
-      this.socket = io.connect();
+      this.socket = io.connect(this.props.lobby);
     }
 
     // timeout for debounce
@@ -496,6 +496,7 @@ class GameEngine extends Component {
     clearInterval(this.renderInterval);
     if (this.props.multi) {
       this.socket.disconnect();
+      this.props.resetLobby();
     }
   }
 
@@ -770,6 +771,7 @@ class GameEngine extends Component {
 }
 
 GameEngine.propTypes = {
+  resetLobby: PropTypes.func,
   guest: PropTypes.object,
   mapProps: PropTypes.object.isRequired,
   multi: PropTypes.bool.isRequired,

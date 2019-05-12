@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { MainButton } from '../Style/MenuStyle.js';
+import { MenuTitle, MenuButton } from '../Style/MenuStyle.js';
+
 import request from 'request-promise-native';
 import styled from 'styled-components';
 
@@ -18,26 +19,31 @@ import styled from 'styled-components';
  *
  */
 
+const Background = styled.div`
+  background-color: #323232;
+  height: 100%;
+`;
+
+const Img = styled.img`
+  width: 100%;
+  heigh: 50%;
+`;
+
 const Card = styled.div`
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   transition: 0.3s;
-  border-radius: 5px;
+  border-radius: 2.5%;
   display: inline-block;
   margin-left: 10%;
-  height: 200px;
-  margin-top: 20px;
+  height: 80%;
+  margin-bottom: 10%;
   color: white;
   background-color: #808080;
 
   :hover {
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
   }
-`;
-
-const Background = styled.div`
-  background-color: #2f2f2f;
-  margin: 0px;
-  height: 100vh;
 `;
 
 const Container = styled.div`
@@ -45,13 +51,12 @@ const Container = styled.div`
 `;
 
 const Div = styled.div`
-  // margin-top: 10%;
-  // margin-left: 25%;
-  // margin-right: 25%;
-  padding-top: 10%;
+  padding-top: 2.5%;
   padding-right: 25%;
   padding-left: 25%;
   justify-content: center;
+  overflow-y: auto;
+  height: 80vh;
 `;
 
 class Lobbies extends Component {
@@ -96,15 +101,17 @@ class Lobbies extends Component {
   render() {
     const { lobbies } = this.state;
     let cards = undefined;
+    const maps = ['maps/easy.png', 'maps/medium.png', 'maps/hard.png'];
     if (lobbies !== undefined) {
-      cards = lobbies.map(lobby => {
+      cards = lobbies.map((lobby, i) => {
         return (
           <Card
             key={lobby.lName}
-            onclick={() => {
-              this.props.func(lobby.lName);
+            onClick={() => {
+              this.props.chosen(lobby.lName, i);
             }}
           >
+            <Img alt={'Game maps that can be played in multi'} src={maps[i]} />
             <Container>
               <h4>
                 <b>{lobby.lName}</b>
@@ -124,11 +131,11 @@ class Lobbies extends Component {
     }
     return (
       <Background>
+        <MenuButton className="tomenu" onClick={this.handleClick}>
+          {'<-'} Main Menu{' '}
+        </MenuButton>
+        <MenuTitle> Lobbies </MenuTitle>
         <Div>{cards}</Div>
-        <MainButton className="tomenu" onClick={this.handleClick}>
-          {' '}
-          Go To Menu{' '}
-        </MainButton>
       </Background>
     );
   }
