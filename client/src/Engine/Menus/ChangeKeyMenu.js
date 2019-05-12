@@ -36,8 +36,7 @@ class ChangeKeyMenu extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    const docBody = document.querySelector('body');
-    docBody.addEventListener('keypress', e => this.handleKeyChange(e));
+    document.body.addEventListener('keypress', e => this.handleKeyChange(e));
   }
 
   // now we reset the jump key in GameEngine upon leaving
@@ -53,8 +52,7 @@ class ChangeKeyMenu extends Component {
   }
 
   componentWillUnmount() {
-    const docBody = document.querySelector('body');
-    docBody.removeEventListener('keypress', e => this.handleKeyChange(e));
+    document.body.removeEventListener('keypress', e => this.handleKeyChange(e));
     this._isMounted = false;
   }
 
@@ -62,10 +60,10 @@ class ChangeKeyMenu extends Component {
     const { showModal, currentKey } = this.props;
     const { jumpKey } = this.state;
     return (
-      <ModalProvider>
-        <StyledModal isOpen={showModal}>
-          <StyledP>Press New jumpKey</StyledP>
-          <StyledP>
+      <ModalProvider className="modalprovider">
+        <StyledModal className="styledmodal" isOpen={showModal}>
+          <StyledP className="instruction">Press New jumpKey</StyledP>
+          <StyledP className="current">
             {`Current Key: ${
               currentKey === 32
                 ? 'SPACE'
@@ -73,7 +71,7 @@ class ChangeKeyMenu extends Component {
             }`}
           </StyledP>
           {jumpKey && (
-            <StyledP>
+            <StyledP className="selected">
               {`Selected Key: ${
                 jumpKey === 32
                   ? 'SPACE'
@@ -92,7 +90,8 @@ class ChangeKeyMenu extends Component {
 
 ChangeKeyMenu.propTypes = {
   goBack: PropTypes.func.isRequired,
-  showModal: PropTypes.bool.isRequired
+  showModal: PropTypes.bool.isRequired,
+  currentKey: PropTypes.number.isRequired
 };
 
 export default ChangeKeyMenu;

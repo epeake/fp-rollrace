@@ -17,18 +17,24 @@ const StyledP = styled.p`
 
 export default function GameoverMenu(props) {
   return (
-    <ModalProvider>
-      <StyledModal isOpen={props.showModal}>
-        <StyledP>Game Over!</StyledP>
+    <ModalProvider className="modalprovider">
+      <StyledModal className="styledmodal" isOpen={props.showModal}>
+        <StyledP className="prompt">Game Over!</StyledP>
         {/* only show the current score if the player actually completed the game */}
-        {!props.wasBooted && <StyledP>{`Score: ${props.score} sec`}</StyledP>}
+        {!props.wasBooted && (
+          <StyledP className="score">{`Score: ${props.score} sec`}</StyledP>
+        )}
 
         {/* only show the highscore if the player has one on file for the map */}
         {props.highscore !== -1 && (
-          <StyledP>{`Highscore: ${props.highscore} sec`}</StyledP>
+          <StyledP className="highscore">{`Highscore: ${
+            props.highscore
+          } sec`}</StyledP>
         )}
-        <ModalStyledButton onClick={props.restart}>Restart</ModalStyledButton>
-        <ModalStyledButton onClick={props.exitToMenu}>
+        <ModalStyledButton className="restart" onClick={props.restart}>
+          Restart
+        </ModalStyledButton>
+        <ModalStyledButton className="goToMenu" onClick={props.exitToMenu}>
           Main Menu
         </ModalStyledButton>
       </StyledModal>

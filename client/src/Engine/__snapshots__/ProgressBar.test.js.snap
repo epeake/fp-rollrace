@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`progressbar progressBar snapshot 1`] = `
+exports[`Progress bar snapshot test progressBar snapshot 1`] = `
 <g>
   <rect
     fill="#ffffff"

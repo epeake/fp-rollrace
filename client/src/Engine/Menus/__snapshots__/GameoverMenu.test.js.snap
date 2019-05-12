@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Game over menu tests Change Key menu snapshot test progressBar snapshot 1`] = `
+<t
+  className="modalprovider"
+>
+  <i
+    className="styledmodal"
+    isOpen={true}
+  >
+    <styled.p
+      className="prompt"
+    >
+      Game Over!
+    </styled.p>
+    <styled.p
+      className="score"
+    >
+      Score: 0 sec
+    </styled.p>
+    <styled.p
+      className="highscore"
+    >
+      Highscore: undefined sec
+    </styled.p>
+    <styled.button
+      className="restart"
+      onClick={[MockFunction]}
+    >
+      Restart
+    </styled.button>
+    <styled.button
+      className="goToMenu"
+      onClick={[MockFunction]}
+    >
+      Main Menu
+    </styled.button>
+  </i>
+</t>
+`;
