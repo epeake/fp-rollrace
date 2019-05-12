@@ -32,6 +32,7 @@ const { lobbies } = require('./seeds/dev/lobbies.js');
 // db-errors provides a consistent wrapper around database errors
 const { wrapError, DBError } = require('db-errors');
 
+const MAX_PLAYERS_LOBBY = 3; // maximum number of players that can be in the lobby
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
@@ -145,7 +146,7 @@ app.post(
   }
 );
 
-// update player's stats and settings
+// update player's stats
 app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
   const mapParam = `map_${request.body.mapId}`;
   if (request.body.type === 'end') {
@@ -168,8 +169,7 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
         user
           .$query()
           .patchAndFetch({
-            total_games: user.total_games + 1,
-            control: request.body.contents.jumpkey // add the jumpkey to the databse
+            total_games: user.total_games + 1
           })
           .then(rows => {
             response.send(rows);
@@ -196,9 +196,7 @@ app.get(
 app.get('/api/lobbies/', (request, response) => {
   /* Allow user to connect to lobbies with less than 3 players */
   const available = lobbies.filter(lobby => {
-    return (
-      lobby.nPlayers < 3
-    ); /* TODO: This should be a constant in another file */
+    return lobby.nPlayers < MAX_PLAYERS_LOBBY;
   });
 
   response.send(available);

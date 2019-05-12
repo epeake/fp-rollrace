@@ -18,7 +18,7 @@ const ProgressBar = props => {
 
   */
   const percentage = currX / pathLen;
-  let currentPos = x + CONSTANTS.WIDTH * percentage;
+  let currentPos = x + CONSTANTS.PROGRESS_BAR_WIDTH * percentage;
   if (!currentPos) {
     currentPos = x;
   }
@@ -27,17 +27,17 @@ const ProgressBar = props => {
     <g>
       <rect
         fill={'#ffffff'}
-        width={CONSTANTS.WIDTH}
-        height={CONSTANTS.HEIGHT}
+        width={CONSTANTS.PROGRESS_BAR_WIDTH}
+        height={CONSTANTS.PROGRESS_BAR_HEIGHT}
         x={x}
-        y={y + CONSTANTS.POS_OFFSET}
+        y={y + CONSTANTS.PROGRESS_BAR_POS_OFFSET}
       />
 
       {/* sprite 1 */}
       <ellipse
         fill={spriteColor}
         cx={currentPos} /*update player one position*/
-        cy={y + CONSTANTS.SPRITE_OFFSET} /* offset */
+        cy={y + CONSTANTS.PROGRESS_BAR_SPRITE_OFFSET} /* offset */
         rx={5.0}
         ry={15.0}
       />
