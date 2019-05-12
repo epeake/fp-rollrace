@@ -32,6 +32,7 @@ const { lobbies } = require('./seeds/dev/lobbies.js');
 // db-errors provides a consistent wrapper around database errors
 const { wrapError, DBError } = require('db-errors');
 
+const MAX_PLAYERS_LOBBY = 3; // maximum number of players that can be in the lobby
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bind all Models to a knex instance.
@@ -195,9 +196,7 @@ app.get(
 app.get('/api/lobbies/', (request, response) => {
   /* Allow user to connect to lobbies with less than 3 players */
   const available = lobbies.filter(lobby => {
-    return (
-      lobby.nPlayers < 3
-    ); /* TODO: This should be a constant in another file */
+    return lobby.nPlayers < MAX_PLAYERS_LOBBY;
   });
 
   response.send(available);

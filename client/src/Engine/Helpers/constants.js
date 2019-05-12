@@ -15,11 +15,11 @@ export const CONSTANTS = {
   PROGRESS_BAR_HEIGHT: 30, // Progress bar height
   PROGRESS_BAR_POS_OFFSET: 35, // X position offset for the progress bar
   PROGRESS_BAR_SPRITE_OFFSET: 50, // X position offset for the progress bar sprite
-  jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
-  UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
   TOOLBAR_Y: 15, // controls the y positions of the timer and the progress bar
   TOOLBAR_X: 800, // controls the x positions of the timer and the progress bar
   ICON_X: 40, // controls the x position of the pause button and player color icon
+  jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
+  UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
   UPDATE_TIMEOUT: 20, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game
