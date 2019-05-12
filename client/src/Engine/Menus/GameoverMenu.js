@@ -1,3 +1,8 @@
+/*
+ * This file contains the ChangeKeyMenu component, which is called from the
+ * when the player is either booted, or reached the end of the map.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';

@@ -1,3 +1,8 @@
+/* This file defines the styles for all the styled components used
+ * throughout the app menus (like settings, stats, map chooser, etc).
+ * This includes the headings, buttons, and backgrounds
+ */
+
 import styled from 'styled-components';
 
 export const MenuTitle = styled.h1`

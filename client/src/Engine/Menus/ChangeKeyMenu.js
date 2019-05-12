@@ -1,3 +1,8 @@
+/*
+ * This file contains the ChangeKeyMenu component, which is called from the
+ * paused menu. Key is not actually changed in GameEngine until the user exits.
+ */
+
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { ModalProvider } from 'styled-react-modal';
@@ -14,6 +19,14 @@ class ChangeKeyMenu extends Component {
   constructor(props) {
     super(props);
     this._isMounted = false;
+
+    /*
+     * We have to maintain a separate state for jump key here and the GameEngine's
+     * jump key becuase here we also display the current selected jump key on
+     * top of the previous jump key.  The importance of this is that if the
+     * player is to rapidly change key, there are many function calls, which
+     * causes uneccesary computation.
+     */
     this.state = {
       jumpKey: undefined
     };
@@ -26,6 +39,7 @@ class ChangeKeyMenu extends Component {
     document.body.addEventListener('keypress', e => this.handleKeyChange(e));
   }
 
+  // now we reset the jump key in GameEngine upon leaving
   handleExit() {
     const newKey = this.state.jumpKey;
     this.props.goBack(newKey);

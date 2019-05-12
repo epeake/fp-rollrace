@@ -1,3 +1,13 @@
+/*  App component that displays the main menu. The main menu includes options to
+ * play single player, multiplayer, change user settings (such as player color and name),
+ * and an option to see player stats. App maintains various of the important states needed
+ * throughout the game; It maintains the game states that get passed down to game engine, it maintains
+ * the state that indicate whether you are playing multiplayer or not, it maintains the playercolor
+ * and playername as a state that gets passed down to settings and game engine. Lastly, the main
+ * page includes a log in component that allows you to create an account that saves player statistics. The
+ * app also maintains the state indicating if you are logged in.
+ */
+
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import request from 'request-promise-native';
@@ -69,7 +79,7 @@ class App extends Component {
        * not go to the map chooser menu
        */
       mapProps: {
-        map: [
+        path: [
           'm 0, 650 h 359 v -180 h 159 v 100 h 95 v 100 h 143 v -100 h 381 v -100 h 159 v 100 h 238 v -95 h 365 v -95 h 286 v -95 h 143 v 413 h 333 v -95 h 603 v 95 h 238 v -79 h 143 v 175 h 127 v -79 h 143 v -95 h 111 v 16 h 429 v -143 h 111 v 143 h 333 v -111 h 127 v 111 h 270 v 143 h 143 v -79 h 79 v -79 h 238 v -127 h 175 v 127 h 143 v -95 h 127 v 238 h 159 v -111 h 270 v -127 h 159 v 175 h 238 v -111 h 190 v 95 h 127 v -127 h 397 v -127 h 190 v 190 h 206 v -95 h 111 v 79 h 127 v -111 h 111 v 143 h 95 v -127 h 127 v 143 h 127 v -127 h 127 v 318 h 460 v -175 h 127 v 143 h 111 v -222 h 333 v -127 h 412 v -1000 h 500'
         ],
         strokeWidth: 6, // must be an even number for the parsing algorithm
@@ -101,6 +111,7 @@ class App extends Component {
     this.selectColor = this.selectColor.bind(this);
     this.selectName = this.selectName.bind(this);
   }
+  //updates nickName state that gets sent in the callback from settings
   selectName(selectedName) {
     if (selectedName === null) {
       this.setState({ nickName: ' ' });
@@ -108,6 +119,7 @@ class App extends Component {
       this.setState({ nickName: selectedName });
     }
   }
+  //updates player color state that gets sent in the callback from settings
   selectColor(selectedColor) {
     this.setState({ playercolor: selectedColor });
   }

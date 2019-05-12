@@ -1,3 +1,9 @@
+/*
+ * NOT CURRENTLY IN USE (Outdated): This file gives the player a tutorial on
+ * how to play the game if they are confused.  Player resumes the game by
+ * clicking on the Play button.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';

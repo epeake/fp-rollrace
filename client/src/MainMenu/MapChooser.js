@@ -1,3 +1,11 @@
+/*
+ * Displayes the possible maps to play from in singleplayer mode.  Includes title,
+ * difficulty, and a picture.  When the user clicks the play button, they update
+ * the state of the map in the App.js file, which is then passed to the GameEngine
+ * so the path is rendered properly and the stats are set for the correct map.
+ *  Map update happens with the prop handleChooseMap.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -36,6 +44,7 @@ class MapChooser extends Component {
     this.setState({ currMap: this.state.currMap + 1 });
   }
 
+  // load all of the maps contained from within the server's maps.json file
   componentDidMount() {
     const options = {
       url: `${
@@ -80,7 +89,7 @@ class MapChooser extends Component {
               <ClearMainButton className="leftbutton">{'<'}</ClearMainButton>
             )}
 
-            <img src={item.image} height={'60%'} width={'90%'} alt="" />
+            <img src={item.image} height={'450'} width={'800'} alt="" />
             {this.state.currMap !== this.state.content.length - 1 ? (
               <MainButton className="rightbutton" onClick={this.handleGoRight}>
                 {'>'}

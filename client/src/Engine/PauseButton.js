@@ -1,3 +1,8 @@
+/*
+ * This is the svg for our pause button in the game.  Clicking the button fires
+ * handleClick function passed in props.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
