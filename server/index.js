@@ -1,3 +1,8 @@
+/*
+ * Index.js loads up the server, populates the maps Map used in the server.js file
+ * and controls all sockets.
+ */
+
 const http = require('http');
 const { app, maps } = require('./server');
 const fs = require('fs');

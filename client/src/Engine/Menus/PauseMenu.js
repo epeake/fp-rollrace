@@ -1,3 +1,8 @@
+/*
+ * This file contains the PauseMenu, displayed after the user clicks the pause
+ * button from within the game.
+ */
+
 import React from 'react';
 import { ModalProvider } from 'styled-react-modal';
 import PropTypes from 'prop-types';
@@ -8,10 +13,19 @@ const PauseMenu = props => {
   return (
     <ModalProvider>
       <StyledModal isOpen={showModal}>
-        <ModalStyledButton onClick={resume}>Resume</ModalStyledButton>
-        <ModalStyledButton onClick={restart}>Restart</ModalStyledButton>
-        <ModalStyledButton onClick={changeKey}> Change Key</ModalStyledButton>
-        <ModalStyledButton onClick={goToMenu}>Main Menu</ModalStyledButton>
+        <ModalStyledButton className="resume" onClick={resume}>
+          Resume
+        </ModalStyledButton>
+        <ModalStyledButton className="restart" onClick={restart}>
+          Restart
+        </ModalStyledButton>
+        <ModalStyledButton className="changeKey" onClick={changeKey}>
+          {' '}
+          Change Key
+        </ModalStyledButton>
+        <ModalStyledButton className="goToMenu" onClick={goToMenu}>
+          Main Menu
+        </ModalStyledButton>
       </StyledModal>
     </ModalProvider>
   );

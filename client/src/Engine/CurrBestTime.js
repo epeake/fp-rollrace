@@ -1,3 +1,8 @@
+/*
+ * This file contains the SVG for the current best time AKA highscore, which is
+ * displayed for the current map ingame.
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { SVGText } from '../Style/EngineStyle.js';
