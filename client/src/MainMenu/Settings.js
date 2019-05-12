@@ -1,3 +1,10 @@
+/* This is the settings page. It includes the options to change the
+ * the player color and player name. It also includes the slider
+ * component (inspired by the practicals) that changes the color of the plaer.
+ * The player name and colors (rgb) get saved as a state and get sent back up
+ * to app through a call back.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Form, Input } from 'reactstrap';
@@ -5,7 +12,7 @@ import styled from 'styled-components';
 import {
   MenuBackground,
   MenuTitle,
-  MainButton,
+  MenuButton,
   MenuText
 } from '../Style/MenuStyle.js';
 
@@ -99,9 +106,9 @@ class Settings extends Component {
     return (
       <MenuBackground>
         <MenuTitle> Settings </MenuTitle>
-        <MainButton className="tomenu" onClick={this.handleClick}>
+        <MenuButton className="tomenu" onClick={this.handleClick}>
           {'<-'} Main Menu
-        </MainButton>
+        </MenuButton>
         <Row>
           <SettingsOption>
             <MenuText> Choose Your Color </MenuText>
@@ -151,10 +158,10 @@ class Settings extends Component {
             </Form>
           </SettingsOption>
         </Row>
-        <MainButton className="savesettings" onClick={this.saveSettings}>
+        <MenuButton className="savesettings" onClick={this.saveSettings}>
           {' '}
           Save Settings{' '}
-        </MainButton>
+        </MenuButton>
       </MenuBackground>
     );
   }

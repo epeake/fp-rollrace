@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { MainButton } from '../Style/MenuStyle.js';
 import request from 'request-promise-native';
 import styled from 'styled-components';
 
@@ -8,7 +9,7 @@ import styled from 'styled-components';
  *
  * props: chosen (call back)
  *
- * This class servers as an interface into the available
+ * This class serves as an interface into the available
  * lobbies for multiplayer. When the component is mounted
  * there is a request made to /api/lobbies/ that will give
  * list of available lobbies in cards. When a lobby is clicked on
@@ -16,6 +17,11 @@ import styled from 'styled-components';
  * this implies that the names of each lobby will be
  *
  */
+
+const Img = styled.img`
+  width: 100%;
+  heigh: 50%;
+`;
 
 const Card = styled.div`
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -60,6 +66,10 @@ class Lobbies extends Component {
     this.state = {
       lobbies: undefined /* To be filled in after request to server is made */
     };
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick() {
+    this.props.goToMenu();
   }
 
   componentDidMount() {
@@ -91,15 +101,17 @@ class Lobbies extends Component {
   render() {
     const { lobbies } = this.state;
     let cards = undefined;
+    const maps = ['maps/easy.png', 'maps/medium.png', 'maps/hard.png'];
     if (lobbies !== undefined) {
-      cards = lobbies.map(lobby => {
+      cards = lobbies.map((lobby, i) => {
         return (
           <Card
             key={lobby.lName}
-            onclick={() => {
-              this.props.func(lobby.lName);
+            onClick={() => {
+              this.props.chosen(lobby.lName, i);
             }}
           >
+            <Img alt={'Game maps that can be played in multi'} src={maps[i]} />
             <Container>
               <h4>
                 <b>{lobby.lName}</b>
@@ -120,6 +132,10 @@ class Lobbies extends Component {
     return (
       <Background>
         <Div>{cards}</Div>
+        <MainButton className="tomenu" onClick={this.handleClick}>
+          {' '}
+          Go To Menu{' '}
+        </MainButton>
       </Background>
     );
   }

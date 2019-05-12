@@ -1,3 +1,8 @@
+/*
+ * This file is the game.  It links together all of the other files contained
+ * in this Engine folder.  The brains of it all.
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -53,7 +58,7 @@ class GameEngine extends Component {
        * each game will have a socket to connect back to the server
        * store the other players as a member for THIS player
        */
-      this.socket = io.connect();
+      this.socket = io.connect(this.props.lobby);
     }
 
     // timeout for debounce
@@ -72,6 +77,26 @@ class GameEngine extends Component {
       this.mapLength,
       this.props.mapProps.strokeWidth,
       this.props.mapProps.path
+    );
+
+    // find minY based on map
+    this.variables.minY = this.hashedGameMap.reduce(
+      (accumulator, currentValue) => {
+        const minY = currentValue.reduce((accumulator2, currentValue2) => {
+          //console.log(currentValue[0]);
+          if (currentValue2[1] > accumulator2) {
+            return currentValue2[1];
+          } else {
+            return accumulator2;
+          }
+        }, 0);
+        if (minY > accumulator) {
+          return minY;
+        } else {
+          return accumulator;
+        }
+      },
+      0
     );
 
     this.debounce = this.debounce.bind(this);
@@ -468,6 +493,7 @@ class GameEngine extends Component {
     if (this.props.multi) {
       this.socket.disconnect();
     }
+    this.props.resetLobby();
   }
 
   componentDidMount() {
@@ -741,6 +767,7 @@ class GameEngine extends Component {
 }
 
 GameEngine.propTypes = {
+  resetLobby: PropTypes.func,
   guest: PropTypes.object,
   mapProps: PropTypes.object.isRequired,
   multi: PropTypes.bool.isRequired,

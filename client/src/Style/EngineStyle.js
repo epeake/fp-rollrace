@@ -1,3 +1,5 @@
+/* Saves style for text used in engine folder */
+
 import styled from 'styled-components';
 
 export const SVGText = styled.text`
