@@ -272,7 +272,6 @@ class GameEngine extends Component {
         this.variables.timePaused) /
         1000
     );
-    const { jumpKey } = this.state;
 
     if (
       !this.props.guest // exclusive to members

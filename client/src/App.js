@@ -214,8 +214,7 @@ class App extends Component {
       this.setState(
         {
           guest: Object.assign(this.state.guest, {
-            total_games: this.state.guest.total_games + 1,
-            control: key
+            total_games: this.state.guest.total_games + 1
           })
         },
         callback

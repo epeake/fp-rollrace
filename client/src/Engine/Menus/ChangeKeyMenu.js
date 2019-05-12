@@ -23,7 +23,8 @@ class ChangeKeyMenu extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    document.body.addEventListener('keypress', e => this.handleKeyChange(e));
+    const docBody = document.querySelector('body');
+    docBody.addEventListener('keypress', e => this.handleKeyChange(e));
   }
 
   handleExit() {
@@ -38,7 +39,8 @@ class ChangeKeyMenu extends Component {
   }
 
   componentWillUnmount() {
-    document.body.removeEventListener('keypress', e => this.handleKeyChange(e));
+    const docBody = document.querySelector('body');
+    docBody.removeEventListener('keypress', e => this.handleKeyChange(e));
     this._isMounted = false;
   }
 
@@ -65,7 +67,9 @@ class ChangeKeyMenu extends Component {
               }`}
             </StyledP>
           )}
-          <ModalStyledButton onClick={this.handleExit}>Back</ModalStyledButton>
+          <ModalStyledButton className="back" onClick={this.handleExit}>
+            Back
+          </ModalStyledButton>
         </StyledModal>
       </ModalProvider>
     );
