@@ -84,7 +84,7 @@ class App extends Component {
       user: GUEST_ACCOUNT,
       mode: 'menu',
       multi: false,
-      lobby: undefined,
+      lobby: '',
       loggedIn: false,
       playercolor: `rgb(${Math.random() * 255},${Math.random() *
         255},${Math.random() * 255})`,
