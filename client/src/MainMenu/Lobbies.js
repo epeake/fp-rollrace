@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { MenuTitle, MenuButton } from '../Style/MenuStyle.js';
-import './lobbies.css';
+
 import request from 'request-promise-native';
 import styled from 'styled-components';
 
@@ -35,7 +35,7 @@ const Card = styled.div`
   border-radius: 2.5%;
   display: inline-block;
   margin-left: 10%;
-  height: 200%;
+  height: 80%;
   margin-bottom: 10%;
   color: white;
   background-color: #808080;
@@ -55,6 +55,8 @@ const Div = styled.div`
   padding-right: 25%;
   padding-left: 25%;
   justify-content: center;
+  overflow-y: auto;
+  height: 80vh;
 `;
 
 class Lobbies extends Component {

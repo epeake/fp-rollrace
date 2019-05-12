@@ -1,8 +1,0 @@
-/*
-* Overflow is hidden in the game so spacebar does not scroll page, so we have to
-* force overflow to be scroll here.
-*/
-
-body {
-  overflow: scroll !important;
-}
