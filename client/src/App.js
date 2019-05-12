@@ -331,15 +331,13 @@ class App extends Component {
                 resetLobby={() => {
                   this.setState({ lobby: '' });
                 }}
-                lobby={this.state.lobby}
-                mapProps={Object.assign(
-                  {},
-                  { map: this.state.map, strokeWidth: this.state.strokeWidth }
-                )}
+                mapProps={this.state.mapProps}
                 goToMenu={this.handleGoToMenu}
                 guest={this.state.guest}
                 multi={this.state.multi}
                 playercolor={this.state.playercolor}
+                updateGuestStats={this.updateGuestStats}
+                playerName={this.state.nickName}
               />
             );
           } else {
@@ -355,15 +353,13 @@ class App extends Component {
         } else {
           return (
             <GameEngine
-              lobby={''}
-              mapProps={Object.assign(
-                {},
-                { map: this.state.map, strokeWidth: this.state.strokeWidth }
-              )}
+              mapProps={this.state.mapProps}
               goToMenu={this.handleGoToMenu}
               guest={this.state.guest}
               multi={this.state.multi}
               playercolor={this.state.playercolor}
+              updateGuestStats={this.updateGuestStats}
+              playerName={this.state.nickName}
             />
           );
         }

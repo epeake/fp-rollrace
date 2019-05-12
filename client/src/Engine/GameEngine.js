@@ -767,7 +767,6 @@ class GameEngine extends Component {
 }
 
 GameEngine.propTypes = {
-  lobby: PropTypes.string.isRequired,
   resetLobby: PropTypes.func,
   guest: PropTypes.object,
   mapProps: PropTypes.object.isRequired,
