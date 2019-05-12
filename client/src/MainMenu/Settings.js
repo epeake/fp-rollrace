@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import {
   MenuBackground,
   MenuTitle,
-  MainButton,
+  MenuButton,
   MenuText
 } from '../Style/MenuStyle.js';
 
@@ -106,9 +106,9 @@ class Settings extends Component {
     return (
       <MenuBackground>
         <MenuTitle> Settings </MenuTitle>
-        <MainButton className="tomenu" onClick={this.handleClick}>
+        <MenuButton className="tomenu" onClick={this.handleClick}>
           {'<-'} Main Menu
-        </MainButton>
+        </MenuButton>
         <Row>
           <SettingsOption>
             <MenuText> Choose Your Color </MenuText>
@@ -158,10 +158,10 @@ class Settings extends Component {
             </Form>
           </SettingsOption>
         </Row>
-        <MainButton className="savesettings" onClick={this.saveSettings}>
+        <MenuButton className="savesettings" onClick={this.saveSettings}>
           {' '}
           Save Settings{' '}
-        </MainButton>
+        </MenuButton>
       </MenuBackground>
     );
   }

@@ -38,7 +38,7 @@ const content = [
 describe('Stats tests', () => {
   let comp = null;
   beforeEach(() => {
-    comp = mount(<Statistics />);
+    comp = mount(<Statistics goToMenu={() => {}} user={{}} />);
   });
 
   test('Stats contains a go to menu button', () => {

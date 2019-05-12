@@ -20,8 +20,7 @@ import {
 } from '../Style/MenuStyle.js';
 
 const MapDiv = styled.div`
-  text-align: center
-  height: 100vh;
+  text-align: center;
 `;
 
 class MapChooser extends Component {
@@ -89,7 +88,7 @@ class MapChooser extends Component {
               <ClearMainButton className="leftbutton">{'<'}</ClearMainButton>
             )}
 
-            <img src={item.image} height={'450'} width={'800'} alt="" />
+            <img src={item.image} height={'50%'} width={'50%'} alt="" />
             {this.state.currMap !== this.state.content.length - 1 ? (
               <MainButton className="rightbutton" onClick={this.handleGoRight}>
                 {'>'}

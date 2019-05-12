@@ -64,7 +64,7 @@ class Timer extends Component {
         // stop ticking when there is no more time left
         clearInterval(this.tickInterval);
         this.setState({ minutes: '00', seconds: '00' }); //  render once more with 00:00 on time
-        this.props.handleBoot(true); //Let game know that time is up and set booted state to true
+        this.props.handleBoot(true); // Let game know that time is up and set booted state to true
         return;
       }
 
