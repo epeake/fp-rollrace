@@ -492,8 +492,8 @@ class GameEngine extends Component {
     clearInterval(this.renderInterval);
     if (this.props.multi) {
       this.socket.disconnect();
+      this.props.resetLobby();
     }
-    this.props.resetLobby();
   }
 
   componentDidMount() {
