@@ -145,7 +145,7 @@ app.post(
   }
 );
 
-// update player's stats
+// update player's stats and settings
 app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
   const mapParam = `map_${request.body.mapId}`;
   if (request.body.type === 'end') {
@@ -168,7 +168,8 @@ app.put('/api/users/', authenticationMiddleware, (request, response, next) => {
         user
           .$query()
           .patchAndFetch({
-            total_games: user.total_games + 1
+            total_games: user.total_games + 1,
+            control: request.body.contents.jumpkey // add the jumpkey to the databse
           })
           .then(rows => {
             response.send(rows);

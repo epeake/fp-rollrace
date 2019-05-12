@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Change key menu tests Change Key menu snapshot test progressBar snapshot 1`] = `
+<t
+  className="modalprovider"
+>
+  <i
+    className="styledmodal"
+    isOpen={true}
+  >
+    <styled.p
+      className="instruction"
+    >
+      Press New jumpKey
+    </styled.p>
+    <styled.p
+      className="current"
+    >
+      Current Key: SPACE
+    </styled.p>
+    <styled.button
+      className="back"
+      onClick={[Function]}
+    >
+      Back
+    </styled.button>
+  </i>
+</t>
+`;

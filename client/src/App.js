@@ -139,6 +139,7 @@ class App extends Component {
         .get(options)
         .then(resp => {
           this.setState({ user: resp });
+          console.log(resp);
         })
         .catch(err => {
           throw Error(err);
@@ -322,6 +323,7 @@ class App extends Component {
         if (this.state.multi) {
           //render the lobbies
           if (this.state.lobby) {
+            console.log('yess');
             /*
              * make a request here for those players in that lobby and pass to the game
              * engine as a prop.

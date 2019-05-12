@@ -60,10 +60,10 @@ class ChangeKeyMenu extends Component {
     const { showModal, currentKey } = this.props;
     const { jumpKey } = this.state;
     return (
-      <ModalProvider>
-        <StyledModal isOpen={showModal}>
-          <StyledP>Press New jumpKey</StyledP>
-          <StyledP>
+      <ModalProvider className="modalprovider">
+        <StyledModal className="styledmodal" isOpen={showModal}>
+          <StyledP className="instruction">Press New jumpKey</StyledP>
+          <StyledP className="current">
             {`Current Key: ${
               currentKey === 32
                 ? 'SPACE'
@@ -71,7 +71,7 @@ class ChangeKeyMenu extends Component {
             }`}
           </StyledP>
           {jumpKey && (
-            <StyledP>
+            <StyledP className="selected">
               {`Selected Key: ${
                 jumpKey === 32
                   ? 'SPACE'
@@ -79,7 +79,9 @@ class ChangeKeyMenu extends Component {
               }`}
             </StyledP>
           )}
-          <ModalStyledButton onClick={this.handleExit}>Back</ModalStyledButton>
+          <ModalStyledButton className="back" onClick={this.handleExit}>
+            Back
+          </ModalStyledButton>
         </StyledModal>
       </ModalProvider>
     );
@@ -88,7 +90,8 @@ class ChangeKeyMenu extends Component {
 
 ChangeKeyMenu.propTypes = {
   goBack: PropTypes.func.isRequired,
-  showModal: PropTypes.bool.isRequired
+  showModal: PropTypes.bool.isRequired,
+  currentKey: PropTypes.number.isRequired
 };
 
 export default ChangeKeyMenu;

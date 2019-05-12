@@ -6,11 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-
-const WIDTH = 300; // Set maximum width of progressbar
-const HEIGHT = 30; // bar height
-const POS_OFFSET = 35;
-const SPRITE_OFFSET = 50;
+import { CONSTANTS } from './Helpers/constants.js';
 
 const ProgressBar = props => {
   const { currX, pathLen, spriteColor, x, y } = props;
@@ -22,7 +18,7 @@ const ProgressBar = props => {
 
   */
   const percentage = currX / pathLen;
-  let currentPos = x + WIDTH * percentage;
+  let currentPos = x + CONSTANTS.WIDTH * percentage;
   if (!currentPos) {
     currentPos = x;
   }
@@ -31,17 +27,17 @@ const ProgressBar = props => {
     <g>
       <rect
         fill={'#ffffff'}
-        width={WIDTH}
-        height={HEIGHT}
+        width={CONSTANTS.WIDTH}
+        height={CONSTANTS.HEIGHT}
         x={x}
-        y={y + POS_OFFSET}
+        y={y + CONSTANTS.POS_OFFSET}
       />
 
       {/* sprite 1 */}
       <ellipse
         fill={spriteColor}
         cx={currentPos} /*update player one position*/
-        cy={y + SPRITE_OFFSET} /* offset */
+        cy={y + CONSTANTS.SPRITE_OFFSET} /* offset */
         rx={5.0}
         ry={15.0}
       />
