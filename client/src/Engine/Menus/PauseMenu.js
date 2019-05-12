@@ -13,10 +13,19 @@ const PauseMenu = props => {
   return (
     <ModalProvider>
       <StyledModal isOpen={showModal}>
-        <ModalStyledButton onClick={resume}>Resume</ModalStyledButton>
-        <ModalStyledButton onClick={restart}>Restart</ModalStyledButton>
-        <ModalStyledButton onClick={changeKey}> Change Key</ModalStyledButton>
-        <ModalStyledButton onClick={goToMenu}>Main Menu</ModalStyledButton>
+        <ModalStyledButton className="resume" onClick={resume}>
+          Resume
+        </ModalStyledButton>
+        <ModalStyledButton className="restart" onClick={restart}>
+          Restart
+        </ModalStyledButton>
+        <ModalStyledButton className="changeKey" onClick={changeKey}>
+          {' '}
+          Change Key
+        </ModalStyledButton>
+        <ModalStyledButton className="goToMenu" onClick={goToMenu}>
+          Main Menu
+        </ModalStyledButton>
       </StyledModal>
     </ModalProvider>
   );
