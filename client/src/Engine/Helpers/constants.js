@@ -40,6 +40,7 @@ export const CONSTANTS = {
     endScore: undefined, // score at the completion of the game
     gameover: false, // boolean to determine whether or not the game has ended
     jumpKey: 32, // space bar
+    pauseKey: 112, // p key
     changingKey: false, // boolean to determine whether or not the game is in the key change state
     timerCanStart: false, // prevents timer from starting during countdown
     resetTimer: true, // should we reset the timer after a restart or game start

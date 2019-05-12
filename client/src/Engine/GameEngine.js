@@ -83,7 +83,6 @@ class GameEngine extends Component {
     this.variables.minY = this.hashedGameMap.reduce(
       (accumulator, currentValue) => {
         const minY = currentValue.reduce((accumulator2, currentValue2) => {
-          //console.log(currentValue[0]);
           if (currentValue2[1] > accumulator2) {
             return currentValue2[1];
           } else {
@@ -183,6 +182,12 @@ class GameEngine extends Component {
       this.variables.gameStartTime
     ) {
       this.handleJumpKey();
+    } else if (
+      event.keyCode === this.state.pauseKey &&
+      this.variables.gameStartTime &&
+      !this.state.paused
+    ) {
+      this.pauseGame();
     } else {
       void 0; // do nothing
     }
@@ -360,7 +365,7 @@ class GameEngine extends Component {
         adjustedTime - currentTime < CONSTANTS.TIME_THRESH &&
         !this.state.paused
       ) {
-        //console.log(this.variables.motionChange.event);
+        //console.log(this.variables.motionChange);
 
         const y = this.getY({
           currentTime: adjustedTime,
@@ -422,8 +427,7 @@ class GameEngine extends Component {
             atWall: this.variables.atWall,
             x: this.variables.x,
             paused: this.state.paused
-          }) >=
-          this.mapLength - this.props.mapProps.end
+          }) >= this.props.mapProps.end
         ) {
           this.endGame(false); // game ended not due to a boot
         } else {
@@ -575,7 +579,7 @@ class GameEngine extends Component {
 
   render() {
     // Find the length of the map
-    const pathLength = this.mapLength - this.props.mapProps.end;
+    const pathLength = this.props.mapProps.end;
     const docBody = document.querySelector('body');
     docBody.addEventListener('keypress', e => this.handleKeyPress(e));
 

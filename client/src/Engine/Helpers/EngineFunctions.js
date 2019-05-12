@@ -319,7 +319,10 @@ const findPath = props => {
   for (currentX; currentX <= Math.min(maxX, mapLength - 1); currentX++) {
     const locations = map[currentX];
     for (let j = 0; j < locations.length; j++) {
-      if (locations[j][1] - CONSTANTS.SPRITE_SIDE < highest) {
+      if (
+        yStart < locations[j][1] - CONSTANTS.SPRITE_SIDE &&
+        locations[j][1] - CONSTANTS.SPRITE_SIDE < highest
+      ) {
         // the time when the sprite will reach the path
         const time = getTimeForGivenY({
           yStart: yStart,
