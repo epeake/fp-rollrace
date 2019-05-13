@@ -25,9 +25,11 @@ const path = require('path');
 const passport = require('passport');
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const { OAuth2Client } = require('google-auth-library');
+const fs = require('fs');
+const util = require('util');
 
 // We will need to update the number of lobbies later
-const { lobbies } = require('./seeds/dev/lobbies.js');
+const { lobbies } = require('./lobbies.js');
 
 // db-errors provides a consistent wrapper around database errors
 const { wrapError, DBError } = require('db-errors');
@@ -39,8 +41,21 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 Model.knex(knex);
 const app = express();
 
-// maps is populated by index.js.  This is all of the current maps for single player
+// This is all of the current maps for single player
 const maps = new Map();
+const readFile = util.promisify(fs.readFile);
+
+readFile(path.join(__dirname, 'maps/maps.json'))
+  .then(contents => {
+    const mapsArr = JSON.parse(contents);
+    mapsArr.forEach(map => {
+      maps.set(map.mapId, map);
+    });
+  })
+  .catch(err => {
+    // in this case there was an error parsing the file, so throw and log on server
+    console.error(err); // eslint-disable-line no-console
+  });
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {

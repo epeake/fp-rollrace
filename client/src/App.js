@@ -29,7 +29,8 @@ const GUEST_ACCOUNT = {
   total_multi_wins: 0,
   map_0: -1,
   map_1: -1,
-  map_2: -1
+  map_2: -1,
+  map_3: -1
 };
 
 const CenteredDiv = styled.div`
@@ -330,6 +331,7 @@ class App extends Component {
                 resetLobby={() => {
                   this.setState({ lobby: '' });
                 }}
+                lobby={this.state.lobby}
                 mapProps={this.state.mapProps}
                 goToMenu={this.handleGoToMenu}
                 guest={this.state.guest}
@@ -352,6 +354,7 @@ class App extends Component {
         } else {
           return (
             <GameEngine
+              lobby={this.state.lobby}
               mapProps={this.state.mapProps}
               goToMenu={this.handleGoToMenu}
               guest={this.state.guest}

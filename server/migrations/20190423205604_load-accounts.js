@@ -30,6 +30,10 @@ exports.up = function(knex, Promise) {
       .integer('map_2')
       .notNullable()
       .defaultTo(-1);
+    table
+      .integer('map_3')
+      .notNullable()
+      .defaultTo(-1);
   });
 };
 
