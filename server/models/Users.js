@@ -21,7 +21,8 @@ class Users extends Model {
         total_multi_games: { type: 'integer' },
         map_0: { type: 'integer' },
         map_1: { type: 'integer' },
-        map_2: { type: 'integer' }
+        map_2: { type: 'integer' },
+        map_3: { type: 'integer' }
       }
     };
   }

@@ -5,9 +5,6 @@
 
 const http = require('http');
 const { app } = require('./server');
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
 
 const server = http.createServer(app).listen(process.env.PORT || 3001); // 3002?); switch these back in production
 console.log('Listening on port %d', server.address().port); // eslint-disable-line no-console
