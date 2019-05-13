@@ -17,7 +17,7 @@ const user = {
 
 const mapContent = [
   {
-    id: 0,
+    mapId: 0,
     title: 'Lazy Hills',
     level: 'Easy',
     image: 'easy.jpg',
@@ -31,7 +31,7 @@ const mapContent = [
     }
   },
   {
-    id: 1,
+    mapId: 1,
     title: 'Slippery when Wet',
     level: 'Medium',
     image: 'medium.jpg',
@@ -43,6 +43,31 @@ const mapContent = [
       minutes: '00',
       seconds: '30'
     }
+  },
+  {
+    mapId: 2,
+    title: 'Roll Racers Only',
+    level: 'Hard',
+    image: 'maps/hard.png',
+    path: [
+      'm 0, 650 h 640 v -160 h 160 v 160 h 160 v -160h 359 v -180 h 159 v 100 h 95 v 100 h 143 v 200 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 300 v -40 h 127 v 43 h 111 v -222 h 333 v -127 h 412 v 200 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 640 v -1000 h 500'
+    ],
+    end: 5900,
+    strokeWidth: 6,
+    startTime: { minutes: '00', seconds: '30' }
+  },
+  {
+    mapId: 3,
+    title: 'Pick Your Poison (Beta)',
+    level: 'Dual Path (Beta)',
+    image: 'maps/hard.png',
+    path: [
+      'm 0, 650 h 640 v -160 h 160 v 160 h 160 v -160h 359 v -180 h 159 v 100 h 95 v 100 h 143 v 200 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 300 v -40 h 127 v 43 h 111 v -222 h 333 v -127 h 412 v 200 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 160 v -160 h 160 v 160 h 640 v -1000 h 500',
+      'm 2100, 400 h 6000'
+    ],
+    end: 5900,
+    strokeWidth: 6,
+    startTime: { minutes: '00', seconds: '30' }
   }
 ];
 

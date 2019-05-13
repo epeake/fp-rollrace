@@ -330,6 +330,7 @@ class App extends Component {
                 resetLobby={() => {
                   this.setState({ lobby: '' });
                 }}
+                lobby={this.state.lobby}
                 mapProps={this.state.mapProps}
                 goToMenu={this.handleGoToMenu}
                 guest={this.state.guest}
@@ -352,6 +353,7 @@ class App extends Component {
         } else {
           return (
             <GameEngine
+              lobby={this.state.lobby}
               mapProps={this.state.mapProps}
               goToMenu={this.handleGoToMenu}
               guest={this.state.guest}
