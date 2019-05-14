@@ -29,6 +29,8 @@ The `--prefix` option treats the supplied path as the package root. In this case
 npm install --save reactstrap --prefix client
 ```
 
+In addition to installing dependencies, if you wish to run the application locally, you must run "npx knex migrate:latest" to intiallize the SQLITE DB.
+
 ## Running the Application
 
 The combined application, client and server, can be run with `npm start` in the top-level directory. `npm start` launches the CRA development server on <http://localhost:3000> and the backend server on http://localhost:3001. By setting the `proxy` field in the client `package.json`, the client development server will proxy any unrecognized requests to the server. By default this starts the server in hot-reloading mode (like with the client application).
