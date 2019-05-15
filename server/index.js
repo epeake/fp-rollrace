@@ -50,15 +50,11 @@ galactus.on('connection', socket => {
     socket.broadcast.emit('PLAYER', arr);
   });
 
-  socket.on('CHANGE_POS', (player, fn) => {
+  socket.on('CHANGE_POS', player => {
     gPlayers.set(socket.id, player);
-    const arr = Array.from(gPlayers.values()).filter(playerData => {
-      return playerData.key !== socket.id;
-    });
-
-    fn(arr);
+    const arr = Array.from(gPlayers.values());
     // tell all other sockets about the player that just joined
-    socket.broadcast.emit('CHANGE_POS', arr);
+    galactus.emit('NEW_POS', arr);
   });
 
   socket.on('disconnect', () => {

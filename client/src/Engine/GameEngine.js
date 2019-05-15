@@ -418,8 +418,34 @@ class GameEngine extends Component {
       }
     }, CONSTANTS.UPDATE_TIMEOUT);
 
+    setInterval(() => {
+      const updatePlayer = {
+        mapTrans: this.getMapTranslation({
+          currentTime: new Date().getTime(),
+          mapTranslationStart: this.variables.mapTranslationStart,
+          mapTranslationStartTime: this.variables.mapTranslationStartTime,
+          mapTranslation: this.state.mapTranslation,
+          atWall: this.variables.atWall,
+          paused: this.state.paused
+        }),
+        y: this.getY({
+          currentTime: new Date().getTime(),
+          descentStartTime: this.variables.descentStartTime,
+          jumpStartTime: this.variables.jumpStartTime,
+          jumpState: this.variables.jumpState,
+          yStart: this.variables.yStart,
+          y: this.state.y,
+          paused: this.state.paused
+        }),
+        color: this.state.color,
+        key: this.socket.id
+      };
+      // use a callback
+      this.socket.emit('CHANGE_POS', updatePlayer);
+    }, CONSTANTS.RENDER_TIMEOUT);
+
     this.renderInterval = setInterval(() => {
-      if (this.variables.motionChange !== 'nothing' && !this.state.paused) {
+      if (!this.state.paused) {
         if (
           this.getX({
             currentTime: new Date().getTime(),
@@ -450,8 +476,17 @@ class GameEngine extends Component {
               yStart: this.variables.yStart,
               y: this.state.y,
               paused: this.state.paused
-            })
+            }),
+            players: this.variables.players
           });
+          // const updatePlayer = {
+          //   mapTrans: this.state.mapTranslation,
+          //   y: this.state.y,
+          //   color: this.state.color,
+          //   key: this.socket.id
+          // };
+          // // use a callback
+          // this.socket.emit('CHANGE_POS', updatePlayer);
         }
       }
     }, CONSTANTS.RENDER_TIMEOUT);
@@ -520,6 +555,10 @@ class GameEngine extends Component {
           are set after the emit call
         */
 
+        this.socket.on('NEW_POS', data => {
+          this.variables.players = data;
+        });
+
         /*
           this will occur when another player has joined
           the game (not when THIS player has joined)
@@ -535,20 +574,6 @@ class GameEngine extends Component {
           Also emit a CHANGE_POS event that allows
           server to update all other players on position of this player
          */
-
-        setInterval(() => {
-          // should probably be a assign to a variable so it can be cleared see componentWillUnmount()
-          const updatePlayer = {
-            mapTrans: this.state.mapTranslation,
-            y: this.state.y,
-            color: this.state.color,
-            key: this.socket.id
-          };
-          // use a callback
-          this.socket.emit('CHANGE_POS', updatePlayer, data => {
-            this.setState({ players: data });
-          });
-        }, CONSTANTS.UPDATE_INTERVAL);
 
         /*
           Using the mapTranslation allows THIS player to keep track of where OTHER
@@ -617,34 +642,28 @@ class GameEngine extends Component {
         // TODO: need unique key for players
         boxes.unshift(
           this.state.players.map(player => {
-            return (
-              <circle
-                key={player.id}
-                // this difference allows for other players
-                // to be rendered at different places in the map
-                // based on their x coordinate
-                cx={
-                  this.getMapTranslation({
-                    currentTime: new Date().getTime(),
-                    mapTranslationStart: this.variables.mapTranslationStart,
-                    mapTranslationStartTime: this.variables
-                      .mapTranslationStartTime,
-                    mapTranslation: this.state.mapTranslation,
-                    atWall: this.variables.atWall,
-                    paused: this.state.paused
-                  }) -
-                  player.mapTrans +
-                  200 +
-                  CONSTANTS.SPRITE_SIDE / 2
-                }
-                cy={player.y}
-                r={CONSTANTS.SPRITE_SIDE / 2}
-                stroke="white"
-                strokeWidth="1"
-                fill={player.color}
-                fill-opacity="0.4"
-              />
-            );
+            if (player.key !== this.socket.id) {
+              return (
+                <circle
+                  key={player.id}
+                  // this difference allows for other players
+                  // to be rendered at different places in the map
+                  // based on their x coordinate
+                  cx={
+                    this.state.mapTranslation -
+                    player.mapTrans +
+                    this.variables.x +
+                    CONSTANTS.SPRITE_SIDE / 2
+                  }
+                  cy={player.y + CONSTANTS.SPRITE_SIDE / 2}
+                  r={CONSTANTS.SPRITE_SIDE / 2}
+                  stroke="white"
+                  strokeWidth="1"
+                  fill={player.color}
+                  fill-opacity="0.4"
+                />
+              );
+            }
           })
         );
       }

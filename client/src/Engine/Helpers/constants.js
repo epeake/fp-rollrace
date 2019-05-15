@@ -4,7 +4,7 @@
 
 // RENDER_TIMEOUT and STARTING_Y are constants for our constants.
 // time between rerenders
-const RENDER_TIMEOUT = 20;
+const RENDER_TIMEOUT = 30;
 
 // Where the sprite first starts
 const STARTING_Y = 547; // currently the same for all maps
@@ -19,8 +19,8 @@ export const CONSTANTS = {
   TOOLBAR_X: 800, // controls the x positions of the timer and the progress bar
   ICON_X: 40, // controls the x position of the pause button and player color icon
   jump: { STOP: 0, UP: 1, DOWN: 2 }, // Jump state enum for clarity
-  UPDATE_INTERVAL: 20, // milliseconds between multiplayer updates
-  UPDATE_TIMEOUT: 20, // time between motionChange updates
+  UPDATE_INTERVAL: 1, // milliseconds between multiplayer updates
+  UPDATE_TIMEOUT: RENDER_TIMEOUT, // time between motionChange updates
   RENDER_TIMEOUT: RENDER_TIMEOUT, // time between rerenders
   JUMP_SPEED: 0.0013, // acceleration ("gravity") in the game
   JUMP_POWER: 0.7, // jumping velocity
